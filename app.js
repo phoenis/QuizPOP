@@ -132,6 +132,7 @@ function tick(){
 }
 
 function flip(){
+  if (state.revealed) return;
   const i = state.deck[0];
   if (i === undefined) return;
   clearInterval(tickHandle);
@@ -216,6 +217,16 @@ function renderJoin(){
 }
 
 function renderHome(){
+  if (state.revealed){
+    return `<div class="screen screen-home">
+      <div class="empty-deck" style="flex:1;">
+        <div class="glyph">✦</div>
+        <h2 style="font-size:32px;">Il gioco è chiuso</h2>
+        <p class="pretty">La classifica è stata svelata ai discorsi. Grazie per aver giocato!</p>
+        <button class="btn-outline" data-action="go" data-screen="board">Vedi la classifica</button>
+      </div>
+    </div>`;
+  }
   const top = state.deck[0];
   const card = top === undefined ? null : Q(top);
   if (!card){
