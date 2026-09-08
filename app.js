@@ -24,6 +24,20 @@ const QS = [
   {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'}
 ];
 const BASE_PTS = 60, BONUS_PTS = 40, DAILY = 4, TIMER_S = 20;
+// categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
+const CATS = [
+  {name:'Come è iniziata', from:0, to:4, mark:'❖', medal:'Le origini', note:'Tutte e cinque sull’inizio'},
+  {name:'La vita insieme', from:5, to:9, mark:'✤', medal:'Casa nostra', note:'Tutte e cinque sulla convivenza'},
+  {name:'Fino a oggi', from:10, to:14, mark:'✱', medal:'Fino all’altare', note:'Tutte e cinque sull’anno del matrimonio'},
+  {name:'Su Stefano', from:15, to:19, mark:'✾', medal:'Esperto di Stefano', note:'Tutte e cinque su di lui'},
+];
+function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
+function catState(res, c){
+  let done = 0, right = 0;
+  for (let i = c.from; i <= c.to; i++){ if (res[i]){ done++; if (res[i].correct) right++; } }
+  const n = c.to - c.from + 1;
+  return { done, right, n, earned: right === n, failed: done === n && right < n };
+}
 const TEAMS = ['Amici di Mara','Famiglia di Mara','Amici di Stefano','Famiglia di Stefano','Colleghi'];
 const RIVALS_DEMO = [
   {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1},
@@ -251,15 +265,36 @@ function renderHome(){
   const remaining = total - done;
   const sel = Math.min(state.sel, total - 1);
 
-  const cells = all.map((x, i) => {
-    const isDone = !!state.res[i];
-    const isSel = i === sel;
-    const isDaily = i === DAILY && !isDone;
-    return `<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''}" data-action="select-cell" data-i="${i}">
-      <span class="n serif tabular">${i + 1}</span>
-      ${isDone ? `<span class="mark">✦</span>` : ''}
-      ${isDaily ? `<span class="daily-tag">doppio</span>` : ''}
-    </button>`;
+  const lastFixedTo = CATS.length ? CATS[CATS.length - 1].to : -1;
+  const blockDefs = CATS.map(c => ({ ...c, isExtra: false }));
+  if (total - 1 > lastFixedTo){
+    blockDefs.push({ name: 'Domande extra', from: lastFixedTo + 1, to: total - 1, mark: '✦', isExtra: true });
+  }
+
+  const catBlocks = blockDefs.map(c => {
+    const st = c.isExtra ? null : catState(state.res, c);
+    const progress = c.isExtra ? '' : (st.earned ? c.medal : (st.failed ? 'niente medaglia' : st.right + '/' + st.n));
+    const ink = (!c.isExtra && st.earned) ? 'var(--accent-700)' : 'var(--neutral-700)';
+    const cells = [];
+    for (let i = c.from; i <= c.to; i++){
+      const isDone = !!state.res[i];
+      const isSel = i === sel;
+      const isDaily = i === DAILY && !isDone;
+      const wrong = isDone && !state.res[i].correct;
+      const glyph = wrong ? '·' : c.mark;
+      cells.push(`<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''} ${wrong?'wrong':''}" data-action="select-cell" data-i="${i}">
+        <span class="n serif tabular">${i + 1}</span>
+        ${isDone ? `<span class="mark">${glyph}</span>` : ''}
+        ${isDaily ? `<span class="daily-tag">×2</span>` : ''}
+      </button>`);
+    }
+    return `<div class="cat-block">
+      <div class="cat-head">
+        <span class="cat-name">${esc(c.name)}</span>
+        ${!c.isExtra ? `<span class="cat-progress" style="color:${ink}"><span class="cat-mark serif">${c.mark}</span><span class="tabular">${esc(progress)}</span></span>` : ''}
+      </div>
+      <div class="cal-grid5">${cells.join('')}</div>
+    </div>`;
   }).join('');
 
   let panel;
@@ -272,7 +307,8 @@ function renderHome(){
     </div>`;
   } else {
     const card = Q(sel);
-    const label = 'Domanda ' + (sel + 1) + (sel === DAILY ? ' · del giorno, vale doppio' : '');
+    const cat = CATS[catOf(sel)];
+    const label = (cat ? cat.name + ' · ' : '') + 'domanda ' + (sel + 1) + (sel === DAILY ? ' · vale doppio' : '');
     const r = state.res[sel];
     panel = `<div class="card-preview">
       <div class="kicker">${esc(label)}</div>
@@ -295,7 +331,7 @@ function renderHome(){
         <div class="micro">Punti</div>
       </div>
     </div>
-    <div class="cal-grid">${cells}</div>
+    <div class="cat-blocks">${catBlocks}</div>
     ${panel}
   </div>`;
 }
@@ -372,6 +408,9 @@ function renderResult(){
     ? 'La busta resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
     : (mine ? `Sei ${mine.rank}º su ${board.length} in questo momento.` : '');
   const cta = nextOpen(state.res, state.qi + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
+  const myCat = CATS[catOf(state.qi)];
+  const myCatSt = myCat ? catState(state.res, myCat) : null;
+  const medalWon = !!(r.correct && myCatSt && myCatSt.earned);
   return `<div class="screen screen-result">
     <div class="kicker result-kicker">${kicker}</div>
     <div class="result-pts serif tabular" style="color:${ink}">${r.pts ? '+' + r.pts : '0'}</div>
@@ -379,10 +418,18 @@ function renderResult(){
     <h2 class="result-title">${esc(title)}</h2>
     <hr class="rule sm">
     <p class="result-blurb pretty">${esc(q.s)}</p>
+    ${medalWon ? `<div class="medal-won">
+      <span class="medal-mark">${esc(myCat.mark)}</span>
+      <span class="medal-text">
+        <span class="kicker">Medaglia vinta</span>
+        <span class="medal-name serif">${esc(myCat.medal)}</span>
+        <span class="medal-note">${esc(myCat.note)}</span>
+      </span>
+    </div>` : ''}
     <div class="breakdown">
       <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
       <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular" style="color:var(--accent-700)">${r.correct ? '+' + r.bonus : '—'}</span></div>
-      ${r.multi === 2 ? `<div class="breakdown-row"><span>Carta del giorno</span><span class="val tabular">×2</span></div>` : ''}
+      ${r.multi === 2 ? `<div class="breakdown-row"><span>Domanda del giorno</span><span class="val tabular">×2</span></div>` : ''}
       <div class="breakdown-row total"><span>Totale</span><span class="val tabular">${r.pts || 0}</span></div>
     </div>
     <p class="rank-line">${esc(rankLine)}</p>
@@ -461,9 +508,17 @@ function renderProfile(){
   const best = Object.values(state.res).filter(x => x.correct).sort((a, b) => a.used - b.used)[0];
   const name = state.name || 'Zia Franca';
   const badges = [
+    ...CATS.map(c => {
+      const st = catState(state.res, c);
+      return {
+        mark: c.mark, name: c.medal,
+        note: st.earned ? c.note : (st.failed ? 'Categoria chiusa: ' + st.right + '/' + st.n + ' giuste' : c.name + ' · ' + st.right + '/' + st.n + ' giuste'),
+        locked: !st.earned,
+      };
+    }),
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
-    { mark: '✧', name: 'Carta del giorno', note: 'Hai girato la carta del giorno', locked: !state.res[DAILY] },
-    { mark: '✷', name: 'Mazzo completo', note: 'Tutte e quindici le carte', locked: done < total },
+    { mark: '✧', name: 'Domanda del giorno', note: 'Hai aperto la domanda del giorno', locked: !state.res[DAILY] },
+    { mark: '✷', name: 'Calendario completo', note: 'Tutte e quindici le domande', locked: done < total },
   ];
   const badgeRows = badges.map(b => `<div class="badge-row ${b.locked?'locked':''}">
     <div class="badge-glyph">${b.mark}</div>
@@ -554,7 +609,7 @@ function renderAdmin(){
     <hr class="rule sm" style="margin-left:0;">
     <div class="admin-stats">
       <div class="stat-cell"><div class="v serif tabular">${totalPlayers}</div><div class="c">Giocano</div></div>
-      <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Carte</div></div>
+      <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
     <div class="envelope-box">
@@ -564,9 +619,9 @@ function renderAdmin(){
         ? `<button class="btn-outline" data-action="close-board">Riapri il gioco</button>`
         : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
     </div>
-    <div class="section-title" style="color:rgba(247,236,214,.6);">Le carte</div>
+    <div class="section-title" style="color:rgba(247,236,214,.6);">Le domande</div>
     ${items}
-    <div class="section-title" style="color:rgba(247,236,214,.6);">Nuova carta</div>
+    <div class="section-title" style="color:rgba(247,236,214,.6);">Nuova domanda</div>
     <div class="type-chips">${typeChips}</div>
     <input id="admin-q" class="admin-input" type="text" placeholder="Scrivi la domanda…" value="${esc(state.newCardQ)}">
     <input id="admin-a" class="admin-input" type="text" placeholder="Risposta giusta" value="${esc(state.newCardA)}">
@@ -581,7 +636,7 @@ function renderTabs(){
     profile: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`,
   };
   const tabs = [
-    { id: 'home', label: 'Mazzo' },
+    { id: 'home', label: 'Domande' },
     { id: 'board', label: 'Busta' },
     { id: 'profile', label: 'Profilo' },
   ];
