@@ -16,7 +16,12 @@ const QS = [
   {k:'Chi ha detto cosa', h:'Detta da uno dei due. O da tutti e due.', t:'«Il vestito lo scelgo io, tu occupati della musica.»', o:['Mara','Stefano','Entrambi, insieme'], c:2, s:'Detto da entrambi, nello stesso momento, a due persone diverse.'},
   {k:'Messaggio vocale', h:'Una promessa del 2021. Mantenuta? No.', t:'Che cosa promette Stefano in questo vocale?', o:['Di non russare più','Di imparare a stirare','Di portarla a Oporto ogni anno','Di non toccare il termostato'], c:3, audio:true, audioSrc:'assets/audio/card-13.mp3', s:'Il termostato. Promessa infranta lo stesso inverno.'},
   {k:'Sfida a coppie', h:'Facile. Troppo facile?', t:'Come si chiama il gatto che si sono presi insieme?', o:['Pepe','Ravioli','Nuvola','Gino'], c:1, pair:true, s:'Ravioli. Il nome era di Mara, il gatto ha scelto Stefano.'},
-  {k:'L’ultima carta', h:'Chiudiamo con i conti.', t:'Quanti anni sono passati da quella cena a oggi?', o:['4','5','7','10'], c:2, s:'Sette anni, due traslochi, un gatto e una cugina che si prende tutto il merito.'}
+  {k:'L’ultima carta', h:'Chiudiamo con i conti.', t:'Quanti anni sono passati da quella cena a oggi?', o:['4','5','7','10'], c:2, s:'Sette anni, due traslochi, un gatto e una cugina che si prende tutto il merito.'},
+  {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte: questo conquista Stefano.'},
+  {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Stefano?', o:['Risotto ai funghi','Zucca','Risotto','Formaggio'], c:3, s:'Il formaggio, sempre e comunque.'},
+  {k:'Su Stefano', h:'Un giorno tutto suo.', t:'Se Stefano potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Trekking','Giocare in famiglia','Collezionare bilance rare','Giocare con gli amici'], c:1, s:'Giocare in famiglia: la sua giornata ideale.'},
+  {k:'Su Stefano', h:'Un talento che ammette volentieri.', t:'Qual è la cosa che Stefano pensa Mara faccia meglio di lui?', o:['La lavatrice','La lavastoviglie','Organizzare le vacanze','Giocare'], c:2, s:'Organizzare le vacanze: qui Mara vince senza discussione.'},
+  {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'}
 ];
 const BASE_PTS = 60, BONUS_PTS = 40, DAILY = 4, TIMER_S = 20;
 const TEAMS = ['Amici di Mara','Famiglia di Mara','Amici di Stefano','Famiglia di Stefano','Colleghi'];
@@ -522,7 +527,9 @@ function renderAdmin(){
     <div class="envelope-box">
       <div class="micro">La busta</div>
       <div class="big serif">${state.revealed ? 'Aperta a tutti' : 'Chiusa a tutti'}</div>
-      <button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>
+      ${state.revealed
+        ? `<button class="btn-outline" data-action="close-board">Riapri il gioco</button>`
+        : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
     </div>
     <div class="section-title" style="color:rgba(247,236,214,.6);">Le carte</div>
     ${items}
@@ -587,6 +594,7 @@ root.addEventListener('click', e => {
     case 'go': go(el.dataset.screen); break;
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
+    case 'close-board': closeReveal(); break;
     case 'admin-unlock': {
       const input = document.getElementById('admin-pass');
       if (input && input.value === ADMIN_PASSPHRASE){ state.adminUnlocked = true; state.adminError = ''; }
@@ -613,6 +621,14 @@ function openReveal(){
   state.revealed = true;
   if (state.mode === 'online' && fb){
     fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { revealed: true }, { merge: true });
+  }
+  render();
+}
+
+function closeReveal(){
+  state.revealed = false;
+  if (state.mode === 'online' && fb){
+    fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { revealed: false }, { merge: true });
   }
   render();
 }
