@@ -43,8 +43,8 @@ pubblico (la sicurezza vera è nelle regole del punto 3).
 Si raggiunge visitando l'indirizzo del sito con `#sposi` in fondo, ad esempio:
 `https://maraestefano.it/quiz/#sposi`
 
-La parola d'ordine di default è **`sposi2026`** — per cambiarla, apri `app.js` e modifica
-la riga `const ADMIN_PASSPHRASE = 'sposi2026';` in cima al file.
+Non c'è una password: l'unica protezione è che nessuno conosce quell'indirizzo,
+quindi non condividetelo con gli invitati.
 
 Da lì potete:
 - vedere quanti invitati stanno giocando e la percentuale di completamento,

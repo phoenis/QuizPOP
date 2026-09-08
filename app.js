@@ -36,7 +36,6 @@ const RIVALS_DEMO = [
 function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5,multi:1}; return r; }
 
 const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','Vocale','A coppie','Del giorno'];
-const ADMIN_PASSPHRASE = 'sposi2026'; // cambia questa parola per il pannello sposi (index.html#sposi)
 
 /* ============ Utilità ============ */
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
@@ -56,8 +55,6 @@ const state = {
   extraCards: [],
   mode: 'local',
   guestId: null,
-  adminUnlocked: false,
-  adminError: '',
   newCardType: 0, newCardQ: '', newCardA: '',
 };
 let tickHandle = null;
@@ -487,17 +484,6 @@ function renderFinale(){
 }
 
 function renderAdmin(){
-  if (!state.adminUnlocked){
-    return `<div class="screen screen-admin">
-      <div class="admin-gate">
-        <div class="kicker">Solo per gli sposi</div>
-        <h2 class="admin-title" style="font-size:26px;">Pannello sposi</h2>
-        <input id="admin-pass" type="password" placeholder="Parola d’ordine">
-        ${state.adminError ? `<div style="color:var(--accent-400);font-size:12.5px;">${esc(state.adminError)}</div>` : ''}
-        <button class="btn-dark" style="width:auto;padding:14px 28px;" data-action="admin-unlock">Entra</button>
-      </div>
-    </div>`;
-  }
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
   const totalPossible = totalPlayers * totalCards;
@@ -595,13 +581,6 @@ root.addEventListener('click', e => {
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
-    case 'admin-unlock': {
-      const input = document.getElementById('admin-pass');
-      if (input && input.value === ADMIN_PASSPHRASE){ state.adminUnlocked = true; state.adminError = ''; }
-      else state.adminError = 'Parola sbagliata.';
-      render();
-      break;
-    }
     case 'admin-type': state.newCardType = +el.dataset.i; render(); break;
     case 'admin-publish': publishCard(); break;
   }
@@ -610,11 +589,6 @@ root.addEventListener('input', e => {
   if (e.target.id === 'name-input') state.name = e.target.value;
   if (e.target.id === 'admin-q') state.newCardQ = e.target.value;
   if (e.target.id === 'admin-a') state.newCardA = e.target.value;
-});
-root.addEventListener('keydown', e => {
-  if (e.target.id === 'admin-pass' && e.key === 'Enter'){
-    document.querySelector('[data-action="admin-unlock"]').click();
-  }
 });
 
 function openReveal(){

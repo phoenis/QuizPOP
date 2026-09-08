@@ -272,8 +272,6 @@ input{font-family:inherit;}
 .type-chip.on{ background:var(--accent-400); color:var(--admin-ground); border-color:var(--accent-400); }
 .admin-input{ width:100%; border:0; border-bottom:1px solid rgba(247,236,214,.35); background:transparent; color:var(--admin-ink); font-family:'Lora',serif; font-size:15px; padding:10px 0; margin-top:var(--sp-4); outline:none; }
 .admin-input::placeholder{ color:rgba(247,236,214,.4); }
-.admin-gate{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; gap:var(--sp-4); text-align:center; }
-.admin-gate input{ background:transparent; border:0; border-bottom:1px solid rgba(247,236,214,.35); color:var(--admin-ink); font-family:'Cormorant Garamond',serif; font-size:24px; text-align:center; padding:8px; outline:none; }
 
 /* ===== TAB BAR ===== */
 .tabbar{ display:flex; padding:6px 14px 30px; background:var(--cream); border-top:1px solid var(--neutral-300); position:sticky; bottom:0; }
