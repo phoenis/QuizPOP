@@ -157,14 +157,28 @@ function afterResult(){
   render();
 }
 
-function ranked(){
+function allPlayersWithMe(){
   const board = state.players.length ? state.players.slice() : RIVALS_DEMO.slice();
-  const mine = { id: state.guestId, name: state.name || 'Tu', score: state.score, me: true,
+  const mine = { id: state.guestId, name: state.name || 'Tu', team: state.team, score: state.score, me: true,
     detail: Object.keys(state.res).length + ' carte su ' + allQuestions().length };
   const already = board.some(p => p.id === state.guestId);
-  const all = already ? board.map(p => p.id === state.guestId ? { ...p, me: true, name: state.name || p.name, score: state.score } : p)
-                       : [...board, mine];
-  return all.sort((a, b) => b.score - a.score).map((p, i) => ({ ...p, rank: i + 1, initials: initialsOf(p.name || 'Tu') }));
+  return already
+    ? board.map(p => p.id === state.guestId ? { ...p, ...mine } : p)
+    : [...board, mine];
+}
+
+function ranked(){
+  return allPlayersWithMe().sort((a, b) => b.score - a.score).map((p, i) => ({ ...p, rank: i + 1, initials: initialsOf(p.name || 'Tu') }));
+}
+
+// squadre: media punti a persona, cosi' una squadra piccola non e' svantaggiata rispetto a una grande
+function computeTeams(){
+  const all = allPlayersWithMe();
+  return TEAMS.map((label, i) => {
+    const members = all.filter(p => p.team === i);
+    const total = members.reduce((s, p) => s + (p.score || 0), 0);
+    return { i, label, count: members.length, avg: members.length ? total / members.length : 0 };
+  }).filter(g => g.count > 0);
 }
 
 /* ============ Rendering ============ */
@@ -373,10 +387,17 @@ function renderBoard(){
   const times = Object.values(state.res).map(x => x.used);
   const avg = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
   const done = Object.keys(state.res).length;
+  const teams = computeTeams();
+  const personaLabel = n => n === 1 ? 'persona' : 'persone';
   if (locked){
-    const rows = board.filter(p => !p.me).map(p => `<div class="board-row">
-      <div class="avatar">${esc(p.initials)}</div>
+    const unsealedOrder = allPlayersWithMe().filter(p => !p.me);
+    const rows = unsealedOrder.map(p => `<div class="board-row">
+      <div class="avatar">${esc(initialsOf(p.name || 'Tu'))}</div>
       <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc((p.detail||'').split('·')[0].trim())}</div></div>
+      <div class="board-score">•••</div>
+    </div>`).join('');
+    const teamRows = teams.map(g => `<div class="board-row ${g.i===state.team?'me':''}">
+      <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
       <div class="board-score">•••</div>
     </div>`).join('');
     return `<div class="screen screen-board">
@@ -390,6 +411,9 @@ function renderBoard(){
         <div class="big serif tabular">${state.score} punti tuoi</div>
         <div class="board-detail" style="margin-top:6px;">${done ? 'Media ' + numIt(avg) + 's su ' + done + ' carte' : 'Nessuna carta girata'}</div>
       </div>
+      <div class="section-title">Squadre</div>
+      <p class="rank-line" style="margin-top:0;">Media punti a persona, nascosta come il resto fino al reveal.</p>
+      <div style="margin-top:8px;">${teamRows}</div>
     </div>`;
   }
   const rows = board.map(p => `<div class="board-row ${p.me?'me':''}">
@@ -397,12 +421,21 @@ function renderBoard(){
     <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc(p.detail||'')}</div></div>
     <div class="board-score open serif tabular">${p.score}</div>
   </div>`).join('');
+  const teamsRanked = teams.slice().sort((a, b) => b.avg - a.avg).map((g, i) => ({ ...g, rank: i + 1 }));
+  const teamRows = teamsRanked.map(g => `<div class="board-row ${g.i===state.team?'me':''}">
+    <div class="board-rank serif tabular">${g.rank}</div>
+    <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
+    <div class="board-score open serif tabular">${Math.round(g.avg)}</div>
+  </div>`).join('');
   return `<div class="screen screen-board">
     <div class="kicker">${board.length} invitati · busta aperta</div>
     <h1 class="board-title">Classifica</h1>
     <hr class="rule sm" style="margin-left:0;">
     <div style="margin-top:8px;">${rows}</div>
     <div class="board-footer">A parità di punti vince chi ha risposto più in fretta.</div>
+    <div class="section-title">Squadre</div>
+    <p class="rank-line" style="margin-top:0;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente da quanti sono.</p>
+    <div style="margin-top:8px;">${teamRows}</div>
   </div>`;
 }
 
