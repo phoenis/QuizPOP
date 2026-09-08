@@ -213,7 +213,7 @@ function renderJoin(){
       <div class="chips">${chips}</div>
     </div>
     <div class="join-spacer"></div>
-    <button class="btn-outline block" data-action="join" style="margin-top:24px;">Comincia</button>
+    <button class="btn-outline block" data-action="join" style="margin-top:14px;">Comincia</button>
     <p class="fine-print">Niente codici, niente password. La squadra serve solo per le statistiche finali.</p>
   </div>`;
 }
@@ -324,7 +324,7 @@ function renderQuiz(){
       <button class="btn-text" data-action="rimetti">Rimetti nel mazzo</button>
       <span class="counter">Carta ${state.qi + 1} di ${allQuestions().length}</span>
     </div>
-    <div class="kicker" style="margin-top:22px;">${esc(q.k)}</div>
+    <div class="kicker" style="margin-top:14px;">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
     <hr class="rule sm">
     ${renderQuizBody(q)}
