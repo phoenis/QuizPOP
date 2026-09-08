@@ -47,7 +47,7 @@ const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'g-' + Math.random
 const state = {
   screen: 'boot',
   name: '', team: 1,
-  deck: QS.map((_, i) => i),
+  sel: 0,
   qi: 0, left: 0, locked: false, seq: [],
   res: {}, score: 0,
   revealed: false,
@@ -70,7 +70,7 @@ function loadLocalProfile(){
 function saveLocalProfile(){
   localStorage.setItem('msquiz_profile', JSON.stringify({
     guestId: state.guestId, name: state.name, team: state.team,
-    deck: state.deck, res: state.res, score: state.score,
+    sel: state.sel, res: state.res, score: state.score,
   }));
 }
 
@@ -91,7 +91,7 @@ async function persistProgress(){
   if (state.mode === 'online' && fb && state.guestId) {
     const ref = fb.doc(fb.db, 'players', state.guestId);
     await fb.setDoc(ref, {
-      name: state.name, team: state.team, deck: state.deck,
+      name: state.name, team: state.team, sel: state.sel,
       res: state.res, score: state.score, updatedAt: fb.serverTimestamp(),
     }, { merge: true });
   } else {
@@ -99,11 +99,14 @@ async function persistProgress(){
   }
 }
 
-function reconcileDeck(){
+// trova la prossima domanda senza risposta, ciclicamente, a partire da from
+function nextOpen(res, from){
   const total = allQuestions().length;
-  for (let i = 0; i < total; i++){
-    if (!state.deck.includes(i) && !(i in state.res)) state.deck.push(i);
+  for (let k = 0; k < total; k++){
+    const i = ((from || 0) + k) % total;
+    if (!res[i]) return i;
   }
+  return null;
 }
 
 /* ============ Logica di gioco ============ */
@@ -135,25 +138,24 @@ function tick(){
 
 function flip(){
   if (state.revealed) return;
-  const i = state.deck[0];
-  if (i === undefined) return;
+  const i = state.sel;
+  if (i === undefined || i === null || state.res[i]) return;
   clearInterval(tickHandle);
   state.screen = 'quiz'; state.qi = i; state.left = dur(); state.locked = false; state.seq = [];
   tickHandle = setInterval(tick, 100);
   render();
 }
-function skip(){ state.deck = [...state.deck.slice(1), state.deck[0]]; render(); }
 function pick(idx){
   if (state.locked) return;
   clearInterval(tickHandle); tickHandle = null;
   finish(idx);
   render();
 }
-function goHomeWithoutStoppingTimer(){ state.screen = 'home'; render(); }
 function go(screen){ clearInterval(tickHandle); tickHandle = null; state.screen = screen; render(); }
 function afterResult(){
-  state.deck = state.deck.filter(v => v !== state.qi);
-  state.screen = state.deck.length ? 'home' : 'finale';
+  const nx = nextOpen(state.res, state.qi + 1);
+  state.sel = nx === null ? state.qi : nx;
+  state.screen = nx === null ? 'finale' : 'home';
   render();
 }
 
@@ -217,7 +219,7 @@ function renderJoin(){
     <h1 class="join-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
     <hr class="rule">
-    <p class="join-intro pretty">Quindici domande su di noi, una carta alla volta. Rispondi quando vuoi — la classifica resta chiusa fino ai discorsi.</p>
+    <p class="join-intro pretty">Quindici domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
     <div class="field-block">
       <div class="field-label">Come ti chiamiamo noi</div>
       <input id="name-input" class="name-input" type="text" placeholder="Zia Franca" value="${esc(state.name)}" maxlength="40">
@@ -235,7 +237,7 @@ function renderJoin(){
 function renderHome(){
   if (state.revealed){
     return `<div class="screen screen-home">
-      <div class="empty-deck" style="flex:1;">
+      <div class="empty-deck full">
         <div class="glyph">✦</div>
         <h2 style="font-size:32px;">Il gioco è chiuso</h2>
         <p class="pretty">La classifica è stata svelata ai discorsi. Grazie per aver giocato!</p>
@@ -243,47 +245,58 @@ function renderHome(){
       </div>
     </div>`;
   }
-  const top = state.deck[0];
-  const card = top === undefined ? null : Q(top);
-  if (!card){
-    return `<div class="screen screen-home">
-      <div class="empty-deck" style="flex:1;">
-        <div class="glyph">✦</div>
-        <h2 style="font-size:32px;">Mazzo finito</h2>
-        <p class="pretty">Tutte e quindici. Ora si aspettano i discorsi per sapere com’è andata.</p>
-        <button class="btn-outline" data-action="go" data-screen="finale">Vedi il finale</button>
-      </div>
+  const all = allQuestions();
+  const total = all.length;
+  const done = Object.keys(state.res).length;
+  const remaining = total - done;
+  const sel = Math.min(state.sel, total - 1);
+
+  const cells = all.map((x, i) => {
+    const isDone = !!state.res[i];
+    const isSel = i === sel;
+    const isDaily = i === DAILY && !isDone;
+    return `<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''}" data-action="select-cell" data-i="${i}">
+      <span class="n serif tabular">${i + 1}</span>
+      ${isDone ? `<span class="mark">✦</span>` : ''}
+      ${isDaily ? `<span class="daily-tag">doppio</span>` : ''}
+    </button>`;
+  }).join('');
+
+  let panel;
+  if (remaining === 0){
+    panel = `<div class="empty-deck cal-empty">
+      <img src="assets/mascotte/cricetini-cuore.png" alt="">
+      <h2 style="font-size:28px;">Le hai fatte tutte</h2>
+      <p class="pretty">Ora si aspettano i discorsi per sapere com’è andata.</p>
+      <button class="btn-outline" data-action="go" data-screen="finale">Vedi il finale</button>
+    </div>`;
+  } else {
+    const card = Q(sel);
+    const label = 'Domanda ' + (sel + 1) + (sel === DAILY ? ' · del giorno, vale doppio' : '');
+    const r = state.res[sel];
+    panel = `<div class="card-preview">
+      <div class="kicker">${esc(label)}</div>
+      <div class="type serif">${esc(card.k)}</div>
+      <p class="hint pretty">${esc(card.h)}</p>
+      ${r
+        ? `<p class="done-line">Hai già risposto: ${r.pts ? '+' + r.pts : '0 punti'} · ${numIt(r.used)}s</p>`
+        : `<button class="btn-outline block" style="margin-top:14px;" data-action="flip">Apri la domanda</button>`}
     </div>`;
   }
-  const isDaily = top === DAILY;
+
   return `<div class="screen screen-home">
     <div class="home-header">
       <div>
-        <div class="kicker">Ne restano ${state.deck.length}</div>
-        <h1 style="font-size:30px;">Il mazzo</h1>
+        <div class="kicker">${remaining > 0 ? 'Ne restano ' + remaining : 'Tutte fatte'}</div>
+        <h1 style="font-size:30px;">Le domande</h1>
       </div>
       <div class="home-score">
         <div class="num serif tabular">${state.score}</div>
         <div class="micro">Punti</div>
       </div>
     </div>
-    <div class="stage">
-      <div class="deck-layer deck-back"></div>
-      <div class="deck-layer deck-mid"></div>
-      <div class="deck-layer deck-top">
-        <div class="kicker" style="color:var(--cream);opacity:.9;">${esc(card.k)}</div>
-        <div class="hairline"></div>
-        <div class="card-n serif tabular">${top + 1}<sup>di ${allQuestions().length}</sup></div>
-        <div class="spacer"></div>
-        <p class="hint pretty">${esc(card.h)}</p>
-        ${isDaily ? '<div class="pill">Del giorno · vale doppio</div>' : ''}
-        <button class="flip-btn serif" data-action="flip">Gira la carta</button>
-      </div>
-      <div class="deck-actions">
-        <button class="btn-outline small" style="flex:1;" data-action="skip">Salta, ci penso</button>
-        <span class="note">${state.deck.length > 1 ? 'torna in fondo' : 'è l’ultima'}</span>
-      </div>
-    </div>
+    <div class="cal-grid">${cells}</div>
+    ${panel}
   </div>`;
 }
 
@@ -335,8 +348,8 @@ function renderQuiz(){
   const q = Q(state.qi);
   return `<div class="screen screen-quiz">
     <div class="quiz-topbar">
-      <button class="btn-text" data-action="rimetti">Rimetti nel mazzo</button>
-      <span class="counter">Carta ${state.qi + 1} di ${allQuestions().length}</span>
+      <button class="btn-text" data-action="go" data-screen="home">Torna alle domande</button>
+      <span class="counter">Domanda ${state.qi + 1} di ${allQuestions().length}</span>
     </div>
     <div class="kicker" style="margin-top:14px;">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
@@ -358,10 +371,11 @@ function renderResult(){
   const rankLine = locked
     ? 'La busta resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
     : (mine ? `Sei ${mine.rank}º su ${board.length} in questo momento.` : '');
-  const cta = state.deck.filter(v => v !== state.qi).length ? 'Carta successiva' : 'Vedi il finale';
+  const cta = nextOpen(state.res, state.qi + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
   return `<div class="screen screen-result">
     <div class="kicker result-kicker">${kicker}</div>
     <div class="result-pts serif tabular" style="color:${ink}">${r.pts ? '+' + r.pts : '0'}</div>
+    ${r.correct ? `<img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="result-mascot">` : ''}
     <h2 class="result-title">${esc(title)}</h2>
     <hr class="rule sm">
     <p class="result-blurb pretty">${esc(q.s)}</p>
@@ -449,7 +463,7 @@ function renderProfile(){
   const badges = [
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
     { mark: '✧', name: 'Carta del giorno', note: 'Hai girato la carta del giorno', locked: !state.res[DAILY] },
-    { mark: '✷', name: 'Mazzo completo', note: 'Tutte e quindici le carte', locked: done < QS.length },
+    { mark: '✷', name: 'Mazzo completo', note: 'Tutte e quindici le carte', locked: done < total },
   ];
   const badgeRows = badges.map(b => `<div class="badge-row ${b.locked?'locked':''}">
     <div class="badge-glyph">${b.mark}</div>
@@ -589,7 +603,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'flip': flip(); break;
-    case 'skip': skip(); break;
+    case 'select-cell': state.sel = +el.dataset.i; render(); break;
     case 'pick-option': pick(+el.dataset.idx); break;
     case 'toggle-order': {
       const i = +el.dataset.i;
@@ -608,7 +622,6 @@ root.addEventListener('click', e => {
       if (audio && audio.src) audio.play().catch(() => {});
       break;
     }
-    case 'rimetti': goHomeWithoutStoppingTimer(); break;
     case 'after-result': afterResult(); break;
     case 'go': go(el.dataset.screen); break;
     case 'open-board-full': state.revealed = true; go('board'); break;
@@ -648,7 +661,6 @@ async function publishCard(){
     await fb.addDoc(fb.collection(fb.db, 'extraCards'), { ...card, createdAt: fb.serverTimestamp() });
   } else {
     state.extraCards.push(card);
-    reconcileDeck();
   }
   state.newCardQ = ''; state.newCardA = '';
   render();
@@ -668,7 +680,7 @@ async function boot(){
           if (snap.exists()){
             const d = snap.data();
             state.name = d.name || ''; state.team = d.team ?? 1;
-            state.deck = d.deck || QS.map((_, i) => i);
+            state.sel = d.sel ?? 0;
             state.res = d.res || {}; state.score = d.score || 0;
           }
           fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
@@ -681,7 +693,6 @@ async function boot(){
           });
           fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
             state.extraCards = qs.docs.map(doc => doc.data());
-            reconcileDeck();
             render();
           });
           resolve();
@@ -698,7 +709,7 @@ async function boot(){
     state.guestId = (saved && saved.guestId) || uuid();
     if (saved){
       state.name = saved.name || ''; state.team = saved.team ?? 1;
-      state.deck = saved.deck || state.deck; state.res = saved.res || {}; state.score = saved.score || 0;
+      state.sel = saved.sel ?? 0; state.res = saved.res || {}; state.score = saved.score || 0;
     }
   }
   if (location.hash === '#sposi') state.screen = 'admin';
