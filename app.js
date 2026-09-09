@@ -594,6 +594,7 @@ function renderAdmin(){
   const pct = totalPossible ? Math.round((totalDone / totalPossible) * 100) : 0;
   const items = allQuestions().map((x, i) => {
     const answers = state.players.filter(p => p.res && p.res[i]).length;
+    const isExtra = i >= QS.length;
     return `<div class="admin-card-row">
       <div class="num">${i + 1}</div>
       <div style="flex:1;overflow:hidden;">
@@ -601,6 +602,7 @@ function renderAdmin(){
         <div class="tt">${esc(x.t)}</div>
       </div>
       <div class="cnt">${answers} risposte</div>
+      ${isExtra ? `<button class="del" data-action="delete-extra-card" data-id="${esc(x.id)}">✕</button>` : ''}
     </div>`;
   }).join('');
   const typeChips = KIND_LABELS.map((l, i) => `<button class="type-chip ${state.newCardType===i?'on':''}" data-action="admin-type" data-i="${i}">${esc(l)}</button>`).join('');
@@ -680,6 +682,10 @@ root.addEventListener('click', e => {
     case 'close-board': closeReveal(); break;
     case 'admin-type': state.newCardType = +el.dataset.i; render(); break;
     case 'admin-publish': publishCard(); break;
+    case 'delete-extra-card': {
+      if (confirm('Eliminare questa carta extra? Non si può annullare.')) deleteExtraCard(el.dataset.id);
+      break;
+    }
   }
 });
 root.addEventListener('input', e => {
@@ -711,10 +717,19 @@ async function publishCard(){
   if (state.mode === 'online' && fb){
     await fb.addDoc(fb.collection(fb.db, 'extraCards'), { ...card, createdAt: fb.serverTimestamp() });
   } else {
-    state.extraCards.push(card);
+    state.extraCards.push({ ...card, id: uuid() });
   }
   state.newCardQ = ''; state.newCardA = '';
   render();
+}
+
+async function deleteExtraCard(id){
+  if (state.mode === 'online' && fb){
+    await fb.deleteDoc(fb.doc(fb.db, 'extraCards', id));
+  } else {
+    state.extraCards = state.extraCards.filter(c => c.id !== id);
+    render();
+  }
 }
 
 /* ============ Avvio ============ */
@@ -745,7 +760,7 @@ async function boot(){
             render();
           });
           fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
-            state.extraCards = qs.docs.map(doc => doc.data());
+            state.extraCards = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if (ensureOrder() && state.name) persistProgress();
             render();
           });
