@@ -288,7 +288,7 @@ function renderJoin(){
   const chips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
   return `<div class="screen screen-join">
     <div class="kicker">Il gioco degli invitati</div>
-    <h1 class="join-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
+    <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
     <hr class="rule">
     <p class="join-intro pretty">Sedici domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
@@ -317,7 +317,7 @@ function renderHub(){
       <div class="fade"></div>
       <div class="cap">
         <div class="kicker">16 ottobre 2026 · Villa Calini</div>
-        <div class="names serif">Mara <span class="amp">&amp;</span> Stefano</div>
+        <div class="names couple-title">Mara <span class="amp">&amp;</span> Stefano</div>
       </div>
     </div>
     <div class="hub-body">
@@ -748,7 +748,7 @@ function renderAdmin(){
   }).join('');
   return `<div class="screen screen-admin">
     <div class="kicker">Solo per gli sposi</div>
-    <h2 class="admin-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
+    <h2 class="admin-title couple-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
     <hr class="rule sm" style="margin-left:0;">
     <div class="admin-stats">
       <div class="stat-cell"><div class="v serif tabular">${totalPlayers}</div><div class="c">Giocano</div></div>

@@ -5,6 +5,12 @@
 - `firebase-config.js` — le chiavi del progetto Firebase (da compilare, vedi sotto).
 - `firestore.rules` — le regole di sicurezza da incollare nella console Firebase.
 - `assets/photos/` — dove mettere le foto vere (vedi sotto).
+- `assets/fonts/` — i file del font Formata (licenza acquistata, non ridistribuirli altrove).
+
+## Font
+Tutto il testo usa **Formata** (font a pagamento, già incluso in `assets/fonts/`).
+Il titolo "Mara & Stefano" usa invece **Alice**, un font gratuito di Google Fonts
+caricato via `<link>` in `index.html` — non richiede nessun file locale.
 
 ## La home
 Dopo l'iscrizione l'invitato arriva su una home con la vostra foto, la card del
