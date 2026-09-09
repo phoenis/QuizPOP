@@ -1,35 +1,50 @@
 import { firebaseConfig } from './firebase-config.js?v=1';
 
 /* ============ Dati del gioco (copia dal design di riferimento) ============ */
-// NB: le 4 domande "Su Mara" sono un placeholder da rivedere con Mara prima del matrimonio.
+// NB: le domande segnalate "Placeholder" vanno riviste con Mara prima del matrimonio.
 const QS = [
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
   {k:'Su Mara', h:'Un giorno tutto suo.', t:'Se Mara potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
   {k:'Su Mara', h:'Un talento che ammette volentieri.', t:'Qual è la cosa che Mara pensa Stefano faccia meglio di lei?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+  {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
 
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte: questo conquista Stefano.'},
   {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Stefano?', o:['Risotto ai funghi','Zucca','Risotto','Formaggio'], c:3, s:'Il formaggio, sempre e comunque.'},
   {k:'Su Stefano', h:'Un giorno tutto suo.', t:'Se Stefano potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Trekking','Giocare in famiglia','Collezionare bilance rare','Giocare con gli amici'], c:1, s:'Giocare in famiglia: la sua giornata ideale.'},
   {k:'Su Stefano', h:'Un talento che ammette volentieri.', t:'Qual è la cosa che Stefano pensa Mara faccia meglio di lui?', o:['La lavatrice','La lavastoviglie','Organizzare le vacanze','Giocare'], c:2, s:'Organizzare le vacanze: qui Mara vince senza discussione.'},
+  {k:'Su Stefano', h:'Una fede sportiva.', t:'Qual è la squadra del cuore di Stefano?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
 
   {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:['Su un’app','Tramite amici in comune','Al lavoro','In palestra'], c:1, s:'Amici in comune: la cugina di Mara è amica di un amico di Stefano. Una catena che nessuno ricorda bene.'},
   {k:'Ordina le tappe', h:'Quattro momenti, un ordine giusto.', t:'Metti in ordine i primi quattro mesi.', order:['La cena in cui si conoscono','Il primo messaggio','Il primo appuntamento','Il primo viaggio insieme'], shown:[1,3,0,2], s:'Cena, messaggio (tre settimane dopo), appuntamento, viaggio.'},
   {k:'Indovina la foto', h:'Guarda bene lo sfondo.', t:'Dove è stata scattata la loro prima foto insieme?', o:['A una cena di amici','A Oporto','Alla sagra del pesce','Al mare'], c:0, photo:true, photoSrc:'assets/photos/card-04.jpg', s:'La cena in cui li hanno presentati. Sono ai due estremi del tavolo.'},
   {k:'Sfida a coppie', h:'Facile. Troppo facile?', t:'Come si chiama il gatto che si sono presi insieme?', o:['Pepe','Ravioli','Nuvola','Gino'], c:1, pair:true, s:'Ravioli. Il nome era di Mara, il gatto ha scelto Stefano.'},
+  {k:'La loro vita insieme', h:'Un pensiero speciale.', t:'Qual è stato il primo regalo che si sono fatti?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
 
   {k:'Ordina le tappe', h:'L’anno del matrimonio, in fila.', t:'Ordina l’anno del matrimonio.', order:['La proposta','La scelta della sala','Le prove dell’abito','Oggi'], shown:[2,0,3,1], s:'Proposta, sala, abito, oggi. In mezzo undici inviti stampati due volte.'},
   {k:'Chi ha detto cosa', h:'Detta da uno dei due. O da tutti e due.', t:'«Il vestito lo scelgo io, tu occupati della musica.»', o:['Mara','Stefano','Entrambi, insieme'], c:2, s:'Detto da entrambi, nello stesso momento, a due persone diverse.'},
   {k:'L’ultima carta', h:'Chiudiamo con i conti.', t:'Quanti anni sono passati da quella cena a oggi?', o:['4','5','7','10'], c:2, s:'Sette anni, due traslochi, un gatto e una cugina che si prende tutto il merito.'},
-  {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'}
+  {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'},
+  {k:'La giornata di oggi', h:'Il momento più importante.', t:'Che rito è stato celebrato oggi?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera (es. civile o religioso) prima del matrimonio.'},
+
+  // "I tavoli": nei libretti-segnaposto ogni tavolo racconta una sua escursione e un
+  // aneddoto sul luogo. Queste 5 domande vanno completate con i contenuti veri dei
+  // libretti e i nomi/numeri dei tavoli — l'idea è che per rispondere si deve andare
+  // a chiedere in giro, cosà gli invitati si mescolano tra tavoli diversi.
+  {k:'I tavoli', h:'Bisogna proprio chiedere in giro.', t:'A quale tavolo appartiene la prima escursione raccontata nei libretti?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'I tavoli', h:'Un aneddoto da scoprire.', t:'Quale tavolo ha vissuto questo aneddoto sul luogo della sua escursione?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'I tavoli', h:'Un indizio dal libretto.', t:'Indovina il tavolo giusto per questo luogo misterioso.', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'I tavoli', h:'Chi ha fatto questa gita?', t:'Trova il tavolo che ha raccontato questa storia.', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'I tavoli', h:'Ultimo indizio.', t:'A quale tavolo appartiene quest’ultima storia?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
 ];
 const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
-// categorie da 4 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
+// categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
 const CATS = [
-  {name:'Mara', from:0, to:3, mark:'❖', medal:'Esperta di Mara', note:'Tutte e quattro su di lei'},
-  {name:'Stefano', from:4, to:7, mark:'✤', medal:'Esperto di Stefano', note:'Tutte e quattro su di lui'},
-  {name:'La loro vita insieme', from:8, to:11, mark:'✱', medal:'Casa nostra', note:'Tutte e quattro sulla vita insieme'},
-  {name:'La giornata di oggi', from:12, to:15, mark:'✾', medal:'Il giorno del sì', note:'Tutte e quattro sul matrimonio'},
+  {name:'Mara', from:0, to:4, mark:'❖', medal:'Esperta di Mara', note:'Tutte e cinque su di lei'},
+  {name:'Stefano', from:5, to:9, mark:'✤', medal:'Esperto di Stefano', note:'Tutte e cinque su di lui'},
+  {name:'La loro vita insieme', from:10, to:14, mark:'✱', medal:'Casa nostra', note:'Tutte e cinque sulla vita insieme'},
+  {name:'La giornata di oggi', from:15, to:19, mark:'✾', medal:'Il giorno del sì', note:'Tutte e cinque sul matrimonio'},
+  {name:'I tavoli', from:20, to:24, mark:'❋', medal:'Giro dei tavoli', note:'Tutte e cinque sulle storie dei tavoli'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
@@ -357,7 +372,7 @@ function renderJoin(){
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
     <hr class="rule">
-    <p class="join-intro pretty">Sedici domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
+    <p class="join-intro pretty">Venticinque domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
     <div class="field-block">
       <div class="field-label">Come ti chiamiamo noi</div>
       <input id="name-input" class="name-input" type="text" placeholder="Zia Franca" value="${esc(state.name)}" maxlength="40">
