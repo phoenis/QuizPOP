@@ -1,35 +1,35 @@
 import { firebaseConfig } from './firebase-config.js?v=1';
 
 /* ============ Dati del gioco (copia dal design di riferimento) ============ */
+// NB: le 4 domande "Su Mara" sono un placeholder da rivedere con Mara prima del matrimonio.
 const QS = [
-  {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:['Su un’app','Tramite amici in comune','Al lavoro','In palestra'], c:1, s:'Amici in comune: la cugina di Mara è amica di un amico di Stefano. Una catena che nessuno ricorda bene.'},
-  {k:'Vero o falso', h:'Una sola risposta, e non è quella che pensi.', t:'La prima volta si sono parlati per più di dieci minuti.', o:['Vero','Falso'], c:1, s:'Falso. Due frasi e un ciao, poi tre settimane di silenzio.'},
-  {k:'Chi ha detto cosa', h:'Una frase vera, detta davvero. Da chi?', t:'«Chiedi tu il suo numero, io non me la sento.»', o:['Mara','Stefano','La cugina di Mara'], c:1, s:'Stefano, alla cugina di Mara, che ha fatto tutto lei.'},
-  {k:'Indovina la foto', h:'Guarda bene lo sfondo.', t:'Dove è stata scattata la loro prima foto insieme?', o:['A una cena di amici','A Oporto','Alla sagra del pesce','Al mare'], c:0, photo:true, photoSrc:'assets/photos/card-04.jpg', s:'La cena in cui li hanno presentati. Sono ai due estremi del tavolo.'},
-  {k:'Ordina le tappe', h:'Quattro momenti, un ordine giusto.', t:'Metti in ordine i primi quattro mesi.', order:['La cena in cui si conoscono','Il primo messaggio','Il primo appuntamento','Il primo viaggio insieme'], shown:[1,3,0,2], s:'Cena, messaggio (tre settimane dopo), appuntamento, viaggio.'},
-  {k:'Messaggio vocale', h:'Sette secondi di voce. Alza il volume.', t:'Chi sta parlando in questo messaggio vocale?', o:['Mara','Stefano','La mamma di Mara','Il testimone'], c:2, audio:true, audioSrc:'assets/audio/card-06.mp3', s:'La mamma di Mara, il giorno della proposta. Urla più lei degli sposi.'},
-  {k:'Numeri', h:'Una cifra sola. Fidati dell’istinto.', t:'Quanti mesi dal primo appuntamento alla convivenza?', o:['3','9','16','28'], c:1, s:'Nove mesi. Le scommesse degli amici dicevano ventotto.'},
-  {k:'Sfida a coppie', h:'Punti solo se indovinate entrambi.', t:'Chi dei due ha detto per primo agli amici che era una cosa seria?', o:['Mara','Stefano'], c:0, pair:true, s:'Mara, a tutto il gruppo, in un messaggio scritto alle due di notte.'},
-  {k:'Vero o falso', h:'Attenzione: qui si offende qualcuno.', t:'Stefano cucina meglio di Mara.', o:['Vero','Falso'], c:0, s:'Vero, e Mara lo ammette solo senza testimoni. Oggi ce ne sono ottanta.'},
-  {k:'Indovina la foto', h:'Un viaggio, una città. Quale?', t:'In che città è stato questo viaggio?', o:['Napoli','Oporto','Berlino','Palermo'], c:1, photo:true, photoSrc:'assets/photos/card-10.jpg', s:'Oporto. Hanno litigato per una mappa di carta e non si sono parlati fino a cena.'},
-  {k:'Ordina le tappe', h:'L’anno del matrimonio, in fila.', t:'Ordina l’anno del matrimonio.', order:['La proposta','La scelta della sala','Le prove dell’abito','Oggi'], shown:[2,0,3,1], s:'Proposta, sala, abito, oggi. In mezzo undici inviti stampati due volte.'},
-  {k:'Chi ha detto cosa', h:'Detta da uno dei due. O da tutti e due.', t:'«Il vestito lo scelgo io, tu occupati della musica.»', o:['Mara','Stefano','Entrambi, insieme'], c:2, s:'Detto da entrambi, nello stesso momento, a due persone diverse.'},
-  {k:'Messaggio vocale', h:'Una promessa del 2021. Mantenuta? No.', t:'Che cosa promette Stefano in questo vocale?', o:['Di non russare più','Di imparare a stirare','Di portarla a Oporto ogni anno','Di non toccare il termostato'], c:3, audio:true, audioSrc:'assets/audio/card-13.mp3', s:'Il termostato. Promessa infranta lo stesso inverno.'},
-  {k:'Sfida a coppie', h:'Facile. Troppo facile?', t:'Come si chiama il gatto che si sono presi insieme?', o:['Pepe','Ravioli','Nuvola','Gino'], c:1, pair:true, s:'Ravioli. Il nome era di Mara, il gatto ha scelto Stefano.'},
-  {k:'L’ultima carta', h:'Chiudiamo con i conti.', t:'Quanti anni sono passati da quella cena a oggi?', o:['4','5','7','10'], c:2, s:'Sette anni, due traslochi, un gatto e una cugina che si prende tutto il merito.'},
+  {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+  {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+  {k:'Su Mara', h:'Un giorno tutto suo.', t:'Se Mara potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+  {k:'Su Mara', h:'Un talento che ammette volentieri.', t:'Qual è la cosa che Mara pensa Stefano faccia meglio di lei?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte: questo conquista Stefano.'},
   {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Stefano?', o:['Risotto ai funghi','Zucca','Risotto','Formaggio'], c:3, s:'Il formaggio, sempre e comunque.'},
   {k:'Su Stefano', h:'Un giorno tutto suo.', t:'Se Stefano potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Trekking','Giocare in famiglia','Collezionare bilance rare','Giocare con gli amici'], c:1, s:'Giocare in famiglia: la sua giornata ideale.'},
   {k:'Su Stefano', h:'Un talento che ammette volentieri.', t:'Qual è la cosa che Stefano pensa Mara faccia meglio di lui?', o:['La lavatrice','La lavastoviglie','Organizzare le vacanze','Giocare'], c:2, s:'Organizzare le vacanze: qui Mara vince senza discussione.'},
+
+  {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:['Su un’app','Tramite amici in comune','Al lavoro','In palestra'], c:1, s:'Amici in comune: la cugina di Mara è amica di un amico di Stefano. Una catena che nessuno ricorda bene.'},
+  {k:'Ordina le tappe', h:'Quattro momenti, un ordine giusto.', t:'Metti in ordine i primi quattro mesi.', order:['La cena in cui si conoscono','Il primo messaggio','Il primo appuntamento','Il primo viaggio insieme'], shown:[1,3,0,2], s:'Cena, messaggio (tre settimane dopo), appuntamento, viaggio.'},
+  {k:'Indovina la foto', h:'Guarda bene lo sfondo.', t:'Dove è stata scattata la loro prima foto insieme?', o:['A una cena di amici','A Oporto','Alla sagra del pesce','Al mare'], c:0, photo:true, photoSrc:'assets/photos/card-04.jpg', s:'La cena in cui li hanno presentati. Sono ai due estremi del tavolo.'},
+  {k:'Sfida a coppie', h:'Facile. Troppo facile?', t:'Come si chiama il gatto che si sono presi insieme?', o:['Pepe','Ravioli','Nuvola','Gino'], c:1, pair:true, s:'Ravioli. Il nome era di Mara, il gatto ha scelto Stefano.'},
+
+  {k:'Ordina le tappe', h:'L’anno del matrimonio, in fila.', t:'Ordina l’anno del matrimonio.', order:['La proposta','La scelta della sala','Le prove dell’abito','Oggi'], shown:[2,0,3,1], s:'Proposta, sala, abito, oggi. In mezzo undici inviti stampati due volte.'},
+  {k:'Chi ha detto cosa', h:'Detta da uno dei due. O da tutti e due.', t:'«Il vestito lo scelgo io, tu occupati della musica.»', o:['Mara','Stefano','Entrambi, insieme'], c:2, s:'Detto da entrambi, nello stesso momento, a due persone diverse.'},
+  {k:'L’ultima carta', h:'Chiudiamo con i conti.', t:'Quanti anni sono passati da quella cena a oggi?', o:['4','5','7','10'], c:2, s:'Sette anni, due traslochi, un gatto e una cugina che si prende tutto il merito.'},
   {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'}
 ];
-const BASE_PTS = 60, BONUS_PTS = 40, DAILY = 4, TIMER_S = 20;
-// categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
+const BASE_PTS = 60, BONUS_PTS = 40, DAILY = 9, TIMER_S = 20;
+// categorie da 4 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
 const CATS = [
-  {name:'Come è iniziata', from:0, to:4, mark:'❖', medal:'Le origini', note:'Tutte e cinque sull’inizio'},
-  {name:'La vita insieme', from:5, to:9, mark:'✤', medal:'Casa nostra', note:'Tutte e cinque sulla convivenza'},
-  {name:'Fino a oggi', from:10, to:14, mark:'✱', medal:'Fino all’altare', note:'Tutte e cinque sull’anno del matrimonio'},
-  {name:'Su Stefano', from:15, to:19, mark:'✾', medal:'Esperto di Stefano', note:'Tutte e cinque su di lui'},
+  {name:'Mara', from:0, to:3, mark:'❖', medal:'Esperta di Mara', note:'Tutte e quattro su di lei'},
+  {name:'Stefano', from:4, to:7, mark:'✤', medal:'Esperto di Stefano', note:'Tutte e quattro su di lui'},
+  {name:'La loro vita insieme', from:8, to:11, mark:'✱', medal:'Casa nostra', note:'Tutte e quattro sulla vita insieme'},
+  {name:'La giornata di oggi', from:12, to:15, mark:'✾', medal:'Il giorno del sì', note:'Tutte e quattro sul matrimonio'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
@@ -49,7 +49,7 @@ const RIVALS_DEMO = [
 ];
 function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5,multi:1}; return r; }
 
-const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','Vocale','A coppie','Del giorno'];
+const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie','Del giorno'];
 
 /* ============ Utilità ============ */
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
@@ -61,9 +61,10 @@ const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'g-' + Math.random
 const state = {
   screen: 'boot',
   name: '', team: 1,
-  sel: 0,
+  sel: null,
   qi: 0, left: 0, locked: false, seq: [],
   res: {}, score: 0,
+  order: [],
   revealed: false,
   players: [],
   extraCards: [],
@@ -77,6 +78,28 @@ let fb = null; // firebase handles when online
 function allQuestions(){ return QS.concat(state.extraCards); }
 function Q(i){ return allQuestions()[i]; }
 
+function shuffle(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// l'ordine di visualizzazione delle domande e' casuale ma fisso per invitato:
+// le domande gia' assegnate a una posizione non si spostano piu', anche ricaricando;
+// le carte extra pubblicate dopo, essendo nuove, vengono solo aggiunte in coda.
+function ensureOrder(){
+  const total = allQuestions().length;
+  const known = new Set(state.order);
+  const missing = [];
+  for (let i = 0; i < total; i++) if (!known.has(i)) missing.push(i);
+  if (!missing.length) return false;
+  state.order = state.order.concat(shuffle(missing));
+  return true;
+}
+function posOf(i){ return state.order.indexOf(i); }
+
 /* ============ Persistenza locale ============ */
 function loadLocalProfile(){
   try { return JSON.parse(localStorage.getItem('msquiz_profile') || 'null'); } catch { return null; }
@@ -84,7 +107,7 @@ function loadLocalProfile(){
 function saveLocalProfile(){
   localStorage.setItem('msquiz_profile', JSON.stringify({
     guestId: state.guestId, name: state.name, team: state.team,
-    sel: state.sel, res: state.res, score: state.score,
+    sel: state.sel, res: state.res, score: state.score, order: state.order,
   }));
 }
 
@@ -106,19 +129,21 @@ async function persistProgress(){
     const ref = fb.doc(fb.db, 'players', state.guestId);
     await fb.setDoc(ref, {
       name: state.name, team: state.team, sel: state.sel,
-      res: state.res, score: state.score, updatedAt: fb.serverTimestamp(),
+      res: state.res, score: state.score, order: state.order, updatedAt: fb.serverTimestamp(),
     }, { merge: true });
   } else {
     saveLocalProfile();
   }
 }
 
-// trova la prossima domanda senza risposta, ciclicamente, a partire da from
-function nextOpen(res, from){
+// trova la prossima domanda senza risposta seguendo l'ordine casuale dell'invitato,
+// ciclicamente, a partire dalla posizione fromPos
+function nextOpen(res, fromPos){
   const total = allQuestions().length;
   for (let k = 0; k < total; k++){
-    const i = ((from || 0) + k) % total;
-    if (!res[i]) return i;
+    const pos = ((fromPos || 0) + k) % total;
+    const qi = state.order[pos];
+    if (!res[qi]) return qi;
   }
   return null;
 }
@@ -167,7 +192,7 @@ function pick(idx){
 }
 function go(screen){ clearInterval(tickHandle); tickHandle = null; state.screen = screen; render(); }
 function afterResult(){
-  const nx = nextOpen(state.res, state.qi + 1);
+  const nx = nextOpen(state.res, posOf(state.qi) + 1);
   state.sel = nx === null ? state.qi : nx;
   state.screen = nx === null ? 'finale' : 'home';
   render();
@@ -233,7 +258,7 @@ function renderJoin(){
     <h1 class="join-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
     <hr class="rule">
-    <p class="join-intro pretty">Quindici domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
+    <p class="join-intro pretty">Sedici domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
     <div class="field-block">
       <div class="field-label">Come ti chiamiamo noi</div>
       <input id="name-input" class="name-input" type="text" placeholder="Zia Franca" value="${esc(state.name)}" maxlength="40">
@@ -259,43 +284,28 @@ function renderHome(){
       </div>
     </div>`;
   }
+  ensureOrder();
   const all = allQuestions();
   const total = all.length;
   const done = Object.keys(state.res).length;
   const remaining = total - done;
-  const sel = Math.min(state.sel, total - 1);
+  const sel = (state.sel != null && state.sel < total) ? state.sel : state.order[0];
 
-  const lastFixedTo = CATS.length ? CATS[CATS.length - 1].to : -1;
-  const blockDefs = CATS.map(c => ({ ...c, isExtra: false }));
-  if (total - 1 > lastFixedTo){
-    blockDefs.push({ name: 'Domande extra', from: lastFixedTo + 1, to: total - 1, mark: '✦', isExtra: true });
-  }
-
-  const catBlocks = blockDefs.map(c => {
-    const st = c.isExtra ? null : catState(state.res, c);
-    const progress = c.isExtra ? '' : (st.earned ? c.medal : (st.failed ? 'niente medaglia' : st.right + '/' + st.n));
-    const ink = (!c.isExtra && st.earned) ? 'var(--accent-700)' : 'var(--neutral-700)';
-    const cells = [];
-    for (let i = c.from; i <= c.to; i++){
-      const isDone = !!state.res[i];
-      const isSel = i === sel;
-      const isDaily = i === DAILY && !isDone;
-      const wrong = isDone && !state.res[i].correct;
-      const glyph = wrong ? '·' : c.mark;
-      cells.push(`<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''} ${wrong?'wrong':''}" data-action="select-cell" data-i="${i}">
-        <span class="n serif tabular">${i + 1}</span>
-        ${isDone ? `<span class="mark">${glyph}</span>` : ''}
-        ${isDaily ? `<span class="daily-tag">×2</span>` : ''}
-      </button>`);
-    }
-    return `<div class="cat-block">
-      <div class="cat-head">
-        <span class="cat-name">${esc(c.name)}</span>
-        ${!c.isExtra ? `<span class="cat-progress" style="color:${ink}"><span class="cat-mark serif">${c.mark}</span><span class="tabular">${esc(progress)}</span></span>` : ''}
-      </div>
-      <div class="cal-grid5">${cells.join('')}</div>
-    </div>`;
+  const cells = state.order.map((qi, pos) => {
+    const isDone = !!state.res[qi];
+    const isSel = qi === sel;
+    const isDaily = qi === DAILY && !isDone;
+    const wrong = isDone && !state.res[qi].correct;
+    const ci = catOf(qi);
+    const mark = ci >= 0 ? CATS[ci].mark : '✦';
+    const glyph = wrong ? '·' : mark;
+    return `<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''} ${wrong?'wrong':''}" data-action="select-cell" data-i="${qi}">
+      <span class="n serif tabular">${pos + 1}</span>
+      ${isDone ? `<span class="mark">${glyph}</span>` : ''}
+      ${isDaily ? `<span class="daily-tag">×2</span>` : ''}
+    </button>`;
   }).join('');
+  const catBlocks = `<div class="cal-grid">${cells}</div>`;
 
   let panel;
   if (remaining === 0){
@@ -307,8 +317,7 @@ function renderHome(){
     </div>`;
   } else {
     const card = Q(sel);
-    const cat = CATS[catOf(sel)];
-    const label = (cat ? cat.name + ' · ' : '') + 'domanda ' + (sel + 1) + (sel === DAILY ? ' · vale doppio' : '');
+    const label = 'domanda ' + (posOf(sel) + 1) + (sel === DAILY ? ' · vale doppio' : '');
     const r = state.res[sel];
     panel = `<div class="card-preview">
       <div class="kicker">${esc(label)}</div>
@@ -331,7 +340,7 @@ function renderHome(){
         <div class="micro">Punti</div>
       </div>
     </div>
-    <div class="cat-blocks">${catBlocks}</div>
+    ${catBlocks}
     ${panel}
   </div>`;
 }
@@ -357,15 +366,6 @@ function renderQuizBody(q){
       <button class="btn-outline block" style="margin-top:20px;" data-action="confirm-order" ${incomplete?'disabled':''}>Conferma l’ordine</button>
       <button class="btn-text" style="margin-top:10px;" data-action="reset-order">Ricomincia da capo</button>`;
   }
-  if (q.audio){
-    const bars = [60,95,45,80,35,70,50].map((h,i)=>`<span style="height:${h}%;animation-delay:${i*0.12}s"></span>`).join('');
-    return `<div class="audio-row">
-      <button class="audio-play" data-action="play-audio"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent-600)"><polygon points="5,3 21,12 5,21"/></svg></button>
-      <div class="audio-wave">${bars}</div>
-      <div class="audio-dur tabular">0:07</div>
-      <audio id="q-audio" src="${esc(q.audioSrc||'')}" preload="none" style="display:none;"></audio>
-    </div>` + renderOptions(q);
-  }
   let extra = '';
   if (q.pair){
     extra = `<p class="pair-note">Sfida a coppie con <em>Testimone Andrea</em> — punti solo se indovinate entrambi.</p>`;
@@ -385,7 +385,7 @@ function renderQuiz(){
   return `<div class="screen screen-quiz">
     <div class="quiz-topbar">
       <button class="btn-text" data-action="go" data-screen="home">Torna alle domande</button>
-      <span class="counter">Domanda ${state.qi + 1} di ${allQuestions().length}</span>
+      <span class="counter">Domanda ${posOf(state.qi) + 1} di ${allQuestions().length}</span>
     </div>
     <div class="kicker" style="margin-top:14px;">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
@@ -407,7 +407,7 @@ function renderResult(){
   const rankLine = locked
     ? 'La busta resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
     : (mine ? `Sei ${mine.rank}º su ${board.length} in questo momento.` : '');
-  const cta = nextOpen(state.res, state.qi + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
+  const cta = nextOpen(state.res, posOf(state.qi) + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
   const myCat = CATS[catOf(state.qi)];
   const myCatSt = myCat ? catState(state.res, myCat) : null;
   const medalWon = !!(r.correct && myCatSt && myCatSt.earned);
@@ -518,16 +518,17 @@ function renderProfile(){
     }),
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
     { mark: '✧', name: 'Domanda del giorno', note: 'Hai aperto la domanda del giorno', locked: !state.res[DAILY] },
-    { mark: '✷', name: 'Calendario completo', note: 'Tutte e quindici le domande', locked: done < total },
+    { mark: '✷', name: 'Calendario completo', note: 'Tutte le carte del mazzo', locked: done < total },
   ];
   const badgeRows = badges.map(b => `<div class="badge-row ${b.locked?'locked':''}">
     <div class="badge-glyph">${b.mark}</div>
     <div><div class="badge-name">${esc(b.name)}</div><div class="badge-note">${esc(b.note)}</div></div>
   </div>`).join('');
-  const answers = allQuestions().map((x, i) => ({ i, x })).filter(o => state.res[o.i]).map(o => {
+  const answers = allQuestions().map((x, i) => ({ i, x })).filter(o => state.res[o.i])
+    .sort((a, b) => posOf(a.i) - posOf(b.i)).map(o => {
     const r = state.res[o.i];
     return `<div class="answer-row">
-      <span class="num" style="color:${r.correct?'var(--accent-600)':'var(--neutral-500)'}">${o.i+1}</span>
+      <span class="num" style="color:${r.correct?'var(--accent-600)':'var(--neutral-500)'}">${posOf(o.i)+1}</span>
       <span class="title">${esc(o.x.t)}</span>
       <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
     </div>`;
@@ -672,11 +673,6 @@ root.addEventListener('click', e => {
       break;
     }
     case 'reset-order': state.seq = []; render(); break;
-    case 'play-audio': {
-      const audio = document.getElementById('q-audio');
-      if (audio && audio.src) audio.play().catch(() => {});
-      break;
-    }
     case 'after-result': afterResult(); break;
     case 'go': go(el.dataset.screen); break;
     case 'open-board-full': state.revealed = true; go('board'); break;
@@ -735,9 +731,11 @@ async function boot(){
           if (snap.exists()){
             const d = snap.data();
             state.name = d.name || ''; state.team = d.team ?? 1;
-            state.sel = d.sel ?? 0;
+            state.sel = d.sel ?? null;
             state.res = d.res || {}; state.score = d.score || 0;
+            state.order = d.order || [];
           }
+          if (ensureOrder() && state.name) persistProgress();
           fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
             state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             render();
@@ -748,6 +746,7 @@ async function boot(){
           });
           fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
             state.extraCards = qs.docs.map(doc => doc.data());
+            if (ensureOrder() && state.name) persistProgress();
             render();
           });
           resolve();
@@ -764,8 +763,10 @@ async function boot(){
     state.guestId = (saved && saved.guestId) || uuid();
     if (saved){
       state.name = saved.name || ''; state.team = saved.team ?? 1;
-      state.sel = saved.sel ?? 0; state.res = saved.res || {}; state.score = saved.score || 0;
+      state.sel = saved.sel ?? null; state.res = saved.res || {}; state.score = saved.score || 0;
+      state.order = saved.order || [];
     }
+    if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';
   else state.screen = state.name ? 'home' : 'join';

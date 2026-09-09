@@ -4,7 +4,7 @@
 - `index.html`, `style.css`, `app.js` — l'app (nessun build, nessuna dipendenza da installare).
 - `firebase-config.js` — le chiavi del progetto Firebase (da compilare, vedi sotto).
 - `firestore.rules` — le regole di sicurezza da incollare nella console Firebase.
-- `assets/photos/`, `assets/audio/` — dove mettere le foto e i vocali veri (vedi sotto).
+- `assets/photos/` — dove mettere le foto vere (vedi sotto).
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
@@ -54,16 +54,13 @@ Da lì potete:
   "risposta giusta" — genera una carta a due opzioni (la risposta giusta e un
   distrattore generico), non tutti e sette i tipi di domanda complessi.
 
-## Foto e vocali veri
-Quando li avete pronti, basta metterli in `assets/` con questi nomi esatti
-(già collegati nel codice, nessuna modifica da fare):
-- `assets/photos/card-04.jpg` — foto della carta 4 ("dove è stata scattata la prima foto")
-- `assets/photos/card-10.jpg` — foto della carta 10 (il viaggio)
-- `assets/audio/card-06.mp3` — vocale della carta 6 (chi sta parlando)
-- `assets/audio/card-13.mp3` — vocale della carta 13 (la promessa)
+## Foto vere
+Quando è pronta, basta metterla in `assets/` con questo nome esatto
+(già collegato nel codice, nessuna modifica da fare):
+- `assets/photos/card-04.jpg` — foto della domanda "dove è stata scattata la prima foto insieme"
 
-Finché questi file non ci sono, l'app mostra automaticamente il placeholder grigio
-("Foto degli sposi") e il tasto play semplicemente non riproduce nulla.
+Finché il file non c'è, l'app mostra automaticamente il placeholder grigio
+("Foto degli sposi").
 
 ## Mettere il quiz online sul tuo hosting Aruba
 Il sito è completamente statico: quando è pronto, carica via FTP l'intero contenuto
@@ -74,9 +71,21 @@ tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
 
 ## Note tecniche
 - Il timer (20 secondi) non è mai mostrato durante la domanda, come da progetto.
-- La "carta del giorno" (×2 punti) è fissa: è sempre la 5ª carta del mazzo
-  ("Ordina le tappe · i primi quattro mesi"), non cambia in base al giorno reale.
-  Se preferite un'altra carta, cambiate `DAILY` in `app.js`.
+- Le 16 domande sono divise in 4 categorie da 4 ("Mara", "Stefano", "La loro vita
+  insieme", "La giornata di oggi"), ma nel mazzo non si vede alcuna etichetta:
+  è una griglia unica, uniforme. Le categorie contano solo per le medaglie nel
+  profilo di ogni invitato.
+- Ogni invitato vede le domande in un ordine casuale, deciso alla prima apertura
+  del gioco sul suo telefono e poi fissato per sempre (ricaricando la pagina
+  l'ordine non cambia). Le carte extra pubblicate dagli sposi durante l'evento
+  si aggiungono in fondo al mazzo di ciascuno, senza toccare l'ordine già visto.
+- La "carta del giorno" (×2 punti) è fissa per contenuto ("Ordina le tappe · i
+  primi quattro mesi"), non per posizione: essendo l'ordine casuale, può comparire
+  in un punto diverso del mazzo di ogni invitato. Se preferite un'altra domanda,
+  cambiate `DAILY` in `app.js` (è l'indice della domanda nell'array `QS`).
+- Le 4 domande "Su Mara" nell'array `QS` sono un placeholder (risposte "Da
+  completare") in attesa dei contenuti veri — modificatele in `app.js` prima
+  del matrimonio.
 - Se un invitato ricarica la pagina a metà di una domanda, torna al mazzo — il
   cronometro di quella domanda continua comunque a correre in background (uscire
   non è un modo per "congelare" il tempo).
