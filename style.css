@@ -113,11 +113,59 @@ input{font-family:inherit;}
 .chip.on{ background:var(--accent-600); border-color:var(--accent-600); color:var(--cream); }
 .fine-print{ font-size:11px; color:var(--neutral-700); margin-top:10px; }
 
-/* ===== HOME / CALENDARIO ===== */
-.screen-home{ padding:24px 24px 24px; }
+/* ===== HUB (home con foto) ===== */
+.screen-hub{ padding:0 0 24px; }
+.hub-hero{ position:relative; flex:none; height:340px; background:var(--neutral-300); overflow:hidden; }
+.hub-hero img{ width:100%; height:100%; object-fit:cover; }
+.hub-hero .fade{ position:absolute; inset:auto 0 0 0; height:150px; background:linear-gradient(to top, var(--cream) 6%, rgba(253,246,228,.86) 46%, rgba(253,246,228,0)); pointer-events:none; }
+.hub-hero .cap{ position:absolute; inset:auto 24px 18px; text-align:center; }
+.hub-hero .cap .names{ font-size:38px; line-height:1; margin-top:4px; }
+.hub-body{ padding:18px 22px 100px; display:flex; flex-direction:column; gap:12px; }
+.hub-welcome{ text-align:center; font-size:14px; line-height:1.6; color:var(--neutral-800); }
+.hub-quiz-card{ width:100%; text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--accent-600); padding:20px; border-radius:var(--r-md); box-shadow:var(--shadow-sm); display:flex; align-items:flex-end; gap:var(--sp-4); }
+.hub-quiz-card:hover{ background:var(--accent-100); }
+.hub-quiz-card .title{ display:block; font-size:30px; line-height:1.05; margin-top:4px; }
+.hub-quiz-card .sub{ display:block; font-size:12.5px; color:var(--neutral-700); margin-top:6px; }
+.hub-quiz-card img{ flex:none; width:64px; height:auto; }
+.hub-progress{ display:flex; align-items:center; gap:6px; margin-top:10px; }
+.hub-progress .bar{ display:block; flex:1; height:1px; background:var(--neutral-400); position:relative; }
+.hub-progress .bar span{ position:absolute; inset:0 auto 0 0; height:1px; background:var(--accent-600); }
+.hub-progress .frac{ flex:none; font-size:11px; color:var(--accent-700); }
+.hub-tiles{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.hub-tile{ text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--neutral-400); padding:16px 16px 14px; min-height:120px; display:flex; flex-direction:column; border-radius:var(--r-md); box-shadow:var(--shadow-sm); }
+.hub-tile:hover{ background:var(--accent-100); }
+.hub-tile .kicker{ font-size:9.5px; }
+.hub-tile .title{ display:block; font-size:22px; line-height:1.1; margin-top:6px; }
+.hub-tile .foot{ flex:1; display:block; align-self:flex-end; font-size:11.5px; color:var(--accent-700); margin-top:auto; }
+.hub-link-row{ width:100%; text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--neutral-400); padding:15px 18px; display:flex; align-items:center; gap:var(--sp-3); border-radius:var(--r-md); box-shadow:var(--shadow-sm); }
+.hub-link-row:hover{ background:var(--accent-100); }
+.hub-link-row .title{ display:block; margin-top:1px; }
+.hub-link-row .arrow{ flex:none; font-size:18px; color:var(--accent-700); }
+
+/* ===== PROGRAMMA ===== */
+.screen-programma{ padding:58px 24px 100px; }
+.screen-programma > .btn-text{ align-self:flex-start; }
+.programma-row{ display:flex; gap:var(--sp-3); padding:12px 0; border-top:1px solid var(--neutral-300); }
+.programma-row .time{ flex:none; width:70px; font-size:17px; color:var(--accent-700); }
+.programma-row .label{ font-size:14.5px; padding-top:2px; }
+
+/* ===== HOME / DOMANDE (card per categoria) ===== */
+.screen-home{ padding:24px 24px 100px; }
 .home-header{ display:flex; justify-content:space-between; align-items:flex-start; }
 .home-score{ text-align:right; }
 .home-score .num{ font-size:27px; }
+
+.cat-cards{ display:flex; flex-direction:column; gap:14px; margin-top:14px; }
+.cat-card{ border:1px solid var(--neutral-400); border-radius:var(--r-md); background:#fffdf6; box-shadow:var(--shadow-sm); padding:18px; }
+.cat-card.earned{ border-color:var(--accent-600); }
+.cat-card-head{ display:flex; align-items:flex-start; gap:var(--sp-3); }
+.cat-card-glyph{ flex:none; width:36px; height:36px; border-radius:999px; border:1px solid var(--neutral-400); display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--neutral-700); }
+.cat-card.earned .cat-card-glyph{ border-color:var(--accent-600); color:var(--accent-700); }
+.cat-card-kicker{ display:block; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--neutral-700); }
+.cat-card.earned .cat-card-kicker{ color:var(--accent-700); }
+.cat-card-name{ display:block; font-size:24px; line-height:1.1; }
+.cat-card-note{ display:block; font-size:12px; color:var(--neutral-700); margin-top:2px; }
+.cat-card .cal-grid{ margin-top:14px; }
 
 .cal-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:14px; }
 .cal-cell{

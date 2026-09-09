@@ -51,6 +51,14 @@ function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20
 
 const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie','Del giorno'];
 
+// TODO: incolla qui il link del vostro album condiviso (Google Foto, Dropbox...) quando c'è.
+const ALBUM_URL = '';
+// TODO: completare con gli orari veri della giornata e, se volete, il menù.
+const PROGRAMMA = [
+  { time: 'Ore 16', label: 'Cerimonia' },
+];
+const MENU_NOTE = '';
+
 /* ============ Utilità ============ */
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
 const numIt = n => (n||0).toFixed(1).replace('.', ',');
@@ -240,6 +248,8 @@ function render(){
   switch (state.screen){
     case 'boot': html = renderBoot(); break;
     case 'join': html = renderJoin(); break;
+    case 'hub': html = renderHub(); break;
+    case 'programma': html = renderProgramma(); break;
     case 'home': html = renderHome(); break;
     case 'quiz': html = renderQuiz(); break;
     case 'result': html = renderResult(); break;
@@ -247,9 +257,9 @@ function render(){
     case 'profile': html = renderProfile(); break;
     case 'finale': html = renderFinale(); break;
     case 'admin': html = renderAdmin(); break;
-    default: html = renderHome();
+    default: html = renderHub();
   }
-  const showTabs = ['home', 'board', 'profile'].includes(state.screen);
+  const showTabs = ['hub', 'home', 'board', 'profile'].includes(state.screen);
   root.innerHTML = html + (showTabs ? renderTabs() : '');
 }
 
@@ -283,6 +293,75 @@ function renderJoin(){
   </div>`;
 }
 
+function renderHub(){
+  ensureOrder();
+  const total = allQuestions().length;
+  const done = Object.keys(state.res).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return `<div class="screen screen-hub">
+    <div class="hub-hero">
+      <img src="assets/photos/hub-hero.jpg" alt="" onerror="this.remove()">
+      <div class="fade"></div>
+      <div class="cap">
+        <div class="kicker">16 ottobre 2026 · Villa Calini</div>
+        <div class="names serif">Mara <span class="amp">&amp;</span> Stefano</div>
+      </div>
+    </div>
+    <div class="hub-body">
+      <p class="hub-welcome pretty">Benvenuta, <em>${esc(state.name || 'Zia Franca')}</em>. Tutto quello che serve oggi è qui dentro.</p>
+
+      <button class="hub-quiz-card" data-action="go" data-screen="home">
+        <span style="flex:1;min-width:0;">
+          <span class="kicker">Il gioco degli invitati</span>
+          <span class="title serif">Il quiz su di noi</span>
+          <span class="sub">Sedici domande, quattro medaglie</span>
+          <span class="hub-progress">
+            <span class="bar"><span style="width:${pct}%;"></span></span>
+            <span class="frac tabular">${done}/${total}</span>
+          </span>
+        </span>
+        <img src="assets/mascotte/cricetino-fiore-solo.png" alt="">
+      </button>
+
+      <div class="hub-tiles">
+        <button class="hub-tile" data-action="go" data-screen="programma">
+          <span class="kicker">La giornata</span>
+          <span class="title serif">Programma<br>e menù</span>
+          <span class="foot">${esc(PROGRAMMA[0] ? PROGRAMMA[0].time + ' · ' + PROGRAMMA[0].label.toLowerCase() : 'Tutti gli orari')}</span>
+        </button>
+        <button class="hub-tile" data-action="open-album">
+          <span class="kicker">Album condiviso</span>
+          <span class="title serif">Carica le<br>tue foto</span>
+          <span class="foot">Si apre fuori ↗</span>
+        </button>
+      </div>
+
+      <button class="hub-link-row" data-action="go" data-screen="board">
+        <span style="flex:1;min-width:0;">
+          <span class="kicker">${state.revealed ? 'Busta aperta' : 'Busta chiusa fino ai discorsi'}</span>
+          <span class="title serif" style="font-size:22px;">Classifica</span>
+        </span>
+        <span class="arrow">→</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderProgramma(){
+  const rows = PROGRAMMA.map(p => `<div class="programma-row">
+    <div class="time serif">${esc(p.time)}</div>
+    <div class="label">${esc(p.label)}</div>
+  </div>`).join('');
+  return `<div class="screen screen-programma">
+    <button class="btn-text" data-action="go" data-screen="hub">← Torna alla home</button>
+    <h1 class="board-title">Programma <span class="amp">&amp;</span> menù</h1>
+    <hr class="rule sm" style="margin-left:0;">
+    ${rows || `<p class="empty-note">Il programma verrà aggiunto qui.</p>`}
+    <div class="section-title">Menù</div>
+    <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">${MENU_NOTE ? esc(MENU_NOTE) : 'Il menù verrà aggiunto qui.'}</p>
+  </div>`;
+}
+
 function renderHome(){
   if (state.revealed){
     return `<div class="screen screen-home">
@@ -301,7 +380,7 @@ function renderHome(){
   const remaining = total - done;
   const sel = (state.sel != null && state.sel < total) ? state.sel : state.order[0];
 
-  const cells = state.order.map((qi, pos) => {
+  const cellHtml = qi => {
     const isDone = !!state.res[qi];
     const isSel = qi === sel;
     const isDaily = qi === DAILY && !isDone;
@@ -310,12 +389,39 @@ function renderHome(){
     const mark = ci >= 0 ? CATS[ci].mark : '✦';
     const glyph = wrong ? '·' : mark;
     return `<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''} ${wrong?'wrong':''}" data-action="select-cell" data-i="${qi}">
-      <span class="n serif tabular">${pos + 1}</span>
+      <span class="n serif tabular">${posOf(qi) + 1}</span>
       ${isDone ? `<span class="mark">${glyph}</span>` : ''}
       ${isDaily ? `<span class="daily-tag">×2</span>` : ''}
     </button>`;
+  };
+
+  const catCards = CATS.map(c => {
+    const st = catState(state.res, c);
+    const kicker = st.earned ? 'Medaglia vinta' : (st.failed ? 'Niente medaglia' : (st.done > 0 ? st.right + '/' + st.done + ' giuste' : 'Ancora da fare'));
+    const cells = state.order.filter(qi => catOf(qi) === CATS.indexOf(c)).map(cellHtml).join('');
+    return `<div class="cat-card ${st.earned?'earned':''}">
+      <div class="cat-card-head">
+        <span class="cat-card-glyph">${c.mark}</span>
+        <span style="flex:1;min-width:0;">
+          <span class="cat-card-kicker">${esc(kicker)}</span>
+          <span class="cat-card-name serif">${esc(c.name)}</span>
+          <span class="cat-card-note">${esc(st.earned ? c.medal : st.n + ' domande')}</span>
+        </span>
+      </div>
+      <div class="cal-grid">${cells}</div>
+    </div>`;
   }).join('');
-  const catBlocks = `<div class="cal-grid">${cells}</div>`;
+  const extraCells = state.order.filter(qi => catOf(qi) < 0);
+  const extraCard = extraCells.length ? `<div class="cat-card">
+    <div class="cat-card-head">
+      <span class="cat-card-glyph">✦</span>
+      <span style="flex:1;min-width:0;">
+        <span class="cat-card-kicker">Pubblicate dagli sposi</span>
+        <span class="cat-card-name serif">Domande extra</span>
+      </span>
+    </div>
+    <div class="cal-grid">${extraCells.map(cellHtml).join('')}</div>
+  </div>` : '';
 
   let panel;
   if (remaining === 0){
@@ -327,7 +433,8 @@ function renderHome(){
     </div>`;
   } else {
     const card = Q(sel);
-    const label = 'domanda ' + (posOf(sel) + 1) + (sel === DAILY ? ' · vale doppio' : '');
+    const cat = CATS[catOf(sel)];
+    const label = (cat ? cat.name + ' · ' : '') + 'domanda ' + (posOf(sel) + 1) + (sel === DAILY ? ' · vale doppio' : '');
     const r = state.res[sel];
     panel = `<div class="card-preview">
       <div class="kicker">${esc(label)}</div>
@@ -350,7 +457,7 @@ function renderHome(){
         <div class="micro">Punti</div>
       </div>
     </div>
-    ${catBlocks}
+    <div class="cat-cards">${catCards}${extraCard}</div>
     ${panel}
   </div>`;
 }
@@ -656,11 +763,13 @@ function renderAdmin(){
 
 function renderTabs(){
   const icon = {
+    hub: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>`,
     home: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="6" rx="1.5"/><rect x="4" y="11" width="16" height="6" rx="1.5"/><rect x="4" y="19" width="16" height="2" rx="1"/></svg>`,
     board: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="12" width="3" height="8"/><rect x="11" y="7" width="3" height="13"/><rect x="16" y="10" width="3" height="10"/></svg>`,
     profile: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`,
   };
   const tabs = [
+    { id: 'hub', label: 'Home' },
     { id: 'home', label: 'Domande' },
     { id: 'board', label: 'Busta' },
     { id: 'profile', label: 'Profilo' },
@@ -679,7 +788,7 @@ root.addEventListener('click', e => {
       const input = document.getElementById('name-input');
       state.name = (input && input.value.trim()) || 'Zia Franca';
       persistProgress();
-      go('home');
+      go('hub');
       break;
     }
     case 'flip': flip(); break;
@@ -710,6 +819,11 @@ root.addEventListener('click', e => {
     }
     case 'reset-player-answers': {
       if (confirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.')) resetPlayerAnswers(el.dataset.id);
+      break;
+    }
+    case 'open-album': {
+      if (ALBUM_URL) window.open(ALBUM_URL, '_blank');
+      else alert('Il link dell\'album non è ancora stato impostato (ALBUM_URL in app.js).');
       break;
     }
   }
@@ -817,7 +931,7 @@ async function boot(){
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';
-  else state.screen = state.name ? 'home' : 'join';
+  else state.screen = state.name ? 'hub' : 'join';
   render();
 }
 boot();

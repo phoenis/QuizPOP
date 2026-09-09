@@ -6,6 +6,20 @@
 - `firestore.rules` — le regole di sicurezza da incollare nella console Firebase.
 - `assets/photos/` — dove mettere le foto vere (vedi sotto).
 
+## La home
+Dopo l'iscrizione l'invitato arriva su una home con la vostra foto, la card del
+quiz, "Programma e menù" e "Carica le tue foto" (album condiviso). Da qui si
+naviga anche con la barra in basso (Home, Domande, Busta, Profilo).
+- **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`. Finché
+  non c'è, l'app mostra lo sfondo neutro senza foto.
+- **Album condiviso**: apri `app.js`, cerca `ALBUM_URL` (vicino all'inizio del
+  file) e incolla lì il link del vostro album (Google Foto, Dropbox...). Finché
+  è vuoto, il tasto "Carica le tue foto" avvisa che il link non è stato ancora
+  impostato.
+- **Programma e menù**: sempre in `app.js`, cerca `PROGRAMMA` (l'orario della
+  cerimonia c'è già) e `MENU_NOTE` — aggiungete gli altri orari della giornata
+  e, se volete, il testo del menù.
+
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
 Appena inserisci le chiavi Firebase, l'app passa da sola alla **modalità online**
@@ -72,9 +86,9 @@ tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
 ## Note tecniche
 - Il timer (20 secondi) non è mai mostrato durante la domanda, come da progetto.
 - Le 16 domande sono divise in 4 categorie da 4 ("Mara", "Stefano", "La loro vita
-  insieme", "La giornata di oggi"), ma nel mazzo non si vede alcuna etichetta:
-  è una griglia unica, uniforme. Le categorie contano solo per le medaglie nel
-  profilo di ogni invitato.
+  insieme", "La giornata di oggi"), mostrate come 4 card nella schermata "Le
+  domande" (una per categoria, con dentro le sue 4 caselle). Le categorie danno
+  anche una medaglia nel profilo se le indovini tutte e quattro.
 - Ogni invitato vede le domande in un ordine casuale, deciso alla prima apertura
   del gioco sul suo telefono e poi fissato per sempre (ricaricando la pagina
   l'ordine non cambia). Le carte extra pubblicate dagli sposi durante l'evento
