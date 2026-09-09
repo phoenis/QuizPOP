@@ -181,6 +181,7 @@ function finish(idx){
   state.score += pts;
   state.locked = true;
   state.screen = 'result';
+  pushScreen('result');
   persistProgress();
 }
 
@@ -199,6 +200,7 @@ function flip(){
   if (i === undefined || i === null || state.res[i]) return;
   clearInterval(tickHandle);
   state.screen = 'quiz'; state.qi = i; state.left = dur(); state.locked = false; state.seq = [];
+  pushScreen('quiz');
   tickHandle = setInterval(tick, 100);
   render();
 }
@@ -208,12 +210,23 @@ function pick(idx){
   finish(idx);
   render();
 }
-function go(screen){ clearInterval(tickHandle); tickHandle = null; state.screen = screen; render(); }
+
+// ogni cambio di schermata e' una voce nella cronologia del browser, cosi' il
+// tasto "indietro" del telefono torna alla schermata precedente invece di
+// uscire dall'app (vedi anche il listener 'popstate' e boot()).
+function pushScreen(screen){
+  try { history.pushState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
+}
+function go(screen){
+  clearInterval(tickHandle); tickHandle = null;
+  state.screen = screen;
+  pushScreen(screen);
+  render();
+}
 function afterResult(){
   const nx = nextOpen(state.res, posOf(state.qi) + 1);
   state.sel = nx === null ? state.qi : nx;
-  state.screen = nx === null ? 'finale' : 'home';
-  render();
+  go(nx === null ? 'finale' : 'home');
 }
 
 function allPlayersWithMe(){
@@ -353,7 +366,7 @@ function renderProgramma(){
     <div class="label">${esc(p.label)}</div>
   </div>`).join('');
   return `<div class="screen screen-programma">
-    <button class="btn-text" data-action="go" data-screen="hub">← Torna alla home</button>
+    <button class="btn-text" data-action="nav-back">← Torna alla home</button>
     <h1 class="board-title">Programma <span class="amp">&amp;</span> menù</h1>
     <hr class="rule sm" style="margin-left:0;">
     ${rows || `<p class="empty-note">Il programma verrà aggiunto qui.</p>`}
@@ -501,7 +514,7 @@ function renderQuiz(){
   const q = Q(state.qi);
   return `<div class="screen screen-quiz">
     <div class="quiz-topbar">
-      <button class="btn-text" data-action="go" data-screen="home">Torna alle domande</button>
+      <button class="btn-text" data-action="nav-back">Torna alle domande</button>
       <span class="counter">Domanda ${posOf(state.qi) + 1} di ${allQuestions().length}</span>
     </div>
     <div class="kicker" style="margin-top:14px;">${esc(q.k)}</div>
@@ -808,6 +821,7 @@ root.addEventListener('click', e => {
     case 'reset-order': state.seq = []; render(); break;
     case 'after-result': afterResult(); break;
     case 'go': go(el.dataset.screen); break;
+    case 'nav-back': history.back(); break;
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
@@ -932,6 +946,17 @@ async function boot(){
   }
   if (location.hash === '#sposi') state.screen = 'admin';
   else state.screen = state.name ? 'hub' : 'join';
+  try { history.replaceState({ screen: state.screen }, '', '#' + (state.screen === 'admin' ? 'sposi' : state.screen)); } catch {}
   render();
 }
+
+// il tasto "indietro" del telefono ripercorre le schermate visitate, invece
+// di uscire dall'app: ogni cambio di schermata e' una voce di history (vedi
+// pushScreen), qui la recuperiamo quando l'utente torna indietro (o avanti).
+window.addEventListener('popstate', e => {
+  clearInterval(tickHandle); tickHandle = null;
+  state.screen = (e.state && e.state.screen) || (state.name ? 'hub' : 'join');
+  render();
+});
+
 boot();
