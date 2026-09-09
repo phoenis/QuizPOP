@@ -394,48 +394,29 @@ function renderHome(){
   const remaining = total - done;
   const sel = (state.sel != null && state.sel < total) ? state.sel : state.order[0];
 
-  const cellHtml = qi => {
-    const isDone = !!state.res[qi];
-    const isSel = qi === sel;
-    const isDaily = qi === DAILY && !isDone;
-    const wrong = isDone && !state.res[qi].correct;
-    const ci = catOf(qi);
-    const mark = ci >= 0 ? CATS[ci].mark : '✦';
-    const glyph = wrong ? '·' : mark;
-    return `<button class="cal-cell ${isSel?'sel':''} ${isDone?'done':''} ${wrong?'wrong':''}" data-action="select-cell" data-i="${qi}">
-      <span class="n serif tabular">${posOf(qi) + 1}</span>
-      ${isDone ? `<span class="mark">${glyph}</span>` : ''}
-      ${isDaily ? `<span class="daily-tag">×2</span>` : ''}
+  // ogni categoria e' una riga cliccabile con l'anello di percentuale
+  // (quante ne hai fatte, non quante giuste: quello resta nelle medaglie).
+  const catRow = (icon, name, sub, catQs, extraClass) => {
+    const doneN = catQs.filter(qi => state.res[qi]).length;
+    const pct = catQs.length ? Math.round((doneN / catQs.length) * 100) : 0;
+    const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
+    return `<button class="cat-row ${extraClass||''}" data-action="select-cell" data-i="${target}">
+      <span class="cat-row-icon">${icon}</span>
+      <span class="cat-row-info">
+        <span class="cat-row-name serif">${esc(name)}</span>
+        <span class="cat-row-sub">${esc(sub)}</span>
+      </span>
+      <span class="cat-row-ring" style="--pct:${pct};"><span class="cat-row-pct tabular">${pct}%</span></span>
     </button>`;
   };
-
-  const catCards = CATS.map(c => {
+  const catCards = CATS.map((c, idx) => {
     const st = catState(state.res, c);
-    const kicker = st.earned ? 'Medaglia vinta' : (st.failed ? 'Niente medaglia' : (st.done > 0 ? st.right + '/' + st.done + ' giuste' : 'Ancora da fare'));
-    const cells = state.order.filter(qi => catOf(qi) === CATS.indexOf(c)).map(cellHtml).join('');
-    return `<div class="cat-card ${st.earned?'earned':''}">
-      <div class="cat-card-head">
-        <span class="cat-card-glyph">${c.mark}</span>
-        <span style="flex:1;min-width:0;">
-          <span class="cat-card-kicker">${esc(kicker)}</span>
-          <span class="cat-card-name serif">${esc(c.name)}</span>
-          <span class="cat-card-note">${esc(st.earned ? c.medal : st.n + ' domande')}</span>
-        </span>
-      </div>
-      <div class="cal-grid">${cells}</div>
-    </div>`;
+    const catQs = state.order.filter(qi => catOf(qi) === idx);
+    const sub = st.earned ? st.n + ' domande · ' + c.medal : st.n + ' domande';
+    return catRow(c.mark, c.name, sub, catQs, st.earned ? 'earned' : '');
   }).join('');
-  const extraCells = state.order.filter(qi => catOf(qi) < 0);
-  const extraCard = extraCells.length ? `<div class="cat-card">
-    <div class="cat-card-head">
-      <span class="cat-card-glyph">✦</span>
-      <span style="flex:1;min-width:0;">
-        <span class="cat-card-kicker">Pubblicate dagli sposi</span>
-        <span class="cat-card-name serif">Domande extra</span>
-      </span>
-    </div>
-    <div class="cal-grid">${extraCells.map(cellHtml).join('')}</div>
-  </div>` : '';
+  const extraQs = state.order.filter(qi => catOf(qi) < 0);
+  const extraCard = extraQs.length ? catRow('✦', 'Domande extra', extraQs.length + ' domande · pubblicate dagli sposi', extraQs) : '';
 
   let panel;
   if (remaining === 0){
