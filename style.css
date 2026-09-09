@@ -29,7 +29,7 @@
   --canvas-ground:#e8dcc4;
 
   --sp-1:4.4px; --sp-2:8.8px; --sp-3:13.2px; --sp-4:17.6px; --sp-6:26.4px; --sp-8:35.2px;
-  --r-sm:8px; --r-md:16px; --r-full:999px;
+  --r-sm:0.5rem; --r-md:1rem; --r-full:999px;
   --shadow-sm:0 1px 2px rgba(46,43,37,.14);
   --shadow-md:0 3px 10px rgba(46,43,37,.16);
   --shadow-lg:0 12px 32px rgba(46,43,37,.22);
@@ -141,7 +141,7 @@ input{font-family:inherit;}
 .hub-hero .cap .names{ font-size:38px; line-height:1; margin-top:4px; }
 .hub-body{ padding:18px 22px 40px; display:flex; flex-direction:column; gap:12px; }
 .hub-welcome{ text-align:center; font-size:14px; line-height:1.6; color:var(--neutral-800); }
-.hub-quiz-card{ width:100%; text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--accent-600); padding:20px; border-radius:var(--r-md); box-shadow:var(--shadow-sm); display:flex; align-items:flex-end; gap:var(--sp-4); }
+.hub-quiz-card{ width:100%; text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--accent-600); padding:20px; border-radius:var(--r-sm); box-shadow:var(--shadow-sm); display:flex; align-items:flex-end; gap:var(--sp-4); }
 .hub-quiz-card:hover{ background:var(--accent-100); }
 .hub-quiz-card .title{ display:block; font-size:30px; line-height:1.05; margin-top:4px; }
 .hub-quiz-card .sub{ display:block; font-size:12.5px; color:var(--neutral-700); margin-top:6px; }
