@@ -83,6 +83,14 @@ input{font-family:inherit;}
   font-size:16px; display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow-sm);
 }
+/* speculare all'icona profilo: solo sulla schermata categorie, per tornare alla home */
+.back-fab{
+  position:absolute; top:20px; left:20px; z-index:6;
+  width:44px; height:44px; border-radius:50%; border:1px solid var(--neutral-400);
+  background:var(--cream); color:var(--ink); font-size:18px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow-sm);
+}
 
 .kicker{
   font-size:11px; text-transform:uppercase; letter-spacing:.24em;
@@ -170,7 +178,7 @@ input{font-family:inherit;}
 
 /* ===== HOME / DOMANDE (card per categoria) ===== */
 .screen-home{ padding:24px 24px 40px; }
-.home-header{ display:flex; justify-content:space-between; align-items:flex-start; padding-right:52px; }
+.home-header{ display:flex; justify-content:space-between; align-items:flex-start; padding-left:52px; padding-right:52px; }
 .home-score{ text-align:right; }
 .home-score .num{ font-size:27px; }
 

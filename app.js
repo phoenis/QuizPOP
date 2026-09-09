@@ -182,7 +182,10 @@ function finish(idx){
   state.score += pts;
   state.locked = true;
   state.screen = 'result';
-  pushScreen('result');
+  // sempre in continuazione della sessione di domande aperta con flip(): non
+  // apre una nuova voce di history, altrimenti "indietro" potrebbe tornare a
+  // rivedere una domanda già risposta (vedi nota su flip()).
+  replaceScreen('result');
   persistProgress();
 }
 
@@ -200,8 +203,14 @@ function flip(){
   const i = state.sel;
   if (i === undefined || i === null || state.res[i]) return;
   clearInterval(tickHandle);
+  // apre una nuova voce di history solo se si entra "da fuori" (dalla
+  // schermata categorie): il resto della sessione (domanda dopo domanda,
+  // fino a che la categoria non e' finita) sovrascrive quella stessa voce,
+  // cosi' l'indietro esce dall'intera sessione invece di ripercorrere le
+  // domande gia' risposte una per una.
+  const continuing = state.screen === 'quiz' || state.screen === 'result';
   state.screen = 'quiz'; state.qi = i; state.left = dur(); state.locked = false; state.seq = [];
-  pushScreen('quiz');
+  if (continuing) replaceScreen('quiz'); else pushScreen('quiz');
   tickHandle = setInterval(tick, 100);
   render();
 }
@@ -218,6 +227,9 @@ function pick(idx){
 function pushScreen(screen){
   try { history.pushState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
 }
+function replaceScreen(screen){
+  try { history.replaceState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
+}
 function go(screen){
   clearInterval(tickHandle); tickHandle = null;
   state.screen = screen;
@@ -225,9 +237,25 @@ function go(screen){
   render();
 }
 function afterResult(){
+  // resta nella stessa categoria finche' ce n'e' una domanda non ancora
+  // fatta: apre subito quella, senza passare dalla schermata categorie.
+  const cat = catOf(state.qi);
+  const catQs = cat >= 0 ? state.order.filter(qi => catOf(qi) === cat) : [];
+  const nextInCat = catQs.find(qi => !state.res[qi]);
+  if (nextInCat !== undefined){
+    state.sel = nextInCat;
+    flip();
+    return;
+  }
+  // categoria finita: torna alla schermata categorie (o al finale se non
+  // resta nessuna domanda da nessuna parte), sovrascrivendo la sessione
+  // appena conclusa cosi' non resta raggiungibile all'indietro.
   const nx = nextOpen(state.res, posOf(state.qi) + 1);
   state.sel = nx === null ? state.qi : nx;
-  go(nx === null ? 'finale' : 'home');
+  clearInterval(tickHandle); tickHandle = null;
+  state.screen = nx === null ? 'finale' : 'home';
+  replaceScreen(state.screen);
+  render();
 }
 
 function allPlayersWithMe(){
@@ -400,7 +428,7 @@ function renderHome(){
     const doneN = catQs.filter(qi => state.res[qi]).length;
     const pct = catQs.length ? Math.round((doneN / catQs.length) * 100) : 0;
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
-    return `<button class="cat-row ${extraClass||''}" data-action="select-cell" data-i="${target}">
+    return `<button class="cat-row ${extraClass||''}" data-action="flip-to" data-i="${target}">
       <span class="cat-row-icon">${icon}</span>
       <span class="cat-row-info">
         <span class="cat-row-name serif">${esc(name)}</span>
@@ -442,6 +470,7 @@ function renderHome(){
   }
 
   return `<div class="screen screen-home">
+    <button class="back-fab" data-action="nav-back">←</button>
     ${avatarButton()}
     <div class="home-header">
       <div>
@@ -549,7 +578,7 @@ function renderResult(){
     <div class="result-spacer"></div>
     <div class="result-cta">
       <button class="btn-outline block" data-action="after-result">${cta}</button>
-      <button class="btn-text" data-action="go" data-screen="home" style="align-self:center;">Basta per ora, torno dopo</button>
+      <button class="btn-text" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
     </div>
   </div>`;
 }
@@ -793,6 +822,7 @@ root.addEventListener('click', e => {
     }
     case 'flip': flip(); break;
     case 'select-cell': state.sel = +el.dataset.i; render(); break;
+    case 'flip-to': state.sel = +el.dataset.i; flip(); break;
     case 'pick-option': pick(+el.dataset.idx); break;
     case 'toggle-order': {
       const i = +el.dataset.i;
