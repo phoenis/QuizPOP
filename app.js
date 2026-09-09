@@ -334,6 +334,9 @@ function renderJoin(){
   </div>`;
 }
 
+/* <p class="hub-welcome pretty">Benvenuta, <em>${esc(state.name || 'Zia Franca')}</em>. Tutto quello che serve oggi è qui dentro.</p>
+ */
+
 function renderHub(){
   ensureOrder();
   const total = allQuestions().length;
@@ -350,8 +353,7 @@ function renderHub(){
       </div>
     </div>
     <div class="hub-body">
-      <p class="hub-welcome pretty">Benvenuta, <em>${esc(state.name || 'Zia Franca')}</em>. Tutto quello che serve oggi è qui dentro.</p>
-
+      
       <button class="hub-quiz-card" data-action="go" data-screen="home">
         <span style="flex:1;min-width:0;">
           <span class="kicker">Il gioco</span>
