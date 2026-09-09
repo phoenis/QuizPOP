@@ -287,7 +287,7 @@ function renderBoot(){
 function renderJoin(){
   const chips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
   return `<div class="screen screen-join">
-    <div class="kicker">Il gioco degli invitati</div>
+    <div class="kicker">Il gioco</div>
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
     <hr class="rule">
@@ -326,9 +326,9 @@ function renderHub(){
 
       <button class="hub-quiz-card" data-action="go" data-screen="home">
         <span style="flex:1;min-width:0;">
-          <span class="kicker">Il gioco degli invitati</span>
+          <span class="kicker">Il gioco</span>
           <span class="title serif">Il quiz su di noi</span>
-          <span class="sub">Sedici domande, quattro medaglie</span>
+          <span class="sub">Scala la classifica e vinci un premio!</span>
           <span class="hub-progress">
             <span class="bar"><span style="width:${pct}%;"></span></span>
             <span class="frac tabular">${done}/${total}</span>
@@ -346,20 +346,20 @@ function renderHub(){
         <button class="hub-tile" data-action="open-album">
           <span class="kicker">Album condiviso</span>
           <span class="title serif">Carica le<br>tue foto</span>
-          <span class="foot">Si apre fuori ↗</span>
+          <span class="foot">WedShoots ↗</span>
         </button>
       </div>
+    </div>
+  </div>`;
+}
 
-      <button class="hub-link-row" data-action="go" data-screen="board">
+/* <button class="hub-link-row" data-action="go" data-screen="board">
         <span style="flex:1;min-width:0;">
           <span class="kicker">${state.revealed ? 'Busta aperta' : 'Busta chiusa fino ai discorsi'}</span>
           <span class="title serif" style="font-size:22px;">Classifica</span>
         </span>
         <span class="arrow">→</span>
-      </button>
-    </div>
-  </div>`;
-}
+      </button> */
 
 function renderProgramma(){
   const rows = PROGRAMMA.map(p => `<div class="programma-row">
