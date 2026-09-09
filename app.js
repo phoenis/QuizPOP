@@ -56,12 +56,41 @@ const ALBUM_URL = '';
 
 // Missione fotografica personale: a ogni invitato ne viene assegnata una a
 // caso, evitando (finché ce ne sono di libere) quelle già capitate ad altri.
-// TODO Mara: altre 32 missioni da aggiungere qui (ne aveva proposte 36 in tutto).
 const MISSIONS = [
+  'Fai un brindisi agli sposi',
   'Fai un selfie con la sposa',
+  'Fai un selfie con lo sposo',
   'Fai una foto con tutto il tuo tavolo',
-  'Regala agli sposi un abbraccio (fatti fotografare mentre lo fai)',
+  'Fai una foto con qualcuno che hai conosciuto oggi',
+  'Vai dagli sposi e fai loro gli auguri',
+  'Regala agli sposi un abbraccio',
   'Fai un brindisi con la persona seduta accanto a te',
+  'Inizia un coro per gli sposi',
+  'Fai partire un applauso per gli sposi',
+  'Coinvolgi il tuo tavolo in un brindisi',
+  'Convinci almeno tre persone a ballare con te',
+  'Quando parte una canzone che conosci, canta a squarciagola!',
+  'Organizza una foto di gruppo con almeno 6 persone',
+  'Scatta una foto con qualcuno che ha il vestito del tuo stesso colore',
+  'Scatta una foto con un genitore degli sposi',
+  'Trova un invitato con cui condividi un ricordo e fai una foto con lui',
+  'Fai una foto buffa con gli sposi',
+  'Fai una foto con Enrico',
+  'Fai una foto di gruppo originale',
+  'Trova qualcuno che ti racconti un aneddoto sugli sposi',
+  'Fai partire un hip hip urrà per gli sposi',
+  'Fai ballare gli sposi',
+  'Fai una foto con la persona più elegante per te',
+  'Fai una dedica agli sposi',
+  'Racconta agli sposi un ricordo che hai di loro',
+  'Chiedi a qualcuno come ha conosciuto gli sposi',
+  'Fai una dedica agli sposi',
+  'Dai un bacio alla sposa',
+  'Dai un bacio allo sposo',
+  'Dedica una canzone agli sposi',
+  'Dai un bacio ad Enrico',
+  'Proponi un brindisi agli invitati',
+  'Improvvisate un ballo sulla prossima canzone',
 ];
 
 /* ============ Utilità ============ */
