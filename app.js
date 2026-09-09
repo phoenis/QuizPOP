@@ -443,8 +443,12 @@ function renderMissione(){
   if (inProgress){
     body = `<h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
       <p class="fine-print">Finché ce ne sono di libere, nessun altro invitato ce l'ha uguale.</p>
-      <input id="mission-file" type="file" accept="image/*" style="display:none;">
-      <button class="btn-outline block" style="margin-top:20px;" data-action="mission-photo-pick">Carica la foto e completa</button>
+      <input id="mission-file-camera" type="file" accept="image/*" capture="environment" style="display:none;">
+      <input id="mission-file-gallery" type="file" accept="image/*" style="display:none;">
+      <div class="mission-photo-actions">
+        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta una foto</button>
+        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Dalla galleria</button>
+      </div>
       <button class="btn-text" style="margin-top:12px;" data-action="skip-mission">Non mi piace, cambiala</button>`;
   } else if (!list.length){
     body = `<h1 style="font-size:26px;">Hai una missione fotografica ad aspettarti</h1>
@@ -931,7 +935,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'reveal-mission': assignMission(); break;
-    case 'mission-photo-pick': document.getElementById('mission-file').click(); break;
+    case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
     case 'skip-mission': {
       if (confirm('Cambiare missione? Non potrai più tornare a questa.')) skipMission();
       break;
@@ -945,7 +949,7 @@ root.addEventListener('click', e => {
 });
 root.addEventListener('change', e => {
   if (e.target.id === 'admin-hero-file' && e.target.files[0]) uploadHeroPhoto(e.target.files[0]);
-  if (e.target.id === 'mission-file' && e.target.files[0]) completeMission(e.target.files[0]);
+  if ((e.target.id === 'mission-file-camera' || e.target.id === 'mission-file-gallery') && e.target.files[0]) completeMission(e.target.files[0]);
 });
 root.addEventListener('input', e => {
   if (e.target.id === 'name-input') state.name = e.target.value;
