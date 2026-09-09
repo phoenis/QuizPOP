@@ -616,6 +616,16 @@ function renderAdmin(){
     </div>`;
   }).join('');
   const typeChips = KIND_LABELS.map((l, i) => `<button class="type-chip ${state.newCardType===i?'on':''}" data-action="admin-type" data-i="${i}">${esc(l)}</button>`).join('');
+  const playerRows = state.players.map(p => {
+    const done = Object.keys(p.res || {}).length;
+    return `<div class="admin-card-row">
+      <div style="flex:1;overflow:hidden;">
+        <div class="tt">${esc(p.name || 'Senza nome')}</div>
+        <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
+      </div>
+      <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
+    </div>`;
+  }).join('');
   return `<div class="screen screen-admin">
     <div class="kicker">Solo per gli sposi</div>
     <h2 class="admin-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
@@ -632,6 +642,8 @@ function renderAdmin(){
         ? `<button class="btn-outline" data-action="close-board">Riapri il gioco</button>`
         : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
     </div>
+    ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
+    ${playerRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuno ha ancora giocato.</p>`}` : ''}
     <div class="section-title" style="color:rgba(247,236,214,.6);">Le domande</div>
     ${items}
     <div class="section-title" style="color:rgba(247,236,214,.6);">Nuova domanda</div>
@@ -696,6 +708,10 @@ root.addEventListener('click', e => {
       if (confirm('Eliminare questa carta extra? Non si può annullare.')) deleteExtraCard(el.dataset.id);
       break;
     }
+    case 'reset-player-answers': {
+      if (confirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.')) resetPlayerAnswers(el.dataset.id);
+      break;
+    }
   }
 });
 root.addEventListener('input', e => {
@@ -740,6 +756,13 @@ async function deleteExtraCard(id){
     state.extraCards = state.extraCards.filter(c => c.id !== id);
     render();
   }
+}
+
+// azzera le risposte di un invitato (utile in fase di test, per rigiocare senza
+// doversi iscrivere con un nome nuovo). L'ordine delle carte resta lo stesso.
+async function resetPlayerAnswers(playerId){
+  if (state.mode !== 'online' || !fb) return;
+  await fb.setDoc(fb.doc(fb.db, 'players', playerId), { res: {}, score: 0 }, { merge: true });
 }
 
 /* ============ Avvio ============ */

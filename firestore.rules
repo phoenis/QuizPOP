@@ -5,7 +5,15 @@ service cloud.firestore {
     // Tutti possono leggere tutti i profili: serve per la classifica e la busta chiusa.
     match /players/{playerId} {
       allow read: if true;
-      allow create, update: if request.auth != null && request.auth.uid == playerId;
+      allow create: if request.auth != null && request.auth.uid == playerId;
+      // Un invitato aggiorna solo il proprio profilo. Il pannello sposi puo' anche
+      // azzerare le risposte di un invitato (per farlo riprovare in fase di test),
+      // ma solo con una scrittura che svuota res e azzera il punteggio: non puo'
+      // toccare altri campi ne' impostare punteggi a piacere.
+      allow update: if request.auth != null && (
+        request.auth.uid == playerId ||
+        (request.resource.data.res == {} && request.resource.data.score == 0)
+      );
       allow delete: if false;
     }
     // Stato globale (la busta aperta/chiusa). Scrivibile da chiunque sia autenticato
