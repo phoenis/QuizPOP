@@ -114,7 +114,8 @@ const state = {
   guestId: null,
   newCardType: 0, newCardQ: '', newCardA: '',
   heroPhoto: '',
-  missionIndex: null,
+  missions: [], // [{ index, done }] — una per ogni missione presa (anche più di una)
+  missionPhotos: {}, // { [missionIndex]: dataURL } — solo le proprie, per mostrarle
 };
 let tickHandle = null;
 let fb = null; // firebase handles when online
@@ -162,8 +163,9 @@ function saveLocalProfile(){
   localStorage.setItem('msquiz_profile', JSON.stringify({
     guestId: state.guestId, name: state.name, team: state.team,
     sel: state.sel, res: state.res, score: state.score, order: state.order,
-    missionIndex: state.missionIndex,
+    missions: state.missions,
   }));
+  localStorage.setItem('msquiz_mission_photos', JSON.stringify(state.missionPhotos));
 }
 
 /* ============ Firebase (opzionale) ============ */
@@ -185,7 +187,7 @@ async function persistProgress(){
     await fb.setDoc(ref, {
       name: state.name, team: state.team, sel: state.sel,
       res: state.res, score: state.score, order: state.order,
-      missionIndex: state.missionIndex, updatedAt: fb.serverTimestamp(),
+      missions: state.missions, updatedAt: fb.serverTimestamp(),
     }, { merge: true });
   } else {
     saveLocalProfile();
@@ -408,7 +410,10 @@ function renderHub(){
         <button class="hub-tile" data-action="go" data-screen="missione">
           <span class="kicker">Missione speciale</span>
           <span class="title serif">Scopri la tua<br>missione</span>
-          <span class="foot">${state.missionIndex != null ? 'Ce l\'hai già' : 'Tocca per scoprirla'}</span>
+          <span class="foot">${(() => {
+            const last = state.missions[state.missions.length - 1];
+            return !last ? 'Tocca per scoprirla' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : 'Ce l\'hai già');
+          })()}</span>
         </button>
         <button class="hub-tile" data-action="open-album">
           <span class="kicker">Album condiviso</span>
@@ -429,20 +434,46 @@ function renderHub(){
       </button> */
 
 function renderMissione(){
-  const has = state.missionIndex != null;
-  const text = has ? MISSIONS[state.missionIndex] : '';
+  const list = state.missions;
+  const cur = list[list.length - 1];
+  const inProgress = cur && !cur.done;
+  const done = list.filter(m => m.done);
+
+  let body;
+  if (inProgress){
+    body = `<h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
+      <p class="fine-print">Finché ce ne sono di libere, nessun altro invitato ce l'ha uguale.</p>
+      <input id="mission-file" type="file" accept="image/*" capture="environment" style="display:none;">
+      <button class="btn-outline block" style="margin-top:20px;" data-action="mission-photo-pick">Carica la foto e completa</button>
+      <button class="btn-text" style="margin-top:12px;" data-action="skip-mission">Non mi piace, cambiala</button>`;
+  } else if (!list.length){
+    body = `<h1 style="font-size:26px;">Hai una missione fotografica ad aspettarti</h1>
+      <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando (finché ce ne sono di libere).</p>
+      <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Scopri la tua missione</button>`;
+  } else {
+    body = `<h1 style="font-size:24px;">Missione completata!</h1>
+      <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Se vuoi puoi farne un'altra, oppure fermarti qui.</p>
+      <button class="btn-outline block" style="margin-top:16px;" data-action="reveal-mission">Fai un'altra missione</button>`;
+  }
+
+  const history = done.length ? `
+    <div class="section-title" style="text-align:center;">Le tue missioni fatte</div>
+    <div class="mission-history">
+      ${done.slice().reverse().map(m => `
+        <div class="mission-history-row">
+          ${state.missionPhotos[m.index] ? `<img src="${esc(state.missionPhotos[m.index])}" alt="" class="mission-history-thumb">` : ''}
+          <span>${esc(MISSIONS[m.index])}</span>
+        </div>`).join('')}
+    </div>` : '';
+
   return `<div class="screen screen-missione">
     <button class="btn-text" data-action="nav-back">← Torna alla home</button>
     <div class="mission-wrap">
       <div class="mission-glyph">📸</div>
       <div class="kicker">Missione speciale</div>
-      ${has
-        ? `<h1 class="mission-text pretty">${esc(text)}</h1>
-           <p class="fine-print">È solo tua: nessun altro invitato ce l'ha uguale.</p>`
-        : `<h1 style="font-size:26px;">Hai una missione fotografica ad aspettarti</h1>
-           <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando. Una volta scoperta resta quella.</p>
-           <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Scopri la tua missione</button>`}
+      ${body}
     </div>
+    ${history}
   </div>`;
 }
 
@@ -900,6 +931,11 @@ root.addEventListener('click', e => {
       break;
     }
     case 'reveal-mission': assignMission(); break;
+    case 'mission-photo-pick': document.getElementById('mission-file').click(); break;
+    case 'skip-mission': {
+      if (confirm('Cambiare missione? Non potrai più tornare a questa.')) skipMission();
+      break;
+    }
     case 'admin-hero-pick': document.getElementById('admin-hero-file').click(); break;
     case 'admin-hero-remove': {
       if (confirm('Togliere la foto di copertina? Torna il placeholder.')) removeHeroPhoto();
@@ -909,6 +945,7 @@ root.addEventListener('click', e => {
 });
 root.addEventListener('change', e => {
   if (e.target.id === 'admin-hero-file' && e.target.files[0]) uploadHeroPhoto(e.target.files[0]);
+  if (e.target.id === 'mission-file' && e.target.files[0]) completeMission(e.target.files[0]);
 });
 root.addEventListener('input', e => {
   if (e.target.id === 'name-input') state.name = e.target.value;
@@ -984,28 +1021,74 @@ async function removeHeroPhoto(){
   render();
 }
 
-// evita (finche' ce ne sono di libere) le missioni gia' capitate ad altri
-// invitati: guarda cosa hanno gia' in mano (via state.players, in tempo
-// reale) ed esclude quelle. In locale (senza Firebase) non c'e' nessun
-// altro con cui confrontarsi, quindi e' semplicemente casuale.
+// evita (finche' ce ne sono di libere) le missioni gia' in mano a qualcun
+// altro (via state.players, in tempo reale) o già fatte/in corso per se
+// stessi. In locale (senza Firebase) non c'e' nessun altro con cui
+// confrontarsi, quindi conta solo la propria lista.
 function takenMissionIndexes(){
-  return new Set(
-    state.players
-      .filter(p => p.id !== state.guestId && p.missionIndex != null)
-      .map(p => p.missionIndex)
-  );
+  const taken = new Set();
+  for (const p of state.players){
+    if (p.id === state.guestId) continue;
+    (p.missions || []).forEach(m => taken.add(m.index));
+  }
+  state.missions.forEach(m => taken.add(m.index));
+  return taken;
 }
 
-async function assignMission(){
-  if (state.missionIndex != null) return; // assegnata una volta, resta quella
+// prende una nuova missione (la prima, o un'altra dopo aver completato/
+// saltato quella precedente). excludeIndex serve solo per lo "skip": evita
+// di riproporre subito la stessa appena rifiutata.
+async function assignMission(excludeIndex){
+  const cur = state.missions[state.missions.length - 1];
+  if (cur && !cur.done) return; // ce n'e' gia' una in corso
   const taken = takenMissionIndexes();
+  if (excludeIndex != null) taken.add(excludeIndex);
   const free = MISSIONS.map((_, i) => i).filter(i => !taken.has(i));
-  // se sono finite quelle libere (piu' invitati che missioni), si riparte
-  // dall'intero mazzo: da qui in poi qualche doppione e' inevitabile.
+  // se sono finite quelle libere (piu' invitati/missioni fatte che voci in
+  // lista), si riparte da qualunque missione: da qui in poi qualche
+  // doppione e' inevitabile.
   const pool = free.length ? free : MISSIONS.map((_, i) => i);
-  state.missionIndex = pool[Math.floor(Math.random() * pool.length)];
+  const index = pool[Math.floor(Math.random() * pool.length)];
+  state.missions = [...state.missions, { index, done: false }];
   await persistProgress();
   render();
+}
+
+async function skipMission(){
+  const cur = state.missions[state.missions.length - 1];
+  if (!cur || cur.done) return;
+  state.missions = state.missions.slice(0, -1);
+  await assignMission(cur.index);
+}
+
+async function completeMission(file){
+  const cur = state.missions[state.missions.length - 1];
+  if (!cur || cur.done || !file) return;
+  const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
+  let dataUrl = '';
+  for (const [maxDim, quality] of steps){
+    dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
+    if (dataUrl.length < 500000) break;
+  }
+  if (dataUrl.length >= 500000){
+    alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
+    return;
+  }
+  cur.done = true;
+  state.missionPhotos = { ...state.missionPhotos, [cur.index]: dataUrl };
+  render();
+  if (state.mode === 'online' && fb){
+    await fb.setDoc(fb.doc(fb.db, 'players', state.guestId), { missions: state.missions }, { merge: true });
+    // foto in una collezione separata (non nel documento players): con più
+    // missioni completate si supererebbe presto il limite di 1MB per
+    // documento di Firestore se stessero tutte insieme a punteggio/risposte.
+    await fb.setDoc(fb.doc(fb.db, 'missionPhotos', state.guestId + '_' + cur.index), {
+      guestId: state.guestId, name: state.name, missionIndex: cur.index,
+      photo: dataUrl, createdAt: fb.serverTimestamp(),
+    });
+  } else {
+    saveLocalProfile();
+  }
 }
 
 async function publishCard(){
@@ -1054,11 +1137,20 @@ async function boot(){
             state.sel = d.sel ?? null;
             state.res = d.res || {}; state.score = d.score || 0;
             state.order = d.order || [];
-            state.missionIndex = d.missionIndex ?? null;
+            state.missions = d.missions || [];
           }
           if (ensureOrder() && state.name) persistProgress();
           fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
             state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            render();
+          });
+          // solo le proprie foto missione (query filtrata sul server): con
+          // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
+          // un inutile spreco di dati sul telefono di ciascuno.
+          fb.onSnapshot(fb.query(fb.collection(fb.db, 'missionPhotos'), fb.where('guestId', '==', state.guestId)), qs => {
+            const map = {};
+            qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = d.photo; });
+            state.missionPhotos = map;
             render();
           });
           fb.onSnapshot(fb.doc(fb.db, 'meta', 'state'), doc => {
@@ -1088,9 +1180,10 @@ async function boot(){
       state.name = saved.name || ''; state.team = saved.team ?? 1;
       state.sel = saved.sel ?? null; state.res = saved.res || {}; state.score = saved.score || 0;
       state.order = saved.order || [];
-      state.missionIndex = saved.missionIndex ?? null;
+      state.missions = saved.missions || [];
     }
     state.heroPhoto = localStorage.getItem('msquiz_hero_photo') || '';
+    try { state.missionPhotos = JSON.parse(localStorage.getItem('msquiz_mission_photos') || '{}'); } catch { state.missionPhotos = {}; }
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';

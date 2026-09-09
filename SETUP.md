@@ -29,7 +29,13 @@ alla home.
   sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
   altro stia già giocando finché ce ne sono di libere — con più invitati che
   missioni, da lì in poi qualche doppione può capitare. L'elenco è in `app.js`,
-  cerca `MISSIONS`.
+  cerca `MISSIONS`. Per completarla si carica una foto (compressa nel telefono
+  prima di salvarla, come la foto di copertina); si può anche "cambiarla" se
+  non piace, o farne un'altra dopo aver completato la prima — a piacere.
+  ⚠️ Questa funzione usa una nuova collezione Firestore (`missionPhotos`): se
+  l'avete già attivata online, aggiornate le regole (punto 3 qui sotto) con
+  il contenuto aggiornato di `firestore.rules`, altrimenti il caricamento
+  delle foto missione darà errore di permessi.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
