@@ -703,7 +703,7 @@ function renderFinale(){
   const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Il podio era vicino. Colpa del cugino Pietro.';
   return `<div class="screen screen-finale">
     <div class="kicker">16 ottobre, 23:10 · si apre la busta</div>
-    <h1 class="finale-title">Chi conosce<br><span class="amp">Mara &amp; Stefano</span></h1>
+    <h1 class="finale-title">Chi conosce<br><span class="amp">Mara & Stefano</span></h1>
     <hr class="rule sm">
     <div class="podium">${cols}</div>
     <div class="you-line">

@@ -51,7 +51,7 @@ h1,h2,h3,.serif{font-family:'Formata',sans-serif; font-weight:400; margin:0;}
 p{margin:0;}
 button{font-family:inherit; cursor:pointer; background:none;}
 input{font-family:inherit;}
-.amp{font-style:italic; color:var(--accent-600);}
+.amp{/* font-style:italic; */ color:var(--accent-600);}
 .tabular{font-variant-numeric:tabular-nums;}
 .pretty{text-wrap:pretty;}
 
