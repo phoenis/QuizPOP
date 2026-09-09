@@ -278,7 +278,7 @@ function render(){
 
 function renderBoot(){
   return `<div class="screen" style="align-items:center;justify-content:center;text-align:center;padding:40px;">
-    <div class="kicker">Mara &amp; Stefano</div>
+    <div class="kicker">Mara & Stefano</div>
     <div class="rule sm"></div>
     <p style="font-size:14px;color:var(--neutral-700)">Un attimo…</p>
   </div>`;
