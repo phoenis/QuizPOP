@@ -443,7 +443,7 @@ function renderMissione(){
   if (inProgress){
     body = `<h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
       <p class="fine-print">Finché ce ne sono di libere, nessun altro invitato ce l'ha uguale.</p>
-      <input id="mission-file" type="file" accept="image/*" capture="environment" style="display:none;">
+      <input id="mission-file" type="file" accept="image/*" style="display:none;">
       <button class="btn-outline block" style="margin-top:20px;" data-action="mission-photo-pick">Carica la foto e completa</button>
       <button class="btn-text" style="margin-top:12px;" data-action="skip-mission">Non mi piace, cambiala</button>`;
   } else if (!list.length){
