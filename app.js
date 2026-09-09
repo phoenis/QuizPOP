@@ -53,11 +53,16 @@ const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppi
 
 // TODO: incolla qui il link del vostro album condiviso (Google Foto, Dropbox...) quando c'è.
 const ALBUM_URL = '';
-// TODO: completare con gli orari veri della giornata e, se volete, il menù.
-const PROGRAMMA = [
-  { time: 'Ore 16', label: 'Cerimonia' },
+
+// Missione fotografica personale: a ogni invitato ne viene assegnata una a
+// caso, evitando (finché ce ne sono di libere) quelle già capitate ad altri.
+// TODO Mara: altre 32 missioni da aggiungere qui (ne aveva proposte 36 in tutto).
+const MISSIONS = [
+  'Fai un selfie con la sposa',
+  'Fai una foto con tutto il tuo tavolo',
+  'Regala agli sposi un abbraccio (fatti fotografare mentre lo fai)',
+  'Fai un brindisi con la persona seduta accanto a te',
 ];
-const MENU_NOTE = '';
 
 /* ============ Utilità ============ */
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
@@ -80,6 +85,7 @@ const state = {
   guestId: null,
   newCardType: 0, newCardQ: '', newCardA: '',
   heroPhoto: '',
+  missionIndex: null,
 };
 let tickHandle = null;
 let fb = null; // firebase handles when online
@@ -127,6 +133,7 @@ function saveLocalProfile(){
   localStorage.setItem('msquiz_profile', JSON.stringify({
     guestId: state.guestId, name: state.name, team: state.team,
     sel: state.sel, res: state.res, score: state.score, order: state.order,
+    missionIndex: state.missionIndex,
   }));
 }
 
@@ -148,7 +155,8 @@ async function persistProgress(){
     const ref = fb.doc(fb.db, 'players', state.guestId);
     await fb.setDoc(ref, {
       name: state.name, team: state.team, sel: state.sel,
-      res: state.res, score: state.score, order: state.order, updatedAt: fb.serverTimestamp(),
+      res: state.res, score: state.score, order: state.order,
+      missionIndex: state.missionIndex, updatedAt: fb.serverTimestamp(),
     }, { merge: true });
   } else {
     saveLocalProfile();
@@ -291,7 +299,7 @@ function render(){
     case 'boot': html = renderBoot(); break;
     case 'join': html = renderJoin(); break;
     case 'hub': html = renderHub(); break;
-    case 'programma': html = renderProgramma(); break;
+    case 'missione': html = renderMissione(); break;
     case 'home': html = renderHome(); break;
     case 'quiz': html = renderQuiz(); break;
     case 'result': html = renderResult(); break;
@@ -368,10 +376,10 @@ function renderHub(){
       </button>
 
       <div class="hub-tiles">
-        <button class="hub-tile" data-action="go" data-screen="programma">
-          <span class="kicker">La giornata</span>
-          <span class="title serif">Programma<br>e menù</span>
-          <span class="foot">${esc(PROGRAMMA[0] ? PROGRAMMA[0].time + ' · ' + PROGRAMMA[0].label.toLowerCase() : 'Tutti gli orari')}</span>
+        <button class="hub-tile" data-action="go" data-screen="missione">
+          <span class="kicker">Missione speciale</span>
+          <span class="title serif">Scopri la tua<br>missione</span>
+          <span class="foot">${state.missionIndex != null ? 'Ce l\'hai già' : 'Tocca per scoprirla'}</span>
         </button>
         <button class="hub-tile" data-action="open-album">
           <span class="kicker">Album condiviso</span>
@@ -391,18 +399,21 @@ function renderHub(){
         <span class="arrow">→</span>
       </button> */
 
-function renderProgramma(){
-  const rows = PROGRAMMA.map(p => `<div class="programma-row">
-    <div class="time serif">${esc(p.time)}</div>
-    <div class="label">${esc(p.label)}</div>
-  </div>`).join('');
-  return `<div class="screen screen-programma">
+function renderMissione(){
+  const has = state.missionIndex != null;
+  const text = has ? MISSIONS[state.missionIndex] : '';
+  return `<div class="screen screen-missione">
     <button class="btn-text" data-action="nav-back">← Torna alla home</button>
-    <h1 class="board-title">Programma <span class="amp">&amp;</span> menù</h1>
-    <hr class="rule sm" style="margin-left:0;">
-    ${rows || `<p class="empty-note">Il programma verrà aggiunto qui.</p>`}
-    <div class="section-title">Menù</div>
-    <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">${MENU_NOTE ? esc(MENU_NOTE) : 'Il menù verrà aggiunto qui.'}</p>
+    <div class="mission-wrap">
+      <div class="mission-glyph">📸</div>
+      <div class="kicker">Missione speciale</div>
+      ${has
+        ? `<h1 class="mission-text pretty">${esc(text)}</h1>
+           <p class="fine-print">È solo tua: nessun altro invitato ce l'ha uguale.</p>`
+        : `<h1 style="font-size:26px;">Hai una missione fotografica ad aspettarti</h1>
+           <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando. Una volta scoperta resta quella.</p>
+           <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Scopri la tua missione</button>`}
+    </div>
   </div>`;
 }
 
@@ -859,6 +870,7 @@ root.addEventListener('click', e => {
       else alert('Il link dell\'album non è ancora stato impostato (ALBUM_URL in app.js).');
       break;
     }
+    case 'reveal-mission': assignMission(); break;
     case 'admin-hero-pick': document.getElementById('admin-hero-file').click(); break;
     case 'admin-hero-remove': {
       if (confirm('Togliere la foto di copertina? Torna il placeholder.')) removeHeroPhoto();
@@ -943,6 +955,30 @@ async function removeHeroPhoto(){
   render();
 }
 
+// evita (finche' ce ne sono di libere) le missioni gia' capitate ad altri
+// invitati: guarda cosa hanno gia' in mano (via state.players, in tempo
+// reale) ed esclude quelle. In locale (senza Firebase) non c'e' nessun
+// altro con cui confrontarsi, quindi e' semplicemente casuale.
+function takenMissionIndexes(){
+  return new Set(
+    state.players
+      .filter(p => p.id !== state.guestId && p.missionIndex != null)
+      .map(p => p.missionIndex)
+  );
+}
+
+async function assignMission(){
+  if (state.missionIndex != null) return; // assegnata una volta, resta quella
+  const taken = takenMissionIndexes();
+  const free = MISSIONS.map((_, i) => i).filter(i => !taken.has(i));
+  // se sono finite quelle libere (piu' invitati che missioni), si riparte
+  // dall'intero mazzo: da qui in poi qualche doppione e' inevitabile.
+  const pool = free.length ? free : MISSIONS.map((_, i) => i);
+  state.missionIndex = pool[Math.floor(Math.random() * pool.length)];
+  await persistProgress();
+  render();
+}
+
 async function publishCard(){
   const t = state.newCardQ.trim(), a = state.newCardA.trim();
   if (!t || !a) return;
@@ -989,6 +1025,7 @@ async function boot(){
             state.sel = d.sel ?? null;
             state.res = d.res || {}; state.score = d.score || 0;
             state.order = d.order || [];
+            state.missionIndex = d.missionIndex ?? null;
           }
           if (ensureOrder() && state.name) persistProgress();
           fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
@@ -1022,6 +1059,7 @@ async function boot(){
       state.name = saved.name || ''; state.team = saved.team ?? 1;
       state.sel = saved.sel ?? null; state.res = saved.res || {}; state.score = saved.score || 0;
       state.order = saved.order || [];
+      state.missionIndex = saved.missionIndex ?? null;
     }
     state.heroPhoto = localStorage.getItem('msquiz_hero_photo') || '';
     if (ensureOrder() && state.name) saveLocalProfile();

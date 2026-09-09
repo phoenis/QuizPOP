@@ -14,17 +14,22 @@ caricato via `<link>` in `index.html` — non richiede nessun file locale.
 
 ## La home
 Dopo l'iscrizione l'invitato arriva su una home con la vostra foto, la card del
-quiz, "Programma e menù" e "Carica le tue foto" (album condiviso). Da qui si
-naviga anche con la barra in basso (Home, Domande, Busta, Profilo).
-- **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`. Finché
-  non c'è, l'app mostra lo sfondo neutro senza foto.
+quiz, "Missione speciale" e "Carica le tue foto" (album condiviso). Non c'è una
+barra di navigazione fissa: si torna al profilo con le iniziali in alto a
+destra, e dentro "Le domande" c'è una freccia in alto a sinistra per tornare
+alla home.
+- **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`, oppure
+  caricala direttamente dal pannello `#sposi` (vedi sotto). Finché non c'è
+  nessuna delle due, l'app mostra lo sfondo neutro.
 - **Album condiviso**: apri `app.js`, cerca `ALBUM_URL` (vicino all'inizio del
   file) e incolla lì il link del vostro album (Google Foto, Dropbox...). Finché
   è vuoto, il tasto "Carica le tue foto" avvisa che il link non è stato ancora
   impostato.
-- **Programma e menù**: sempre in `app.js`, cerca `PROGRAMMA` (l'orario della
-  cerimonia c'è già) e `MENU_NOTE` — aggiungete gli altri orari della giornata
-  e, se volete, il testo del menù.
+- **Missione speciale**: ogni invitato scopre una missione fotografica a
+  sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
+  altro stia già giocando finché ce ne sono di libere — con più invitati che
+  missioni, da lì in poi qualche doppione può capitare. L'elenco è in `app.js`,
+  cerca `MISSIONS`.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
