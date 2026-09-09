@@ -23,7 +23,7 @@ const QS = [
   {k:'L’ultima carta', h:'Chiudiamo con i conti.', t:'Quanti anni sono passati da quella cena a oggi?', o:['4','5','7','10'], c:2, s:'Sette anni, due traslochi, un gatto e una cugina che si prende tutto il merito.'},
   {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'}
 ];
-const BASE_PTS = 60, BONUS_PTS = 40, DAILY = 9, TIMER_S = 20;
+const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 // categorie da 4 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
 const CATS = [
   {name:'Mara', from:0, to:3, mark:'❖', medal:'Esperta di Mara', note:'Tutte e quattro su di lei'},
@@ -47,9 +47,9 @@ const RIVALS_DEMO = [
   {id:'demo-5', name:'Luca T.', score:534, res:demoRes(10,5.7), team:4},
   {id:'demo-6', name:'Cugino Pietro', score:288, res:demoRes(6,0), team:2}
 ];
-function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5,multi:1}; return r; }
+function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5}; return r; }
 
-const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie','Del giorno'];
+const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie'];
 
 // TODO: incolla qui il link del vostro album condiviso (Google Foto, Dropbox...) quando c'è.
 const ALBUM_URL = '';
@@ -214,10 +214,9 @@ function finish(idx){
   const correct = q.order
     ? (idx === 'order' && state.seq.length === q.order.length && state.seq.every((v, i) => v === i))
     : (idx !== null && idx === q.c);
-  const multi = state.qi === DAILY ? 2 : 1;
   const bonus = correct ? Math.round(BONUS_PTS * (state.left / dur())) : 0;
-  const pts = correct ? (BASE_PTS + bonus) * multi : 0;
-  state.res[state.qi] = { pts, bonus, correct, used: Math.max(0.1, dur() - state.left), multi, timeout: idx === null };
+  const pts = correct ? BASE_PTS + bonus : 0;
+  state.res[state.qi] = { pts, bonus, correct, used: Math.max(0.1, dur() - state.left), timeout: idx === null };
   state.score += pts;
   state.locked = true;
   state.screen = 'result';
@@ -534,7 +533,7 @@ function renderHome(){
   } else {
     const card = Q(sel);
     const cat = CATS[catOf(sel)];
-    const label = (cat ? cat.name + ' · ' : '') + 'domanda ' + (posOf(sel) + 1) + (sel === DAILY ? ' · vale doppio' : '');
+    const label = (cat ? cat.name + ' · ' : '') + 'domanda ' + (posOf(sel) + 1);
     const r = state.res[sel];
     panel = `<div class="card-preview">
       <div class="kicker">${esc(label)}</div>
@@ -648,7 +647,6 @@ function renderResult(){
     <div class="breakdown">
       <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
       <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular" style="color:var(--accent-700)">${r.correct ? '+' + r.bonus : '—'}</span></div>
-      ${r.multi === 2 ? `<div class="breakdown-row"><span>Domanda del giorno</span><span class="val tabular">×2</span></div>` : ''}
       <div class="breakdown-row total"><span>Totale</span><span class="val tabular">${r.pts || 0}</span></div>
     </div>
     <p class="rank-line">${esc(rankLine)}</p>
@@ -738,7 +736,6 @@ function renderProfile(){
       };
     }),
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
-    { mark: '✧', name: 'Domanda del giorno', note: 'Hai aperto la domanda del giorno', locked: !state.res[DAILY] },
     { mark: '✷', name: 'Calendario completo', note: 'Tutte le carte del mazzo', locked: done < total },
   ];
   const badgeRows = badges.map(b => `<div class="badge-row ${b.locked?'locked':''}">

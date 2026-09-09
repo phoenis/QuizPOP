@@ -110,10 +110,6 @@ tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
   del gioco sul suo telefono e poi fissato per sempre (ricaricando la pagina
   l'ordine non cambia). Le carte extra pubblicate dagli sposi durante l'evento
   si aggiungono in fondo al mazzo di ciascuno, senza toccare l'ordine già visto.
-- La "carta del giorno" (×2 punti) è fissa per contenuto ("Ordina le tappe · i
-  primi quattro mesi"), non per posizione: essendo l'ordine casuale, può comparire
-  in un punto diverso del mazzo di ogni invitato. Se preferite un'altra domanda,
-  cambiate `DAILY` in `app.js` (è l'indice della domanda nell'array `QS`).
 - Le 4 domande "Su Mara" nell'array `QS` sono un placeholder (risposte "Da
   completare") in attesa dei contenuti veri — modificatele in `app.js` prima
   del matrimonio.
