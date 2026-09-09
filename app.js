@@ -273,8 +273,7 @@ function render(){
     case 'admin': html = renderAdmin(); break;
     default: html = renderHub();
   }
-  const showTabs = ['hub', 'home', 'board', 'profile'].includes(state.screen);
-  root.innerHTML = html + (showTabs ? renderTabs() : '');
+  root.innerHTML = html;
 }
 
 function renderBoot(){
@@ -313,6 +312,7 @@ function renderHub(){
   const done = Object.keys(state.res).length;
   const pct = total ? Math.round((done / total) * 100) : 0;
   return `<div class="screen screen-hub">
+    ${avatarButton()}
     <div class="hub-hero">
       <img src="${esc(state.heroPhoto || 'assets/photos/hub-hero.jpg')}" alt="" onerror="this.remove()">
       <div class="fade"></div>
@@ -461,6 +461,7 @@ function renderHome(){
   }
 
   return `<div class="screen screen-home">
+    ${avatarButton()}
     <div class="home-header">
       <div>
         <div class="kicker">${remaining > 0 ? 'Ne restano ' + remaining : 'Tutte fatte'}</div>
@@ -593,6 +594,7 @@ function renderBoard(){
       <div class="board-score">•••</div>
     </div>`).join('');
     return `<div class="screen screen-board">
+      ${avatarButton()}
       <div class="kicker">${board.length} invitati · punti nascosti</div>
       <h1 class="board-title">Classifica</h1>
       <hr class="rule sm" style="margin-left:0;">
@@ -620,6 +622,7 @@ function renderBoard(){
     <div class="board-score open serif tabular">${Math.round(g.avg)}</div>
   </div>`).join('');
   return `<div class="screen screen-board">
+    ${avatarButton()}
     <div class="kicker">${board.length} invitati · busta aperta</div>
     <h1 class="board-title">Classifica</h1>
     <hr class="rule sm" style="margin-left:0;">
@@ -665,6 +668,7 @@ function renderProfile(){
     </div>`;
   }).join('');
   return `<div class="screen screen-profile">
+    ${avatarButton()}
     <div class="avatar lg" style="margin:0 auto;">${initialsOf(name)}</div>
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">${esc(TEAMS[state.team])} · tavolo 4</div>
@@ -784,20 +788,12 @@ function renderAdmin(){
   </div>`;
 }
 
-function renderTabs(){
-  const icon = {
-    hub: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>`,
-    home: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="6" rx="1.5"/><rect x="4" y="11" width="16" height="6" rx="1.5"/><rect x="4" y="19" width="16" height="2" rx="1"/></svg>`,
-    board: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="12" width="3" height="8"/><rect x="11" y="7" width="3" height="13"/><rect x="16" y="10" width="3" height="10"/></svg>`,
-    profile: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`,
-  };
-  const tabs = [
-    { id: 'hub', label: 'Home' },
-    { id: 'home', label: 'Domande' },
-    { id: 'board', label: 'Busta' },
-    { id: 'profile', label: 'Profilo' },
-  ];
-  return `<div class="tabbar">${tabs.map(t => `<button class="tab ${state.screen===t.id?'active':''}" data-action="go" data-screen="${t.id}">${icon[t.id]}<span class="lbl">${t.label}</span></button>`).join('')}</div>`;
+// unica scorciatoia globale rimasta dopo aver tolto la tabbar: le iniziali
+// dell'invitato in alto a destra aprono il profilo; da dentro il profilo lo
+// stesso posto mostra una "×" per tornare a dove si era prima.
+function avatarButton(){
+  if (state.screen === 'profile') return `<button class="avatar-fab" data-action="nav-back">×</button>`;
+  return `<button class="avatar-fab" data-action="go" data-screen="profile">${esc(initialsOf(state.name || 'Tu'))}</button>`;
 }
 
 /* ============ Interazione ============ */
