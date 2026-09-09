@@ -79,6 +79,7 @@ const state = {
   mode: 'local',
   guestId: null,
   newCardType: 0, newCardQ: '', newCardA: '',
+  heroPhoto: '',
 };
 let tickHandle = null;
 let fb = null; // firebase handles when online
@@ -313,7 +314,7 @@ function renderHub(){
   const pct = total ? Math.round((done / total) * 100) : 0;
   return `<div class="screen screen-hub">
     <div class="hub-hero">
-      <img src="assets/photos/hub-hero.jpg" alt="" onerror="this.remove()">
+      <img src="${esc(state.heroPhoto || 'assets/photos/hub-hero.jpg')}" alt="" onerror="this.remove()">
       <div class="fade"></div>
       <div class="cap">
         <div class="kicker">16 ottobre 2026 · Villa Calini</div>
@@ -762,6 +763,15 @@ function renderAdmin(){
         ? `<button class="btn-outline" data-action="close-board">Riapri il gioco</button>`
         : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
     </div>
+    <div class="section-title" style="color:rgba(247,236,214,.6);">Foto di copertina</div>
+    <div class="hero-upload-box">
+      ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="" class="hero-upload-preview">` : `<div class="hero-upload-empty">Nessuna foto caricata</div>`}
+      <input id="admin-hero-file" type="file" accept="image/*" style="display:none;">
+      <div class="hero-upload-actions">
+        <button class="reset-btn" data-action="admin-hero-pick">${state.heroPhoto ? 'Cambia foto' : 'Carica foto'}</button>
+        ${state.heroPhoto ? `<button class="reset-btn" data-action="admin-hero-remove">Rimuovi</button>` : ''}
+      </div>
+    </div>
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
     ${playerRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuno ha ancora giocato.</p>`}` : ''}
     <div class="section-title" style="color:rgba(247,236,214,.6);">Le domande</div>
@@ -840,7 +850,15 @@ root.addEventListener('click', e => {
       else alert('Il link dell\'album non è ancora stato impostato (ALBUM_URL in app.js).');
       break;
     }
+    case 'admin-hero-pick': document.getElementById('admin-hero-file').click(); break;
+    case 'admin-hero-remove': {
+      if (confirm('Togliere la foto di copertina? Torna il placeholder.')) removeHeroPhoto();
+      break;
+    }
   }
+});
+root.addEventListener('change', e => {
+  if (e.target.id === 'admin-hero-file' && e.target.files[0]) uploadHeroPhoto(e.target.files[0]);
 });
 root.addEventListener('input', e => {
   if (e.target.id === 'name-input') state.name = e.target.value;
@@ -860,6 +878,58 @@ function closeReveal(){
   state.revealed = false;
   if (state.mode === 'online' && fb){
     fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { revealed: false }, { merge: true });
+  }
+  render();
+}
+
+// ridimensiona e comprime l'immagine nel browser prima di salvarla: senza
+// questo passaggio una foto di uno smartphone (spesso 3-5 MB) supererebbe
+// il limite di 1 MB per documento di Firestore.
+function fileToCompressedDataUrl(file, maxDim, quality){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(img.src);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function uploadHeroPhoto(file){
+  if (!file) return;
+  const steps = [[1200, 0.75], [1000, 0.6], [800, 0.5], [600, 0.4]];
+  let dataUrl = '';
+  for (const [maxDim, quality] of steps){
+    dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
+    if (dataUrl.length < 700000) break;
+  }
+  if (dataUrl.length >= 700000){
+    alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice o meno ad alta risoluzione.');
+    return;
+  }
+  state.heroPhoto = dataUrl;
+  if (state.mode === 'online' && fb){
+    await fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { heroPhoto: dataUrl }, { merge: true });
+  } else {
+    localStorage.setItem('msquiz_hero_photo', dataUrl);
+  }
+  render();
+}
+
+async function removeHeroPhoto(){
+  state.heroPhoto = '';
+  if (state.mode === 'online' && fb){
+    await fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { heroPhoto: '' }, { merge: true });
+  } else {
+    localStorage.removeItem('msquiz_hero_photo');
   }
   render();
 }
@@ -917,7 +987,9 @@ async function boot(){
             render();
           });
           fb.onSnapshot(fb.doc(fb.db, 'meta', 'state'), doc => {
-            state.revealed = !!(doc.exists() && doc.data().revealed);
+            const d = doc.exists() ? doc.data() : {};
+            state.revealed = !!d.revealed;
+            state.heroPhoto = d.heroPhoto || '';
             render();
           });
           fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
@@ -942,6 +1014,7 @@ async function boot(){
       state.sel = saved.sel ?? null; state.res = saved.res || {}; state.score = saved.score || 0;
       state.order = saved.order || [];
     }
+    state.heroPhoto = localStorage.getItem('msquiz_hero_photo') || '';
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';
