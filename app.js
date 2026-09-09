@@ -89,14 +89,24 @@ function shuffle(arr){
 // l'ordine di visualizzazione delle domande e' casuale ma fisso per invitato:
 // le domande gia' assegnate a una posizione non si spostano piu', anche ricaricando;
 // le carte extra pubblicate dopo, essendo nuove, vengono solo aggiunte in coda.
+// Se una carta extra viene cancellata dal pannello sposi, il suo indice sparisce
+// da allQuestions(): lo togliamo anche dall'ordine salvato, altrimenti resterebbe
+// una casella "fantasma" nella griglia di chi l'aveva gia' vista.
 function ensureOrder(){
   const total = allQuestions().length;
+  let changed = false;
+  if (state.order.some(i => i >= total)){
+    state.order = state.order.filter(i => i < total);
+    changed = true;
+  }
   const known = new Set(state.order);
   const missing = [];
   for (let i = 0; i < total; i++) if (!known.has(i)) missing.push(i);
-  if (!missing.length) return false;
-  state.order = state.order.concat(shuffle(missing));
-  return true;
+  if (missing.length){
+    state.order = state.order.concat(shuffle(missing));
+    changed = true;
+  }
+  return changed;
 }
 function posOf(i){ return state.order.indexOf(i); }
 
