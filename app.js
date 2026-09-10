@@ -468,7 +468,7 @@ function renderMissione(){
   } else if (!list.length){
     body = `<h1 style="font-size:26px;">Hai una missione fotografica ad aspettarti</h1>
       <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando (finché ce ne sono di libere).</p>
-      <button class="btn-outline" style="margin-top:20px;" data-action="reveal-mission">Scopri la tua missione</button>`;
+      <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Scopri la tua missione</button>`;
   } else {
     body = `<h1 style="font-size:24px;">Missione completata!</h1>
       <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Se vuoi puoi farne un'altra, oppure fermarti qui.</p>
