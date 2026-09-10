@@ -445,8 +445,7 @@ function render(){
 function renderBoot(){
   return `<div class="screen" style="align-items:center;justify-content:center;text-align:center;padding:40px;">
     <div class="kicker">Mara & Stefano</div>
-    <div class="rule sm"></div>
-    <p style="font-size:14px;color:var(--neutral-700)">Un attimo…</p>
+    <p style="font-size:14px;color:var(--neutral-700);margin-top:14px;">Un attimo…</p>
   </div>`;
 }
 
@@ -456,26 +455,28 @@ function renderJoin(){
     <div class="kicker">Il gioco</div>
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
-    <hr class="rule">
-    <p class="join-intro pretty">Venticinque domande su di noi, in un calendario. Rispondi quando vuoi e nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
-    <div class="field-block">
-      <div class="field-label">Come ti chiamiamo noi</div>
-      <input id="name-input" class="name-input" type="text" placeholder="Zia Franca" value="${esc(state.name)}" maxlength="40">
+    <p class="join-intro pretty">Venticinque carte su di noi. Rispondi quando vuoi, nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
+    <div class="card join-card">
+      <div class="field-block">
+        <div class="field-label">Come ti chiamiamo noi</div>
+        <input id="name-input" class="name-input" type="text" placeholder="Zia Franca" value="${esc(state.name)}" maxlength="40">
+      </div>
+      <div class="field-block">
+        <div class="field-label">Da che parte stai</div>
+        <div class="chips">${chips}</div>
+      </div>
+      <p class="fine-print">Serve solo per le statistiche finali.</p>
     </div>
-    <div class="field-block">
-      <div class="field-label">Da che parte stai</div>
-      <div class="chips">${chips}</div>
-    </div>
+    <img src="assets/mascotte/criceti-mara-ste.png" alt="" class="join-mascot">
     <div class="join-spacer"></div>
-    <button class="btn-outline block" data-action="join" style="margin-top:14px;">Comincia</button>
-    <p class="fine-print">La squadra serve solo per le statistiche finali.</p>
+    <button class="btn-outline block" data-action="join">Comincia</button>
     ${state.recoverOpen ? `
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
-        <input id="recover-code" class="name-input" style="font-size:20px;letter-spacing:.1em;text-transform:uppercase;" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
+        <input id="recover-code" class="name-input" style="font-size:20px;letter-spacing:.1em;text-transform:uppercase;text-align:center;" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
         <button class="btn-outline block" style="margin-top:10px;" data-action="recover-profile">Recupera profilo</button>
       </div>`
-      : `<button class="btn-text" style="margin-top:14px;" data-action="show-recover">Hai già un profilo su un altro telefono? Recuperalo con un codice</button>`}
+      : `<button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button>`}
   </div>`;
 }
 
@@ -486,44 +487,37 @@ function renderHub(){
   ensureOrder();
   const total = allQuestions().length;
   const done = Object.keys(state.res).length;
-  const pct = total ? Math.round((done / total) * 100) : 0;
   return `<div class="screen screen-hub">
-    ${avatarButton()}
     <div class="hub-hero">
-      <img src="${esc(state.heroPhoto || 'assets/photos/hub-hero.jpg')}" alt="" onerror="this.remove()">
+      ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.style.display='none'">`}
       <div class="fade"></div>
-      <div class="cap">
-        <div class="kicker">16 ottobre 2026 · Villa Calini</div>
-        <div class="names couple-title">Mara <span class="amp">&amp;</span> Stefano</div>
-      </div>
+      ${avatarButton()}
+    </div>
+    <div class="hub-cap">
+      <div class="kicker">16 ottobre 2026 · Villa Calini</div>
+      <div class="names couple-title">Mara <span class="amp">&amp;</span> Stefano</div>
     </div>
     <div class="hub-body">
-      
-      <button class="hub-tile is-quiz" data-action="go" data-screen="home">
-        <span class="hub-wrapper">
+      <button class="hub-quiz-card" data-action="go" data-screen="home">
+        <span class="wrap">
           <span class="kicker">Il gioco</span>
           <span class="title serif">Il quiz su di noi</span>
-          <span class="sub">Scala la classifica e vinci un premio!</span>
-          <span class="hub-progress">
-            <span class="bar"><span style="width:${pct}%;"></span></span>
-            <span class="frac tabular">${done}/${total}</span>
-          </span>
+          <span class="sub">Scala la classifica, vinci un premio</span>
         </span>
-        <img src="assets/mascotte/cricetino-fiore-solo.png" alt="">
+        <span class="hub-quiz-ring"><span class="num tabular">${done}</span><span class="den">/${total}</span></span>
       </button>
-
       <div class="hub-tiles">
         <button class="hub-tile" data-action="go" data-screen="missione">
-          <span class="kicker">Missione speciale</span>
-          <span class="title serif">Scopri la tua<br>missione</span>
-          <span class="foot">${(() => {
+          <span class="kicker">Missione</span>
+          <span class="title serif">${(() => {
             const last = state.missions[state.missions.length - 1];
-            return !last ? 'Tocca per scoprirla' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : 'Ce l\'hai già');
+            return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : 'Ce l\'hai già');
           })()}</span>
+          <img src="assets/mascotte/criceto-mara.png" alt="">
         </button>
         <button class="hub-tile" data-action="go" data-screen="album">
-          <span class="kicker">Album condiviso</span>
-          <span class="title serif">Carica le<br>tue foto</span>
+          <span class="kicker">Album</span>
+          <span class="title serif">Carica le tue foto</span>
           <span class="foot">WedShoots ↗</span>
         </button>
       </div>
@@ -547,23 +541,40 @@ function renderMissione(){
 
   let body;
   if (inProgress){
-    body = `<h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
-      <p class="fine-print">Finché ce ne sono di libere, nessun altro invitato ce l'ha uguale. Va bene anche un video (max 80MB).</p>
+    body = `<div class="card mission-card assigned">
+      <div class="assigned-head">
+        <div class="kicker">La tua missione</div>
+        <span class="mission-pill">Solo tua</span>
+      </div>
+      <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
+      <p class="fine-print" style="margin-top:10px;">Nessun altro invitato ce l'ha uguale. Va bene anche un video (max 80MB).</p>
       <input id="mission-file-camera" type="file" accept="image/*,video/*" capture="environment" style="display:none;">
       <input id="mission-file-gallery" type="file" accept="image/*,video/*" style="display:none;">
       <div class="mission-photo-actions">
-        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta foto/video</button>
-        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Dalla galleria</button>
+        <button class="btn-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
+        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
       </div>
-      <button class="btn-text" style="margin-top:12px;" data-action="skip-mission">Non mi piace, cambiala</button>`;
+      <p class="fine-print" style="text-align:center;"><button class="btn-text" data-action="skip-mission">Non mi piace, cambiala</button></p>
+    </div>
+    <img src="assets/mascotte/criceti-festa.png" alt="" class="mission-mascot">`;
   } else if (!list.length){
-    body = `<h1 style="font-size:26px;">Hai una missione fotografica ad aspettarti</h1>
-      <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando (finché ce ne sono di libere).</p>
-      <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Scopri la tua missione</button>`;
+    body = `<div class="card mission-card">
+      <div class="mission-icon-circle">📷</div>
+      <div class="kicker" style="margin-top:16px;">Missione speciale</div>
+      <h1 style="font-size:26px;margin-top:8px;text-wrap:pretty;">Hai una missione fotografica ad aspettarti</h1>
+      <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
+      <button class="btn-outline block" style="margin-top:22px;" data-action="reveal-mission">Scopri la tua missione</button>
+    </div>
+    <img src="assets/mascotte/criceto-mara.png" alt="" class="mission-mascot">`;
   } else {
-    body = `<h1 style="font-size:24px;">Missione completata!</h1>
-      <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Se vuoi puoi farne un'altra, oppure fermarti qui.</p>
-      <button class="btn-outline block" style="margin-top:16px;" data-action="reveal-mission">Fai un'altra missione</button>`;
+    body = `<div class="card mission-card">
+      <div class="mission-icon-circle">🎉</div>
+      <div class="kicker" style="margin-top:16px;">Missione speciale</div>
+      <h1 style="font-size:24px;margin-top:8px;">Missione completata!</h1>
+      <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Se vuoi puoi farne un'altra, oppure fermarti qui.</p>
+      <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Fai un'altra missione</button>
+    </div>
+    <img src="assets/mascotte/criceti-festa.png" alt="" class="mission-mascot">`;
   }
 
   const history = done.length ? `
@@ -577,11 +588,11 @@ function renderMissione(){
     </div>` : '';
 
   return `<div class="screen screen-missione">
-    <button class="back-fab" data-action="nav-back">←</button>
-    <button class="avatar-fab" data-action="go" data-screen="profile">M</button>
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back">←</button>
+      ${avatarButton()}
+    </div>
     <div class="mission-wrap">
-      <div class="mission-glyph">📸</div>
-      <div class="kicker">Missione speciale</div>
       ${body}
     </div>
     ${history}
@@ -590,18 +601,24 @@ function renderMissione(){
 
 function renderAlbum(){
   return `<div class="screen screen-missione">
-    <button class="back-fab" data-action="nav-back">←</button>
-    <button class="avatar-fab" data-action="go" data-screen="profile">M</button>    <div class="mission-wrap">
-      <div class="mission-glyph">📷</div>
-      <div class="kicker">Album condiviso</div>
-      <h1 style="font-size:26px;">Carica le tue foto su WedShoots</h1>
-      <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Apri WedShoots (l'app, o il sito se non ce l'hai) e inserisci questo codice per entrare nel nostro album:</p>
-      <div class="album-code-box">
-        <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
-        <button class="btn-outline small" data-action="copy-album-code">Copia codice</button>
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back">←</button>
+      ${avatarButton()}
+    </div>
+    <div class="mission-wrap">
+      <div class="card mission-card">
+        <div class="mission-icon-circle">🖼️</div>
+        <div class="kicker" style="margin-top:16px;">Album condiviso</div>
+        <h1 style="font-size:26px;margin-top:8px;">Le tue foto nel nostro album</h1>
+        <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Apri WedShoots e inserisci questo codice per entrare:</p>
+        <div class="album-code-box">
+          <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
+          <button class="btn-fill" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">Copia</button>
+        </div>
+        <button class="btn-outline block" style="margin-top:16px;" data-action="open-album">Apri WedShoots ↗</button>
+        <p class="fine-print" style="text-align:center;">Non hai l'app? <button class="btn-text" data-action="open-album-store">Scaricala</button></p>
       </div>
-      <button class="btn-outline block" style="margin-top:20px;" data-action="open-album">Apri WedShoots</button>
-      <p class="fine-print" style="margin-top:16px;text-align:center;">Non hai ancora l'app? <button class="btn-text" data-action="open-album-store">Scaricala</button></p>
+      <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
     </div>
   </div>`;
 }
@@ -624,35 +641,35 @@ function renderHome(){
   const remaining = total - done;
   const sel = (state.sel != null && state.sel < total) ? state.sel : state.order[0];
 
-  // ogni categoria e' una tile colorata cliccabile ("livello" = ordine in
-  // elenco), con la percentuale di quante ne hai fatte (non quante giuste:
-  // quello resta nelle medaglie) e un segno di completamento sopra.
-  const catRow = (icon, name, sub, catQs, level, variant) => {
+  // ogni categoria e' una tile colorata cliccabile, con badge di stato
+  // (gioca/completato), barra di avanzamento (quante ne hai fatte, non
+  // quante giuste: quello resta nelle medaglie) e il criceto della categoria.
+  const catRow = (icon, name, catQs, variant) => {
     const doneN = catQs.filter(qi => state.res[qi]).length;
     const pct = catQs.length ? Math.round((doneN / catQs.length) * 100) : 0;
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
     const earned = catQs.length > 0 && doneN === catQs.length;
     return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
-    
-      <span class="cat-tile-top">
-        <span class="cat-tile-badge">${earned ? '✓' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.69L9.54 5.98A.998.998 0 0 0 8 6.82"></path></svg>'}</span>
-        <span class="cat-tile-level">${earned ? 'Completato' : 'Gioca'}</span>
-      </span>  
-    <span class="cat-tile-heading">
+      <span class="cat-tile-text">
+        <span class="cat-tile-top">
+          <span class="cat-tile-badge">${earned ? '✓' : '▶'}</span>
+          <span class="cat-tile-level">${earned ? 'Completato' : 'Gioca'}</span>
+        </span>
         <span class="cat-tile-name serif">${esc(name)}</span>
-        <span class="cat-tile-sub">${pct}%</span>
+        <span class="cat-tile-progress">
+          <span class="bar"><span style="width:${pct}%;"></span></span>
+          <span class="pct">${pct}%</span>
+        </span>
       </span>
       <span class="cat-tile-deco" aria-hidden="true">${icon}</span>
     </button>`;
   };
   const catCards = CATS.map((c, idx) => {
-    const st = catState(state.res, c);
     const catQs = state.order.filter(qi => catOf(qi) === idx);
-    const sub = st.earned ? st.n + ' domande · ' + c.medal : st.n + ' domande';
-    return catRow(c.mark, c.name, sub, catQs, idx + 1, idx + 1);
+    return catRow(c.mark, c.name, catQs, idx + 1);
   }).join('');
   const extraQs = state.order.filter(qi => catOf(qi) < 0);
-  const extraCard = extraQs.length ? catRow('✦', 'Domande extra', extraQs.length + ' domande · pubblicate dagli sposi', extraQs, CATS.length + 1, 'extra') : '';
+  const extraCard = extraQs.length ? catRow('✦', 'Domande extra', extraQs, 'extra') : '';
 
   let panel;
   if (remaining === 0){
@@ -678,18 +695,20 @@ function renderHome(){
   }
 
   return `<div class="screen screen-home">
-    <button class="back-fab" data-action="nav-back">←</button>
-    ${avatarButton()}
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back">←</button>
+      ${avatarButton()}
+    </div>
     <div class="home-header">
       <div>
         <div class="kicker">Il quiz</div>
-        <h1 style="font-size:30px;">Quanto ne sai sugli sposi?</h1>
+        <h1 style="font-size:27px;">Quanto ne sai sugli sposi?</h1>
       </div>
-    </div>
-          <div class="home-score">
+      <div class="home-score">
         <div class="num serif tabular">${state.score}</div>
         <div class="micro">Punti</div>
       </div>
+    </div>
     <div class="cat-cards">${catCards}${extraCard}</div>
     ${panel}
   </div>`;
@@ -739,17 +758,16 @@ function renderQuiz(){
   const q = Q(state.qi);
   const catIdx = catOf(state.qi);
   const variant = catIdx >= 0 ? catIdx + 1 : 'extra';
+  const cat = CATS[catIdx];
   return `<div class="screen screen-quiz cat-tile--${variant}">
-    <div class="quiz-topbar">
-
-    <button class="back-fab" data-action="nav-back">←</button>
-    ${avatarButton()}
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back">←</button>
+      <span class="quiz-counter">Carta ${posOf(state.qi) + 1} / ${allQuestions().length}</span>
     </div>
-    <div class="kicker" style="margin-top:14px;">${esc(q.k)}</div>
+    <div class="kicker">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
-    <hr class="rule sm">
     ${renderQuizBody(q)}
-    <div class="quiz-footer">Conta anche quanto ci metti. Te lo diciamo dopo.</div>
+    <div class="quiz-footer">${cat ? cat.mark : ''}<span>Conta anche quanto ci metti. Te lo diciamo dopo.</span></div>
   </div>`;
 }
 
@@ -768,19 +786,22 @@ function renderResult(){
   const catIdx = catOf(state.qi);
   const variant = catIdx >= 0 ? catIdx + 1 : 'extra';
   return `<div class="screen screen-result cat-tile--${variant}">
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back">←</button>
+      <span class="quiz-counter">Carta ${posOf(state.qi) + 1} / ${allQuestions().length}</span>
+    </div>
+    <div class="result-icon">${r.correct ? '✓' : '✕'}</div>
     <div class="kicker result-kicker">${kicker}</div>
-    <div class="result-pts serif tabular">${r.pts ? '+' + r.pts : '0'}</div>
-    ${r.correct ? `<img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="result-mascot">` : ''}
     <h2 class="result-title">${esc(title)}</h2>
-    <hr class="rule sm">
-    <p class="result-blurb pretty">${esc(q.s)}</p>
-    <div class="breakdown">
-      <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
-      <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular">${r.correct ? '+' + r.bonus : '—'}</span></div>
-      <div class="breakdown-row total"><span>Totale</span><span class="val tabular">${r.pts || 0}</span></div>
+    <div class="result-card">
+      <p class="result-blurb pretty">${esc(q.s)}</p>
+      <div class="breakdown">
+        <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
+        <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular">${r.correct ? '+' + r.bonus : '—'}</span></div>
+        <div class="breakdown-row total"><span>Totale</span><span class="val tabular">${r.pts || 0}</span></div>
+      </div>
     </div>
     <p class="rank-line">${esc(rankLine)}</p>
-    <div class="result-spacer"></div>
     <div class="result-cta">
       <button class="btn-outline block" data-action="after-result">${cta}</button>
       <button class="btn-text" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
@@ -795,14 +816,16 @@ function renderMedal(){
   const c = CATS[state.medalCat];
   const variant = state.medalCat + 1;
   return `<div class="screen screen-medal cat-tile--${variant}">
+    <div class="topbar end">
+      <button class="avatar-fab" data-action="after-medal">✕</button>
+    </div>
     <div class="medal-celebrate">
-      <div class="medal-badge-big">${c.mark}</div>
+      <div class="medal-badge-ring">${c.mark}</div>
       <div class="kicker">Medaglia vinta</div>
       <h1 class="medal-celebrate-title pretty">Congratulazioni, sai tutto su ${esc(c.name)}!</h1>
       <div class="medal-celebrate-name serif">${esc(c.medal)}</div>
       <p class="medal-celebrate-note pretty">${esc(c.note)}</p>
     </div>
-    <div class="result-spacer"></div>
     <button class="btn-outline block" data-action="after-medal">Continua</button>
   </div>`;
 }
@@ -821,19 +844,18 @@ function renderBoard(){
     const rows = unsealedOrder.map(p => `<div class="board-row">
       <div class="avatar">${esc(initialsOf(p.name || 'Tu'))}</div>
       <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc((p.detail||'').split('·')[0].trim())}</div></div>
-      <div class="board-score">•••</div>
+      <div class="board-score hidden">•••</div>
     </div>`).join('');
     const teamRows = teams.map(g => `<div class="board-row ${g.i===state.team?'me':''}">
       <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
-      <div class="board-score">•••</div>
+      <div class="board-score hidden">•••</div>
     </div>`).join('');
     return `<div class="screen screen-board">
-      ${avatarButton()}
+      <div class="topbar end">${avatarButton()}</div>
       <div class="kicker">${board.length} invitati · punti nascosti</div>
       <h1 class="board-title">Classifica</h1>
-      <hr class="rule sm" style="margin-left:0;">
-      <p class="board-explainer pretty">Nessuno vede i punti degli altri. La busta si apre quando Mara e Stefano prendono il microfono.</p>
-      <div style="margin-top:8px;"><div class="option-group">${rows}</div></div>
+      <p class="board-explainer pretty" style="margin-top:14px;">Nessuno vede i punti degli altri. La busta si apre quando Mara e Stefano prendono il microfono.</p>
+      <div class="board-list">${rows}</div>
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
         <div class="big serif tabular">${state.score} punti tuoi</div>
@@ -841,30 +863,29 @@ function renderBoard(){
       </div>
       <div class="section-title">Squadre</div>
       <p class="rank-line" style="margin-top:0;">Media punti a persona, nascosta come il resto fino al reveal.</p>
-      <div style="margin-top:8px;">${teamRows}</div>
+      <div class="board-list">${teamRows}</div>
     </div>`;
   }
-  const rows = board.map(p => `<div class="board-row ${p.me?'me':''}">
+  const rows = board.map(p => `<div class="board-row ${p.rank===1?'top':''}">
     <div class="board-rank serif tabular">${p.rank}</div>
-    <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc(p.detail||'')}</div></div>
-    <div class="board-score open serif tabular">${p.score}</div>
+    <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc(p.detail||'')}${p.me?' · tu':''}</div></div>
+    <div class="board-score serif tabular">${p.score}</div>
   </div>`).join('');
   const teamsRanked = teams.slice().sort((a, b) => b.avg - a.avg).map((g, i) => ({ ...g, rank: i + 1 }));
-  const teamRows = teamsRanked.map(g => `<div class="board-row ${g.i===state.team?'me':''}">
+  const teamRows = teamsRanked.map(g => `<div class="board-row ${g.rank===1?'top':''}">
     <div class="board-rank serif tabular">${g.rank}</div>
     <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
-    <div class="board-score open serif tabular">${Math.round(g.avg)}</div>
+    <div class="board-score serif tabular">${Math.round(g.avg)}</div>
   </div>`).join('');
   return `<div class="screen screen-board">
-    ${avatarButton()}
+    <div class="topbar end">${avatarButton()}</div>
     <div class="kicker">${board.length} invitati · busta aperta</div>
     <h1 class="board-title">Classifica</h1>
-    <hr class="rule sm" style="margin-left:0;">
-    <div style="margin-top:8px;">${rows}</div>
+    <div class="board-list">${rows}</div>
     <div class="board-footer">A parità di punti vince chi ha risposto più in fretta.</div>
     <div class="section-title">Squadre</div>
     <p class="rank-line" style="margin-top:0;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente da quanti sono.</p>
-    <div style="margin-top:8px;">${teamRows}</div>
+    <div class="board-list">${teamRows}</div>
   </div>`;
 }
 
@@ -875,19 +896,21 @@ function renderProfile(){
   const avg = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
   const best = Object.values(state.res).filter(x => x.correct).sort((a, b) => a.used - b.used)[0];
   const name = state.name || 'Zia Franca';
-  const badges = [
-    ...CATS.map(c => {
-      const st = catState(state.res, c);
-      return {
-        mark: c.mark, name: c.medal,
-        note: st.earned ? c.note : (st.failed ? 'Categoria chiusa: ' + st.right + '/' + st.n + ' giuste' : c.name + ' · ' + st.right + '/' + st.n + ' giuste'),
-        locked: !st.earned,
-      };
-    }),
+  const earnedCount = CATS.filter(c => catState(state.res, c).earned).length;
+  const medalCards = CATS.map((c, idx) => {
+    const st = catState(state.res, c);
+    const note = st.right + ' su ' + st.n + ' giuste';
+    return `<div class="medal-card ${st.earned ? 'earned cat-tile--' + (idx + 1) : 'locked'}">
+      ${c.mark}
+      <div class="name serif">${esc(c.name)}</div>
+      <div class="note">${note}</div>
+    </div>`;
+  }).join('');
+  const extraBadges = [
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
     { mark: '✷', name: 'Calendario completo', note: 'Tutte le carte del mazzo', locked: done < total },
   ];
-  const badgeRows = badges.map(b => `<div class="badge-row ${b.locked?'locked':''}">
+  const badgeRows = extraBadges.map(b => `<div class="badge-row ${b.locked?'locked':''}">
     <div class="badge-glyph">${b.mark}</div>
     <div><div class="badge-name">${esc(b.name)}</div><div class="badge-note">${esc(b.note)}</div></div>
   </div>`).join('');
@@ -901,17 +924,18 @@ function renderProfile(){
     </div>`;
   }).join('');
   return `<div class="screen screen-profile">
-    ${avatarButton()}
+    <div class="topbar end">${avatarButton()}</div>
     <div class="avatar lg" style="margin:0 auto;">${initialsOf(name)}</div>
     <h1 class="profile-name">${esc(name)}</h1>
-    <div class="profile-team">${esc(TEAMS[state.team])} · tavolo 4</div>
+    <div class="profile-team">${esc(TEAMS[state.team])}</div>
     <div class="stat-strip">
       <div class="stat-cell"><div class="v serif tabular">${state.score}</div><div class="c">Punti</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Carte</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done?numIt(avg)+'s':'—'}</div><div class="c">Media</div></div>
     </div>
-    <div class="section-title">Medaglie</div>
-    <div class="badge-group">
+    <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
+    <div class="medal-grid">${medalCards}</div>
+    <div class="badge-group" style="margin-top:12px;">
     ${badgeRows}
     </div>
     <div class="section-title">Le tue risposte</div>
@@ -933,9 +957,7 @@ function renderFinale(){
   const mine = board.find(p => p.me);
   const podium = board.slice(0, 3).map(p => ({
     ...p,
-    h: p.rank === 1 ? 112 : p.rank === 2 ? 84 : 64,
-    fill: p.rank === 1 ? 'var(--accent-600)' : 'transparent',
-    ink: p.rank === 1 ? '#fdf6e4' : '#3a2f22',
+    h: p.rank === 1 ? 140 : p.rank === 2 ? 96 : 76,
   }));
   const order = [1, 0, 2].filter(i => podium[i]);
   const cols = order.map(i => {
@@ -943,7 +965,7 @@ function renderFinale(){
     return `<div class="podium-col">
       <div class="avatar" style="border-color:var(--accent-500);color:var(--accent-700);">${esc(p.initials)}</div>
       <div class="podium-pname">${esc(p.name)}</div>
-      <div class="podium-block serif" style="height:${p.h}px;background:${p.fill};color:${p.ink}">
+      <div class="podium-block serif ${p.rank===1?'top':''}" style="height:${p.h}px;">
         <div class="score tabular">${p.score}</div>
         <div class="rk">${p.rank}º</div>
       </div>
@@ -951,9 +973,9 @@ function renderFinale(){
   }).join('');
   const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Il podio era vicino. Colpa del cugino Pietro.';
   return `<div class="screen screen-finale">
-    <div class="kicker">16 ottobre, 23:10 · si apre la busta</div>
-    <h1 class="finale-title">Chi conosce<br><span class="amp">Mara & Stefano</span></h1>
-    <hr class="rule sm">
+    <div class="topbar end">${avatarButton()}</div>
+    <div class="kicker finale-kicker">16 ottobre, 23:10 · si apre la busta</div>
+    <h1 class="finale-title">Chi conosce<br><span class="couple-title amp">Mara &amp; Stefano</span></h1>
     <div class="podium">${cols}</div>
     <div class="you-line">
       <div class="micro">Tu</div>
@@ -1022,28 +1044,34 @@ function renderAdmin(){
   return `<div class="screen screen-admin">
     <div class="kicker">Solo per gli sposi</div>
     <h2 class="admin-title couple-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
-    <hr class="rule sm" style="margin-left:0;">
     <div class="admin-stats">
       <div class="stat-cell"><div class="v serif tabular">${totalPlayers}</div><div class="c">Giocano</div></div>
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
     <div class="envelope-box">
-      <div class="micro">La busta</div>
-      <div class="big serif">${state.revealed ? 'Aperta a tutti' : 'Chiusa a tutti'}</div>
+      <div class="row">
+        <div><div class="micro">La busta</div><div class="big serif">${state.revealed ? 'Aperta a tutti' : 'Chiusa a tutti'}</div></div>
+        <div class="lock">${state.revealed ? '🔓' : '🔒'}</div>
+      </div>
       ${state.revealed
-        ? `<button class="btn-outline" data-action="close-board">Riapri il gioco</button>`
+        ? `<button class="btn-dark" data-action="close-board">Riapri il gioco</button>`
         : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
     </div>
     <div class="section-title" style="color:rgba(247,236,214,.6);">Foto di copertina</div>
-    <div class="hero-upload-box">
-      ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="" class="hero-upload-preview">` : `<div class="hero-upload-empty">Nessuna foto caricata</div>`}
+    ${state.heroPhoto ? `<div class="hero-upload-box has-photo">
+      <img src="${esc(state.heroPhoto)}" alt="" class="hero-upload-preview">
       <input id="admin-hero-file" type="file" accept="image/*" style="display:none;">
       <div class="hero-upload-actions">
-        <button class="reset-btn" data-action="admin-hero-pick">${state.heroPhoto ? 'Cambia foto' : 'Carica foto'}</button>
-        ${state.heroPhoto ? `<button class="reset-btn" data-action="admin-hero-remove">Rimuovi</button>` : ''}
+        <button class="reset-btn" data-action="admin-hero-pick">Cambia foto</button>
+        <button class="reset-btn" data-action="admin-hero-remove">Rimuovi</button>
       </div>
-    </div>
+    </div>` : `<div class="hero-upload-box">
+      <div class="hero-upload-empty">vuota</div>
+      <div style="flex:1;font-size:12.5px;color:rgba(247,236,214,.7);line-height:1.45;">Nessuna foto caricata. Appare in cima alla home.</div>
+      <input id="admin-hero-file" type="file" accept="image/*" style="display:none;">
+      <button class="reset-btn" data-action="admin-hero-pick">Carica</button>
+    </div>`}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
     <p class="fine-print" style="color:rgba(247,236,214,.6);">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
     ${playerRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuno ha ancora giocato.</p>`}` : ''}
