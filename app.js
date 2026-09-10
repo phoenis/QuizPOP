@@ -741,17 +741,18 @@ function renderResult(){
   const locked = !state.revealed;
   const kicker = r.correct ? 'Risposta giusta' : 'Risposta sbagliata';
   const title = r.correct ? `Giusta in ${numIt(r.used)}s` : 'Non era questa';
-  const ink = r.correct ? 'var(--accent-600)' : 'var(--neutral-600)';
   const rankLine = locked
     ? 'La busta resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
     : (mine ? `Sei ${mine.rank}º su ${board.length} in questo momento.` : '');
   const cta = nextOpen(state.res, posOf(state.qi) + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
-  const myCat = CATS[catOf(state.qi)];
+  const catIdx = catOf(state.qi);
+  const variant = catIdx >= 0 ? catIdx + 1 : 'extra';
+  const myCat = CATS[catIdx];
   const myCatSt = myCat ? catState(state.res, myCat) : null;
   const medalWon = !!(r.correct && myCatSt && myCatSt.earned);
-  return `<div class="screen screen-result">
+  return `<div class="screen screen-result cat-tile--${variant}">
     <div class="kicker result-kicker">${kicker}</div>
-    <div class="result-pts serif tabular" style="color:${ink}">${r.pts ? '+' + r.pts : '0'}</div>
+    <div class="result-pts serif tabular">${r.pts ? '+' + r.pts : '0'}</div>
     ${r.correct ? `<img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="result-mascot">` : ''}
     <h2 class="result-title">${esc(title)}</h2>
     <hr class="rule sm">
@@ -766,7 +767,7 @@ function renderResult(){
     </div>` : ''}
     <div class="breakdown">
       <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
-      <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular" style="color:var(--accent-700)">${r.correct ? '+' + r.bonus : '—'}</span></div>
+      <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular">${r.correct ? '+' + r.bonus : '—'}</span></div>
       <div class="breakdown-row total"><span>Totale</span><span class="val tabular">${r.pts || 0}</span></div>
     </div>
     <p class="rank-line">${esc(rankLine)}</p>
