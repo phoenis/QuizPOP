@@ -54,6 +54,10 @@ alla home.
   profilo?" nella schermata iniziale: copia lì nome, punti e risposte. Non è
   una sincronizzazione in tempo reale: si può ripetere quando serve per
   riprendere i progressi più recenti.
+- **Uscire da un profilo**: nel profilo, in fondo, "Esci da questo profilo"
+  libera il telefono per iscrivere qualcun altro (o voi stessi con un altro
+  nome, per fare una prova). Il profilo lasciato non si cancella: resta
+  recuperabile con il suo codice (vedi sopra).
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.

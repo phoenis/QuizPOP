@@ -260,6 +260,25 @@ async function recoverProfile(){
   go('hub');
 }
 
+// esce dal profilo corrente per iscriverne uno nuovo sullo stesso telefono
+// (utile per provare come un altro invitato, o per passare da un account
+// all'altro). In locale cancella il profilo salvato sul telefono; online
+// chiude la sessione anonima cosi' la prossima e' un profilo nuovo di zecca
+// — quello vecchio resta comunque recuperabile con il suo codice.
+async function logout(){
+  const warn = state.mode === 'online' && state.transferCode
+    ? `Uscire da questo profilo? Potrai ritrovarlo in qualunque momento con il codice ${state.transferCode}.`
+    : 'Uscire da questo profilo? Su questo telefono si ricomincia da zero.';
+  if (!confirm(warn)) return;
+  if (state.mode === 'online' && fb){
+    await fb.signOut(fb.auth);
+  } else {
+    localStorage.removeItem('msquiz_profile');
+    localStorage.removeItem('msquiz_mission_photos');
+  }
+  location.reload();
+}
+
 // trova la prossima domanda senza risposta seguendo l'ordine casuale dell'invitato,
 // ciclicamente, a partire dalla posizione fromPos
 function nextOpen(res, fromPos){
@@ -868,6 +887,7 @@ function renderProfile(){
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
     ${state.adminUids.includes(state.guestId) ? `<button class="btn-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
+    <button class="btn-text" style="margin:16px auto 0;" data-action="logout">Esci da questo profilo</button>
   </div>`;
 }
 
@@ -1077,6 +1097,7 @@ root.addEventListener('click', e => {
     }
     case 'show-recover': state.recoverOpen = true; render(); break;
     case 'recover-profile': recoverProfile(); break;
+    case 'logout': logout(); break;
     case 'reveal-mission': assignMission(); break;
     case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
     case 'skip-mission': {
