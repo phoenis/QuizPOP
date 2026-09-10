@@ -408,8 +408,8 @@ function renderHub(){
     </div>
     <div class="hub-body">
       
-      <button class="hub-quiz-card" data-action="go" data-screen="home">
-        <span style="flex:1;min-width:0;">
+      <button class="hub-tile is-quiz" data-action="go" data-screen="home">
+        <span class="hub-wrapper">
           <span class="kicker">Il gioco</span>
           <span class="title serif">Il quiz su di noi</span>
           <span class="sub">Scala la classifica e vinci un premio!</span>
