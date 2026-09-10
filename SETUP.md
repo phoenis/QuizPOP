@@ -129,7 +129,10 @@ sottocartella del tuo spazio Aruba, es. `/quiz/` così sarà raggiungibile su
 tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
 
 ## Note tecniche
-- Il timer (20 secondi) non è mai mostrato durante la domanda, come da progetto.
+- Nessuna scadenza sulle domande: si può rispondere con tutta calma. Rispondere
+  entro 20 secondi (mai mostrati a schermo) dà comunque un piccolo bonus di
+  punti in più, che si riduce con il passare del tempo ma non toglie mai il
+  punteggio base della domanda.
 - Le 25 domande sono divise in 5 categorie da 5 ("Mara", "Stefano", "La loro vita
   insieme", "La giornata di oggi", "I tavoli"), mostrate come 5 card nella
   schermata "Le domande" (una per categoria, con dentro le sue 5 caselle). Le

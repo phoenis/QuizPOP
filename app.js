@@ -40,8 +40,7 @@ const QS = [
 const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 // categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
 const CATS = [
-  {name:'Mara', from:0, to:4, mark:'<img src="assets/mascotte/criceto-mara.png" alt="">', medal:'Esperta di Mara', note:'Tutte e cinque su di lei'},
-  {name:'Stefano', from:5, to:9, mark:'<img src="assets/mascotte/criceto-ste.png" alt="">', medal:'Esperto di Stefano', note:'Tutte e cinque su di lui'},
+  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Esperta di Mara', note:'Tutte e cinque su di lei'},
   {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'Casa nostra', note:'Tutte e cinque sulla vita insieme'},
   {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Tutte e cinque sul matrimonio'},
   {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'Giro dei tavoli', note:'Tutte e cinque sulle storie dei tavoli'},
@@ -133,7 +132,7 @@ const state = {
   screen: 'boot',
   name: '', team: 1,
   sel: null,
-  qi: 0, left: 0, locked: false, seq: [],
+  qi: 0, startedAt: 0, locked: false, seq: [],
   res: {}, score: 0,
   order: [],
   revealed: false,
@@ -149,7 +148,6 @@ const state = {
   adminUids: [], // uid di chi, oltre a chi conosce l'indirizzo #sposi, vede anche
                  // un tasto scorciatoia nel proprio profilo per il pannello sposi
 };
-let tickHandle = null;
 let fb = null; // firebase handles when online
 
 function allQuestions(){ return QS.concat(state.extraCards); }
@@ -241,16 +239,20 @@ function nextOpen(res, fromPos){
 }
 
 /* ============ Logica di gioco ============ */
+// nessuna scadenza: si puo' impiegare quanto tempo si vuole. TIMER_S resta
+// solo come finestra di riferimento per il bonus di velocita' (rispondere
+// entro quei secondi vale di piu', oltre resta comunque il punteggio base).
 function dur(){ return TIMER_S; }
 
 function finish(idx){
   const q = Q(state.qi);
   const correct = q.order
     ? (idx === 'order' && state.seq.length === q.order.length && state.seq.every((v, i) => v === i))
-    : (idx !== null && idx === q.c);
-  const bonus = correct ? Math.round(BONUS_PTS * (state.left / dur())) : 0;
+    : (idx === q.c);
+  const used = Math.max(0.1, (Date.now() - state.startedAt) / 1000);
+  const bonus = correct ? Math.round(BONUS_PTS * Math.max(0, 1 - used / dur())) : 0;
   const pts = correct ? BASE_PTS + bonus : 0;
-  state.res[state.qi] = { pts, bonus, correct, used: Math.max(0.1, dur() - state.left), timeout: idx === null };
+  state.res[state.qi] = { pts, bonus, correct, used };
   state.score += pts;
   state.locked = true;
   state.screen = 'result';
@@ -261,34 +263,22 @@ function finish(idx){
   persistProgress();
 }
 
-function tick(){
-  state.left = Math.max(0, state.left - 0.1);
-  if (state.left <= 0){
-    clearInterval(tickHandle); tickHandle = null;
-    finish(null);
-    render();
-  }
-}
-
 function flip(){
   if (state.revealed) return;
   const i = state.sel;
   if (i === undefined || i === null || state.res[i]) return;
-  clearInterval(tickHandle);
   // apre una nuova voce di history solo se si entra "da fuori" (dalla
   // schermata categorie): il resto della sessione (domanda dopo domanda,
   // fino a che la categoria non e' finita) sovrascrive quella stessa voce,
   // cosi' l'indietro esce dall'intera sessione invece di ripercorrere le
   // domande gia' risposte una per una.
   const continuing = state.screen === 'quiz' || state.screen === 'result';
-  state.screen = 'quiz'; state.qi = i; state.left = dur(); state.locked = false; state.seq = [];
+  state.screen = 'quiz'; state.qi = i; state.startedAt = Date.now(); state.locked = false; state.seq = [];
   if (continuing) replaceScreen('quiz'); else pushScreen('quiz');
-  tickHandle = setInterval(tick, 100);
   render();
 }
 function pick(idx){
   if (state.locked) return;
-  clearInterval(tickHandle); tickHandle = null;
   finish(idx);
   render();
 }
@@ -303,7 +293,6 @@ function replaceScreen(screen){
   try { history.replaceState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
 }
 function go(screen){
-  clearInterval(tickHandle); tickHandle = null;
   state.screen = screen;
   pushScreen(screen);
   render();
@@ -324,7 +313,6 @@ function afterResult(){
   // appena conclusa cosi' non resta raggiungibile all'indietro.
   const nx = nextOpen(state.res, posOf(state.qi) + 1);
   state.sel = nx === null ? state.qi : nx;
-  clearInterval(tickHandle); tickHandle = null;
   state.screen = nx === null ? 'finale' : 'home';
   replaceScreen(state.screen);
   render();
@@ -656,12 +644,17 @@ function renderOptions(q){
   </button>`).join('');
 }
 
+/*       <button class="btn-text" data-action="nav-back">Torna alle domande</button>
+      <span class="counter">Domanda ${posOf(state.qi) + 1} di ${allQuestions().length}</span>
+ */
+
 function renderQuiz(){
   const q = Q(state.qi);
   return `<div class="screen screen-quiz">
     <div class="quiz-topbar">
-      <button class="btn-text" data-action="nav-back">Torna alle domande</button>
-      <span class="counter">Domanda ${posOf(state.qi) + 1} di ${allQuestions().length}</span>
+    
+    <button class="back-fab" data-action="nav-back">←</button>
+    ${avatarButton()}
     </div>
     <div class="kicker" style="margin-top:14px;">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
@@ -677,8 +670,8 @@ function renderResult(){
   const board = ranked();
   const mine = board.find(p => p.me);
   const locked = !state.revealed;
-  const kicker = r.correct ? 'Risposta giusta' : (r.timeout ? 'Tempo scaduto' : 'Risposta sbagliata');
-  const title = r.correct ? `Giusta in ${numIt(r.used)}s` : (r.timeout ? 'Carta scaduta' : 'Non era questa');
+  const kicker = r.correct ? 'Risposta giusta' : 'Risposta sbagliata';
+  const title = r.correct ? `Giusta in ${numIt(r.used)}s` : 'Non era questa';
   const ink = r.correct ? 'var(--accent-600)' : 'var(--neutral-600)';
   const rankLine = locked
     ? 'La busta resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
@@ -1342,7 +1335,6 @@ async function boot(){
 // di uscire dall'app: ogni cambio di schermata e' una voce di history (vedi
 // pushScreen), qui la recuperiamo quando l'utente torna indietro (o avanti).
 window.addEventListener('popstate', e => {
-  clearInterval(tickHandle); tickHandle = null;
   state.screen = (e.state && e.state.screen) || (state.name ? 'hub' : 'join');
   render();
 });
