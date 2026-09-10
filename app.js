@@ -248,6 +248,7 @@ async function recoverProfile(){
     alert('Nessun profilo trovato con questo codice.');
     return;
   }
+  const oldId = qs.docs[0].id;
   const d = qs.docs[0].data();
   state.name = d.name || ''; state.team = d.team ?? 1;
   state.sel = d.sel ?? null;
@@ -257,6 +258,10 @@ async function recoverProfile(){
   state.recoverOpen = false; state.recoverCode = '';
   ensureOrder();
   await persistProgress();
+  // il profilo recuperato vive comunque sotto un id nuovo (l'anonimato non
+  // permette di "tornare" a essere lo stesso id di prima): se quello vecchio
+  // era admin, la scorciatoia al pannello sposi va riconcessa anche al nuovo.
+  if (oldId !== state.guestId && state.adminUids.includes(oldId)) await addAdmin(state.guestId);
   go('hub');
 }
 
