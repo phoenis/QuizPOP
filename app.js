@@ -139,6 +139,8 @@ const state = {
   missions: [], // [{ index, done }] — una per ogni missione presa (anche più di una)
   missionPhotos: {}, // { [missionIndex]: dataURL } — solo le proprie, per mostrarle
   allMissionPhotos: [], // tutte le missioni di tutti, solo per il pannello sposi
+  adminUids: [], // uid di chi, oltre a chi conosce l'indirizzo #sposi, vede anche
+                 // un tasto scorciatoia nel proprio profilo per il pannello sposi
 };
 let tickHandle = null;
 let fb = null; // firebase handles when online
@@ -807,6 +809,7 @@ function renderProfile(){
     ${badgeRows}
     <div class="section-title">Le tue risposte</div>
     ${answers || `<div class="empty-note">Ancora niente. Gira la prima carta.</div>`}
+    ${state.adminUids.includes(state.guestId) ? `<button class="btn-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
   </div>`;
 }
 
@@ -869,12 +872,18 @@ function renderAdmin(){
   const typeChips = KIND_LABELS.map((l, i) => `<button class="type-chip ${state.newCardType===i?'on':''}" data-action="admin-type" data-i="${i}">${esc(l)}</button>`).join('');
   const playerRows = state.players.map(p => {
     const done = Object.keys(p.res || {}).length;
+    const isAdmin = state.adminUids.includes(p.id);
     return `<div class="admin-card-row">
       <div style="flex:1;overflow:hidden;">
         <div class="tt">${esc(p.name || 'Senza nome')}</div>
         <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
       </div>
-      <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
+      <div class="admin-card-row-actions">
+        ${isAdmin
+          ? `<button class="reset-btn" data-action="remove-admin" data-id="${esc(p.id)}">Admin ✓</button>`
+          : `<button class="reset-btn" data-action="add-admin" data-id="${esc(p.id)}">Rendi admin</button>`}
+        <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
+      </div>
     </div>`;
   }).join('');
   const missionRows = state.allMissionPhotos
@@ -913,6 +922,7 @@ function renderAdmin(){
       </div>
     </div>
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
+    <p class="fine-print" style="color:rgba(247,236,214,.6);">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
     ${playerRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuno ha ancora giocato.</p>`}` : ''}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Missioni completate</div>
     <div class="mission-admin-list">
@@ -982,6 +992,8 @@ root.addEventListener('click', e => {
       if (confirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.')) resetPlayerAnswers(el.dataset.id);
       break;
     }
+    case 'add-admin': addAdmin(el.dataset.id); break;
+    case 'remove-admin': removeAdmin(el.dataset.id); break;
     case 'open-album': window.open(ALBUM_URL, '_blank'); break;
     case 'open-album-store': {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -1183,6 +1195,29 @@ async function resetPlayerAnswers(playerId){
   await fb.setDoc(fb.doc(fb.db, 'players', playerId), { res: {}, score: 0 }, { merge: true });
 }
 
+// invitati con la scorciatoia al pannello sposi nel proprio profilo, oltre a
+// chi conosce l'indirizzo #sposi. Restano finché qualcuno non li rimuove da
+// qui: per restarci "sempre", basta non togliersi da soli dalla lista.
+async function addAdmin(uid){
+  if (state.adminUids.includes(uid)) return;
+  state.adminUids = [...state.adminUids, uid];
+  if (state.mode === 'online' && fb){
+    await fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { admins: state.adminUids }, { merge: true });
+  } else {
+    localStorage.setItem('msquiz_admins', JSON.stringify(state.adminUids));
+  }
+  render();
+}
+async function removeAdmin(uid){
+  state.adminUids = state.adminUids.filter(id => id !== uid);
+  if (state.mode === 'online' && fb){
+    await fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { admins: state.adminUids }, { merge: true });
+  } else {
+    localStorage.setItem('msquiz_admins', JSON.stringify(state.adminUids));
+  }
+  render();
+}
+
 /* ============ Avvio ============ */
 async function boot(){
   if (hasFirebaseConfig){
@@ -1220,6 +1255,7 @@ async function boot(){
             const d = doc.exists() ? doc.data() : {};
             state.revealed = !!d.revealed;
             state.heroPhoto = d.heroPhoto || '';
+            state.adminUids = d.admins || [];
             render();
           });
           fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
@@ -1256,6 +1292,7 @@ async function boot(){
     }
     state.heroPhoto = localStorage.getItem('msquiz_hero_photo') || '';
     try { state.missionPhotos = JSON.parse(localStorage.getItem('msquiz_mission_photos') || '{}'); } catch { state.missionPhotos = {}; }
+    try { state.adminUids = JSON.parse(localStorage.getItem('msquiz_admins') || '[]'); } catch { state.adminUids = []; }
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';

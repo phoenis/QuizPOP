@@ -82,6 +82,15 @@ Si raggiunge visitando l'indirizzo del sito con `#sposi` in fondo, ad esempio:
 Non c'è una password: l'unica protezione è che nessuno conosce quell'indirizzo,
 quindi non condividetelo con gli invitati.
 
+In più, dal pannello (sezione "Invitati", solo in modalità online) potete dare
+a persone specifiche una **scorciatoia** al pannello sposi direttamente nel
+loro profilo (tasto "Pannello sposi" in fondo), così non devono ricordarsi
+l'indirizzo con `#sposi`: basta toccare "Rendi admin" accanto al loro nome
+(devono aver già giocato almeno una volta, per esistere nella lista). "Togli"
+la revoca in qualunque momento. Per restarci "sempre" (es. voi due), basta non
+togliervi mai da soli dalla lista — l'indirizzo `#sposi` resta comunque valido
+per tutti in ogni caso, come riserva.
+
 Da lì potete:
 - vedere quanti invitati stanno giocando e la percentuale di completamento,
 - **aprire il reveal** (la classifica si sblocca in tempo reale su tutti i telefoni),
