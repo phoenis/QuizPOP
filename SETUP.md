@@ -21,10 +21,14 @@ alla home.
 - **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`, oppure
   caricala direttamente dal pannello `#sposi` (vedi sotto). Finché non c'è
   nessuna delle due, l'app mostra lo sfondo neutro.
-- **Album condiviso**: apri `app.js`, cerca `ALBUM_URL` (vicino all'inizio del
-  file) e incolla lì il link del vostro album (Google Foto, Dropbox...). Finché
-  è vuoto, il tasto "Carica le tue foto" avvisa che il link non è stato ancora
-  impostato.
+- **Album condiviso**: "Carica le tue foto" apre una schermata con il codice
+  dell'album WedShoots (`ALBUM_CODE` in `app.js`, con tasto "copia") e un
+  pulsante che apre `ALBUM_URL` (la pagina ufficiale del sito nozze con il
+  login WedShoots — su molti telefoni apre direttamente l'app se installata,
+  altrimenti la versione web con lo stesso codice). C'è anche un link "Scaricala"
+  che manda allo store giusto (Android/iOS rilevato automaticamente,
+  `WEDSHOOTS_ANDROID_URL`/`WEDSHOOTS_IOS_URL` in `app.js`) per chi non ha
+  ancora l'app.
 - **Missione speciale**: ogni invitato scopre una missione fotografica a
   sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
   altro stia già giocando finché ce ne sono di libere — con più invitati che

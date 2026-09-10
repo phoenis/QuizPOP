@@ -182,6 +182,8 @@ input{font-family:inherit;}
 .mission-history{ display:flex; flex-direction:column; gap:10px; }
 .mission-history-row{ display:flex; align-items:center; gap:12px; border:1px solid var(--neutral-300); border-radius:var(--r-md); padding:10px; font-size:13.5px; }
 .mission-history-thumb{ flex:none; width:48px; height:48px; object-fit:cover; border-radius:var(--r-sm); }
+.album-code-box{ display:flex; align-items:center; gap:10px; margin-top:16px; border:1px dashed var(--accent-600); border-radius:var(--r-md); padding:14px 18px; }
+.album-code{ font-size:22px; letter-spacing:.06em; color:var(--accent-700); }
 
 /* ===== HOME / DOMANDE (card per categoria) ===== */
 .screen-home{ padding:24px 24px 40px; }

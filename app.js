@@ -66,8 +66,14 @@ function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20
 
 const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie'];
 
-// TODO: incolla qui il link del vostro album condiviso (Google Foto, Dropbox...) quando c'è.
-const ALBUM_URL = '';
+// Album condiviso WedShoots: link ufficiale della pagina nozze (apre l'app se
+// installata e supportata sul telefono, altrimenti la versione web con lo
+// stesso login a codice) + codice album da mostrare/copiare, + i link agli
+// store per chi non ha ancora l'app installata.
+const ALBUM_URL = 'https://www.matrimonio.com/web/mara-and-stefano-2026-10-16/wedshoots-8';
+const ALBUM_CODE = 'ITc68bf3c0';
+const WEDSHOOTS_ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.matrimonio.launcher&referrer=af_tranid%3DODMwNjM5OTQ2MDgzMDg3OTc3NA%3D%3D%26c%3DWP-IT-LANDINGS%26pid%3DWP-Android-IT';
+const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 
 // Missione fotografica personale: a ogni invitato ne viene assegnata una a
 // caso, evitando (finché ce ne sono di libere) quelle già capitate ad altri.
@@ -346,6 +352,7 @@ function render(){
     case 'join': html = renderJoin(); break;
     case 'hub': html = renderHub(); break;
     case 'missione': html = renderMissione(); break;
+    case 'album': html = renderAlbum(); break;
     case 'home': html = renderHome(); break;
     case 'quiz': html = renderQuiz(); break;
     case 'result': html = renderResult(); break;
@@ -430,7 +437,7 @@ function renderHub(){
             return !last ? 'Tocca per scoprirla' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : 'Ce l\'hai già');
           })()}</span>
         </button>
-        <button class="hub-tile" data-action="open-album">
+        <button class="hub-tile" data-action="go" data-screen="album">
           <span class="kicker">Album condiviso</span>
           <span class="title serif">Carica le<br>tue foto</span>
           <span class="foot">WedShoots ↗</span>
@@ -493,6 +500,24 @@ function renderMissione(){
       ${body}
     </div>
     ${history}
+  </div>`;
+}
+
+function renderAlbum(){
+  return `<div class="screen screen-missione">
+    <button class="btn-text" data-action="nav-back">← Torna alla home</button>
+    <div class="mission-wrap">
+      <div class="mission-glyph">📷</div>
+      <div class="kicker">Album condiviso</div>
+      <h1 style="font-size:26px;">Carica le tue foto su WedShoots</h1>
+      <p class="pretty" style="font-size:14px;line-height:1.6;color:var(--neutral-800);">Apri WedShoots (l'app, o il sito se non ce l'hai) e inserisci questo codice per entrare nel nostro album:</p>
+      <div class="album-code-box">
+        <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
+        <button class="btn-outline small" data-action="copy-album-code">Copia codice</button>
+      </div>
+      <button class="btn-outline block" style="margin-top:20px;" data-action="open-album">Apri WedShoots</button>
+      <p class="fine-print" style="margin-top:16px;text-align:center;">Non hai ancora l'app? <button class="btn-text" data-action="open-album-store">Scaricala</button></p>
+    </div>
   </div>`;
 }
 
@@ -956,9 +981,15 @@ root.addEventListener('click', e => {
       if (confirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.')) resetPlayerAnswers(el.dataset.id);
       break;
     }
-    case 'open-album': {
-      if (ALBUM_URL) window.open(ALBUM_URL, '_blank');
-      else alert('Il link dell\'album non è ancora stato impostato (ALBUM_URL in app.js).');
+    case 'open-album': window.open(ALBUM_URL, '_blank'); break;
+    case 'open-album-store': {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      window.open(isIOS ? WEDSHOOTS_IOS_URL : WEDSHOOTS_ANDROID_URL, '_blank');
+      break;
+    }
+    case 'copy-album-code': {
+      if (navigator.clipboard) navigator.clipboard.writeText(ALBUM_CODE).then(() => alert('Codice copiato!')).catch(() => alert('Codice album: ' + ALBUM_CODE));
+      else alert('Codice album: ' + ALBUM_CODE);
       break;
     }
     case 'reveal-mission': assignMission(); break;
