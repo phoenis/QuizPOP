@@ -30,6 +30,8 @@
 
   --sp-1:4.4px; --sp-2:8.8px; --sp-3:13.2px; --sp-4:17.6px; --sp-6:26.4px; --sp-8:35.2px;
   --r-sm:0.5rem; --r-md:1rem; --r-full:999px;
+  --card-radius:var(--r-sm);
+  --card-text-hover:rgba(255,253,246,.9);
   --shadow-sm:0 1px 2px rgba(46,43,37,.14);
   --shadow-md:0 3px 10px rgba(46,43,37,.16);
   --shadow-lg:0 12px 32px rgba(46,43,37,.22);
@@ -142,7 +144,7 @@ input{font-family:inherit;}
 
 /* ===== HUB (home con foto) ===== */
 .screen-hub{ padding:0 0 24px; }
-.hub-hero{ position:relative; flex:none; height:340px; background:var(--neutral-300); overflow:hidden; }
+.hub-hero{ position:relative; flex:1; height:340px; background:var(--neutral-300); overflow:hidden; }
 .hub-hero img{ width:100%; height:100%; object-fit:cover; }
 .hub-hero .fade{ position:absolute; inset:auto 0 0 0; height:150px; background:linear-gradient(to top, var(--cream) 6%, rgba(253,246,228,.86) 46%, rgba(253,246,228,0)); pointer-events:none; }
 .hub-hero .cap{ position:absolute; inset:auto 24px 18px; text-align:center; }
@@ -161,11 +163,12 @@ input{font-family:inherit;}
 .hub-progress .bar span{ position:absolute; inset:0 auto 0 0; height:1px; background:var(--accent-600); }
 .hub-progress .frac{ flex:none; font-size:11px; color:var(--accent-700); }
 .hub-tiles{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.hub-tile{ text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--neutral-400); padding:16px 16px 14px; min-height:120px; display:flex; flex-direction:column; border-radius:var(--r-md); box-shadow:var(--shadow-sm); }
+.hub-tile{ display: flex; flex-direction: column; text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--neutral-400); padding:16px 16px 14px; min-height:120px; border-radius:var(--card-radius); box-shadow:var(--shadow-sm); }
 .hub-tile:hover{ background:var(--accent-100); }
 .hub-tile .kicker{ font-size:9.5px; }
-.hub-tile .title{ display:block; font-size:22px; line-height:1.1; margin-top:6px; }
-.hub-tile .foot{ flex:1; display:block; align-self:flex-end; font-size:11.5px; color:var(--accent-700); margin-top:auto; }
+.hub-tile .title{ display:block; font-size:18px; line-height:1.1; margin-top:6px; }
+.hub-tile.is-quiz .title{ font-size:24px;}
+.hub-tile .foot{ align-self:flex-end; font-size:11.5px; color:var(--accent-700); margin-top:auto; padding-top: 10px;}
 .hub-link-row{ width:100%; text-align:left; cursor:pointer; background:#fffdf6; border:1px solid var(--neutral-400); padding:15px 18px; display:flex; align-items:center; gap:var(--sp-3); border-radius:var(--r-md); box-shadow:var(--shadow-sm); }
 .hub-link-row:hover{ background:var(--accent-100); }
 .hub-link-row .title{ display:block; margin-top:1px; }
@@ -187,7 +190,7 @@ input{font-family:inherit;}
 
 /* ===== HOME / DOMANDE (card per categoria) ===== */
 .screen-home{ padding:24px 24px 40px; }
-.home-header{ display:flex; justify-content:space-between; align-items:flex-start; padding-left:52px; padding-right:52px; }
+.home-header{ display:flex; justify-content:space-between; align-items:flex-start; padding-top: 88px; }
 .home-score{ text-align:right; }
 .home-score .num{ font-size:27px; }
 
@@ -195,35 +198,38 @@ input{font-family:inherit;}
    giochi: un colore diverso per categoria (variabili sotto, facili da
    ritoccare), badge di stato in alto a sinistra, glifo decorativo in
    trasparenza sullo sfondo. */
-.cat-cards{ display:flex; flex-direction:column; gap:14px; margin-top:14px; }
+.cat-cards{ display:flex; flex-direction:column; gap:14px; padding-top:14px; padding-bottom: 14px; margin-top: auto; margin-bottom: auto;}
 .cat-tile{
   --tile-a:var(--accent-400); --tile-b:var(--accent-600);
-  position:relative; width:100%; overflow:hidden; text-align:left; cursor:pointer;
+  position:relative; width:100%; overflow:visible; text-align:left; cursor:pointer;
   display:flex; flex-direction:column; gap:4px;
   background:linear-gradient(135deg, var(--tile-a), var(--tile-b));
-  border:0; border-radius:var(--r-md); padding:16px 18px 18px;
+  border:0; border-radius:var(--card-radius); padding:16px 18px 18px;
   color:#fffdf6; box-shadow:var(--shadow-md);
+  gap: 24px;
 }
-.cat-tile--1{ --tile-a:#f6a06b; --tile-b:#d67f48; }
-.cat-tile--2{ --tile-a:#c97a4a; --tile-b:#8c491a; }
+.cat-tile--5{ --tile-a:#f6a06b; --tile-b:#d67f48; }
+.cat-tile--4{ --tile-a:#c97a4a; --tile-b:#8c491a; }
 .cat-tile--3{ --tile-a:#c9899a; --tile-b:#8c4a5a; }
-.cat-tile--4{ --tile-a:#dcae57; --tile-b:#a97a1e; }
-.cat-tile--5{ --tile-a:#8a9c78; --tile-b:#546143; }
+.cat-tile--1{ --tile-a:#dcae57; --tile-b:#a97a1e; }
+.cat-tile--2{ --tile-a:#8a9c78; --tile-b:#546143; }
 .cat-tile--extra{ --tile-a:var(--neutral-500); --tile-b:var(--neutral-700); }
 .cat-tile-top{ display:flex; align-items:center; gap:8px; }
 .cat-tile-badge{
-  flex:none; width:26px; height:26px; border-radius:50%; background:rgba(255,253,246,.9);
-  color:var(--tile-b); display:flex; align-items:center; justify-content:center; font-size:14px;
+  flex:none; width:26px; height:26px; border-radius:50%; background:var(--card-text-hover);
+  color:var(--tile-b); display:flex; align-items:center; justify-content:center; font-size:14px; border: 1px solid transparent;
 }
-.cat-tile.earned{ box-shadow:0 0 0 3px rgba(255,253,246,.55), var(--shadow-md); }
-.cat-tile.earned .cat-tile-badge{ color:var(--accent-700); }
+/* .cat-tile.earned{ box-shadow:0 0 0 3px rgba(255,253,246,.55), var(--shadow-md); } */
+.cat-tile.earned .cat-tile-badge{ /* color:var(--accent-700); */ background-color: transparent; border-color: var(--card-text-hover); color: var(--card-text-hover);}
 .cat-tile-level{ font-size:10.5px; text-transform:uppercase; letter-spacing:.18em; opacity:.85; }
-.cat-tile-name{ font-size:22px; line-height:1.15; margin-top:2px; }
-.cat-tile-sub{ font-size:12px; opacity:.9; }
+.cat-tile-heading{display: flex; flex-direction: column; width: 100%; justify-content: space-between; align-items:flex-start;}
+.cat-tile-name{ font-size:22px; line-height:1.15;}
+.cat-tile-sub{ font-size:12px; opacity:.9; margin-top: 0.2rem;}
 .cat-tile-deco{
-  position:absolute; right:8px; bottom:-6px; font-size:64px; line-height:1;
-  opacity:.22; pointer-events:none;
+  position:absolute; right:8px; bottom:8px; top:40%; font-size:64px; line-height:1;
+  opacity:1; pointer-events:none; height: auto; display: flex; overflow: hidden;
 }
+.cat-tile-deco img{height: 100%; object-fit:contain;}
 
 .card-preview{ display:none; margin-top:14px; border-top:1px solid var(--neutral-300); padding-top:14px; text-align:center; }
 .card-preview .type{ font-size:21px; line-height:1.2; margin-top:4px; }

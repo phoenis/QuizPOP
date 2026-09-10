@@ -27,24 +27,24 @@ const QS = [
   {k:'Su Stefano', h:'La mattina dopo.', t:'Secondo Stefano, cosa farà Mara per prima il giorno dopo il matrimonio?', o:['Farà all’ammmore con suo marito','Farà un’abbondante colazione','Dormirà','Si sveglierà presto'], c:2, s:'Dormirà. Il resto può aspettare.'},
   {k:'La giornata di oggi', h:'Il momento più importante.', t:'Che rito è stato celebrato oggi?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera (es. civile o religioso) prima del matrimonio.'},
 
-  // "I tavoli": nei libretti-segnaposto ogni tavolo racconta una sua escursione e un
+  // "Andiamo in viaggio": nei libretti-segnaposto ogni tavolo racconta una sua escursione e un
   // aneddoto sul luogo. Queste 5 domande vanno completate con i contenuti veri dei
   // libretti e i nomi/numeri dei tavoli — l'idea è che per rispondere si deve andare
   // a chiedere in giro, cosà gli invitati si mescolano tra tavoli diversi.
-  {k:'I tavoli', h:'Bisogna proprio chiedere in giro.', t:'A quale tavolo appartiene la prima escursione raccontata nei libretti?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
-  {k:'I tavoli', h:'Un aneddoto da scoprire.', t:'Quale tavolo ha vissuto questo aneddoto sul luogo della sua escursione?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
-  {k:'I tavoli', h:'Un indizio dal libretto.', t:'Indovina il tavolo giusto per questo luogo misterioso.', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
-  {k:'I tavoli', h:'Chi ha fatto questa gita?', t:'Trova il tavolo che ha raccontato questa storia.', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
-  {k:'I tavoli', h:'Ultimo indizio.', t:'A quale tavolo appartiene quest’ultima storia?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'Andiamo in viaggio', h:'Bisogna proprio chiedere in giro.', t:'A quale tavolo appartiene la prima escursione raccontata nei libretti?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'Andiamo in viaggio', h:'Un aneddoto da scoprire.', t:'Quale tavolo ha vissuto questo aneddoto sul luogo della sua escursione?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'Andiamo in viaggio', h:'Un indizio dal libretto.', t:'Indovina il tavolo giusto per questo luogo misterioso.', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'Andiamo in viaggio', h:'Chi ha fatto questa gita?', t:'Trova il tavolo che ha raccontato questa storia.', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
+  {k:'Andiamo in viaggio', h:'Ultimo indizio.', t:'A quale tavolo appartiene quest’ultima storia?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
 ];
 const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 // categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
 const CATS = [
-  {name:'Mara', from:0, to:4, mark:'❖', medal:'Esperta di Mara', note:'Tutte e cinque su di lei'},
-  {name:'Stefano', from:5, to:9, mark:'✤', medal:'Esperto di Stefano', note:'Tutte e cinque su di lui'},
-  {name:'La loro vita insieme', from:10, to:14, mark:'✱', medal:'Casa nostra', note:'Tutte e cinque sulla vita insieme'},
-  {name:'La giornata di oggi', from:15, to:19, mark:'✾', medal:'Il giorno del sì', note:'Tutte e cinque sul matrimonio'},
-  {name:'I tavoli', from:20, to:24, mark:'❋', medal:'Giro dei tavoli', note:'Tutte e cinque sulle storie dei tavoli'},
+  {name:'Mara', from:0, to:4, mark:'<img src="assets/mascotte/criceto-mara.png" alt="">', medal:'Esperta di Mara', note:'Tutte e cinque su di lei'},
+  {name:'Stefano', from:5, to:9, mark:'<img src="assets/mascotte/criceto-ste.png" alt="">', medal:'Esperto di Stefano', note:'Tutte e cinque su di lui'},
+  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'Casa nostra', note:'Tutte e cinque sulla vita insieme'},
+  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Tutte e cinque sul matrimonio'},
+  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'Giro dei tavoli', note:'Tutte e cinque sulle storie dei tavoli'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
@@ -560,12 +560,14 @@ function renderHome(){
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
     const earned = catQs.length > 0 && doneN === catQs.length;
     return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
-      <span class="cat-tile-top">
-        <span class="cat-tile-badge">${earned ? '✓' : '›'}</span>
-        <span class="cat-tile-level">Livello ${level}</span>
+      <span class="cat-tile-heading">
+        <span class="cat-tile-name serif">${esc(name)}</span>
+        <span class="cat-tile-sub">${pct}%</span>
       </span>
-      <span class="cat-tile-name serif">${esc(name)}</span>
-      <span class="cat-tile-sub">${esc(sub)} · ${pct}%</span>
+      <span class="cat-tile-top">
+        <span class="cat-tile-badge">${earned ? '✓' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.69L9.54 5.98A.998.998 0 0 0 8 6.82"></path></svg>'}</span>
+        <span class="cat-tile-level">${earned ? 'Completato' : 'Gioca'}</span>
+      </span>
       <span class="cat-tile-deco" aria-hidden="true">${icon}</span>
     </button>`;
   };
@@ -606,14 +608,14 @@ function renderHome(){
     ${avatarButton()}
     <div class="home-header">
       <div>
-        <div class="kicker">${remaining > 0 ? 'Ne restano ' + remaining : 'Tutte fatte'}</div>
-        <h1 style="font-size:30px;">Le domande</h1>
+        <div class="kicker">Il quiz</div>
+        <h1 style="font-size:30px;">Quanto ne sai sugli sposi?</h1>
       </div>
-      <div class="home-score">
+    </div>
+          <div class="home-score">
         <div class="num serif tabular">${state.score}</div>
         <div class="micro">Punti</div>
       </div>
-    </div>
     <div class="cat-cards">${catCards}${extraCard}</div>
     ${panel}
   </div>`;
