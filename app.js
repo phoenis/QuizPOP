@@ -66,11 +66,12 @@ function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20
 
 const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie'];
 
-// Album condiviso WedShoots: link ufficiale della pagina nozze (apre l'app se
-// installata e supportata sul telefono, altrimenti la versione web con lo
-// stesso login a codice) + codice album da mostrare/copiare, + i link agli
-// store per chi non ha ancora l'app installata.
-const ALBUM_URL = 'https://www.matrimonio.com/web/mara-and-stefano-2026-10-16/wedshoots-8';
+// Album condiviso WedShoots: pagina ufficiale "download" di wedshoots.com con
+// l'ID album già incorporato, pensata apposta per l'invito — dovrebbe aprire
+// l'app se già installata, altrimenti mandare allo store giusto da sola.
+// + codice album da mostrare/copiare a chi entra dalla versione web, + link
+// diretti agli store come riserva se la pagina non reindirizzasse da sola.
+const ALBUM_URL = 'https://www.wedshoots.com/it/download?albumId=ITc68bf3c0';
 const ALBUM_CODE = 'ITc68bf3c0';
 const WEDSHOOTS_ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.matrimonio.launcher&referrer=af_tranid%3DODMwNjM5OTQ2MDgzMDg3OTc3NA%3D%3D%26c%3DWP-IT-LANDINGS%26pid%3DWP-Android-IT';
 const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';

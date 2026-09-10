@@ -23,12 +23,13 @@ alla home.
   nessuna delle due, l'app mostra lo sfondo neutro.
 - **Album condiviso**: "Carica le tue foto" apre una schermata con il codice
   dell'album WedShoots (`ALBUM_CODE` in `app.js`, con tasto "copia") e un
-  pulsante che apre `ALBUM_URL` (la pagina ufficiale del sito nozze con il
-  login WedShoots — su molti telefoni apre direttamente l'app se installata,
-  altrimenti la versione web con lo stesso codice). C'è anche un link "Scaricala"
-  che manda allo store giusto (Android/iOS rilevato automaticamente,
-  `WEDSHOOTS_ANDROID_URL`/`WEDSHOOTS_IOS_URL` in `app.js`) per chi non ha
-  ancora l'app.
+  pulsante che apre `ALBUM_URL` — la pagina ufficiale `wedshoots.com/it/download`
+  con l'ID album incorporato, pensata da WedShoots stessa per aprire l'app se
+  già installata o mandare allo store se no. ⚠️ Da verificare su un telefono
+  vero prima del matrimonio: se quella pagina non reindirizzasse come
+  previsto, c'è comunque il link "Scaricala" sotto che manda direttamente allo
+  store giusto (Android/iOS rilevato automaticamente,
+  `WEDSHOOTS_ANDROID_URL`/`WEDSHOOTS_IOS_URL` in `app.js`).
 - **Missione speciale**: ogni invitato scopre una missione fotografica a
   sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
   altro stia già giocando finché ce ne sono di libere — con più invitati che
