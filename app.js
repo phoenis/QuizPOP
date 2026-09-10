@@ -39,10 +39,10 @@ const QS = [
 const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 // categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
 const CATS = [
-  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Esperta di Mara', note:'Tutte e cinque su di lei'},
-  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'Casa nostra', note:'Tutte e cinque sulla vita insieme'},
+  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Tutte e cinque su di lei'},
+  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Tutte e cinque sulla vita insieme'},
   {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Tutte e cinque sul matrimonio'},
-  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'Giro dei tavoli', note:'Tutte e cinque sulle storie dei tavoli'},
+  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Tutte e cinque sulle storie dei tavoli'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
@@ -910,7 +910,9 @@ function renderProfile(){
       <div class="stat-cell"><div class="v serif tabular">${done?numIt(avg)+'s':'—'}</div><div class="c">Media</div></div>
     </div>
     <div class="section-title">Medaglie</div>
+    <div class="badge-group">
     ${badgeRows}
+    </div>
     <div class="section-title">Le tue risposte</div>
     ${answers || `<div class="empty-note">Ancora niente. Gira la prima carta.</div>`}
     ${state.mode === 'online' && state.transferCode ? `
