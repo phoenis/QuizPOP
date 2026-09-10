@@ -131,6 +131,7 @@ const state = {
   heroPhoto: '',
   missions: [], // [{ index, done }] — una per ogni missione presa (anche più di una)
   missionPhotos: {}, // { [missionIndex]: dataURL } — solo le proprie, per mostrarle
+  allMissionPhotos: [], // tutte le missioni di tutti, solo per il pannello sposi
 };
 let tickHandle = null;
 let fb = null; // firebase handles when online
@@ -850,6 +851,16 @@ function renderAdmin(){
       <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
     </div>`;
   }).join('');
+  const missionRows = state.allMissionPhotos
+    .slice()
+    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+    .map(m => `<div class="mission-admin-row">
+      <img src="${esc(m.photo)}" alt="" class="mission-admin-thumb">
+      <div style="flex:1;overflow:hidden;">
+        <div class="tt">${esc(m.name || 'Senza nome')}</div>
+        <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
+      </div>
+    </div>`).join('');
   return `<div class="screen screen-admin">
     <div class="kicker">Solo per gli sposi</div>
     <h2 class="admin-title couple-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
@@ -877,6 +888,10 @@ function renderAdmin(){
     </div>
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
     ${playerRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuno ha ancora giocato.</p>`}` : ''}
+    ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Missioni completate</div>
+    <div class="mission-admin-list">
+      ${missionRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuna missione completata ancora.</p>`}
+    </div>` : ''}
     <div class="section-title" style="color:rgba(247,236,214,.6);">Le domande</div>
     ${items}
     <div class="section-title" style="color:rgba(247,236,214,.6);">Nuova domanda</div>
@@ -1180,6 +1195,15 @@ async function boot(){
             if (ensureOrder() && state.name) persistProgress();
             render();
           });
+          // le foto missione di TUTTI gli invitati, solo per il pannello sposi
+          // (per gli invitati normali resta la query filtrata sulla propria,
+          // molto più leggera — vedi sopra).
+          if (location.hash === '#sposi'){
+            fb.onSnapshot(fb.collection(fb.db, 'missionPhotos'), qs => {
+              state.allMissionPhotos = qs.docs.map(doc => doc.data());
+              render();
+            });
+          }
           resolve();
         });
       });

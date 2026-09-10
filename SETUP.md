@@ -84,6 +84,9 @@ Da lì potete:
   gli invitati che non l'hanno ancora fatta). Nota: il form prende solo "domanda" +
   "risposta giusta" — genera una carta a due opzioni (la risposta giusta e un
   distrattore generico), non tutti e sette i tipi di domanda complessi.
+- vedere tutte le **missioni fotografiche completate** da chiunque (foto, testo
+  della missione e nome di chi l'ha fatta), sezione "Missioni completate" —
+  visibile solo in modalità online, ordinata dalla più recente.
 
 ## Foto vere
 Quando è pronta, basta metterla in `assets/` con questo nome esatto
