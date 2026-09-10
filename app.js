@@ -118,6 +118,14 @@ const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0
 const numIt = n => (n||0).toFixed(1).replace('.', ',');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'g-' + Math.random().toString(36).slice(2) + Date.now());
+// codice breve (niente caratteri ambigui tipo 0/O o 1/I) per ritrovare lo
+// stesso profilo su un altro telefono, senza dover digitare l'id lungo.
+function genTransferCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
 // una missione completata puo' essere una foto (dataURL, dentro Firestore) o
 // un video (URL di Firebase Storage): stesso markup, tag diverso.
 function renderMissionMedia(entry, cls){
@@ -146,6 +154,8 @@ const state = {
   allMissionPhotos: [], // tutte le missioni di tutti, solo per il pannello sposi
   adminUids: [], // uid di chi, oltre a chi conosce l'indirizzo #sposi, vede anche
                  // un tasto scorciatoia nel proprio profilo per il pannello sposi
+  transferCode: '', // codice breve per ritrovare lo stesso profilo su un altro telefono
+  recoverOpen: false, recoverCode: '',
 };
 let fb = null; // firebase handles when online
 
@@ -213,16 +223,41 @@ async function initFirebase(){
 }
 
 async function persistProgress(){
+  if (!state.transferCode) state.transferCode = genTransferCode();
   if (state.mode === 'online' && fb && state.guestId) {
     const ref = fb.doc(fb.db, 'players', state.guestId);
     await fb.setDoc(ref, {
       name: state.name, team: state.team, sel: state.sel,
       res: state.res, score: state.score, order: state.order,
-      missions: state.missions, updatedAt: fb.serverTimestamp(),
+      missions: state.missions, transferCode: state.transferCode, updatedAt: fb.serverTimestamp(),
     }, { merge: true });
   } else {
     saveLocalProfile();
   }
+}
+
+// recupera lo stesso profilo su un altro telefono cercandolo per transferCode
+// (mostrato nel proprio profilo) e lo clona sul dispositivo corrente: non è
+// una sincronizzazione live, ma si può ripetere in qualunque momento per
+// riprendere i progressi più recenti.
+async function recoverProfile(){
+  const code = state.recoverCode.trim().toUpperCase();
+  if (!code || state.mode !== 'online' || !fb) return;
+  const qs = await fb.getDocs(fb.query(fb.collection(fb.db, 'players'), fb.where('transferCode', '==', code)));
+  if (qs.empty){
+    alert('Nessun profilo trovato con questo codice.');
+    return;
+  }
+  const d = qs.docs[0].data();
+  state.name = d.name || ''; state.team = d.team ?? 1;
+  state.sel = d.sel ?? null;
+  state.res = d.res || {}; state.score = d.score || 0;
+  state.order = d.order || [];
+  state.missions = d.missions || [];
+  state.recoverOpen = false; state.recoverCode = '';
+  ensureOrder();
+  await persistProgress();
+  go('hub');
 }
 
 // trova la prossima domanda senza risposta seguendo l'ordine casuale dell'invitato,
@@ -390,7 +425,14 @@ function renderJoin(){
     </div>
     <div class="join-spacer"></div>
     <button class="btn-outline block" data-action="join" style="margin-top:14px;">Comincia</button>
-    <p class="fine-print">Niente codici, niente password. La squadra serve solo per le statistiche finali.</p>
+    <p class="fine-print">La squadra serve solo per le statistiche finali.</p>
+    ${state.recoverOpen ? `
+      <div class="field-block">
+        <div class="field-label">Codice del tuo profilo</div>
+        <input id="recover-code" class="name-input" style="font-size:20px;letter-spacing:.1em;text-transform:uppercase;" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
+        <button class="btn-outline block" style="margin-top:10px;" data-action="recover-profile">Recupera profilo</button>
+      </div>`
+      : `<button class="btn-text" style="margin-top:14px;" data-action="show-recover">Hai già un profilo su un altro telefono? Recuperalo con un codice</button>`}
   </div>`;
 }
 
@@ -818,6 +860,13 @@ function renderProfile(){
     ${badgeRows}
     <div class="section-title">Le tue risposte</div>
     ${answers || `<div class="empty-note">Ancora niente. Gira la prima carta.</div>`}
+    ${state.mode === 'online' && state.transferCode ? `
+      <div class="section-title">Il tuo profilo su un altro telefono</div>
+      <div class="album-code-box">
+        <span class="album-code tabular">${esc(state.transferCode)}</span>
+        <button class="btn-outline small" data-action="copy-transfer-code">Copia codice</button>
+      </div>
+      <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
     ${state.adminUids.includes(state.guestId) ? `<button class="btn-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
   </div>`;
 }
@@ -879,12 +928,19 @@ function renderAdmin(){
     </div>`;
   }).join('');
   const typeChips = KIND_LABELS.map((l, i) => `<button class="type-chip ${state.newCardType===i?'on':''}" data-action="admin-type" data-i="${i}">${esc(l)}</button>`).join('');
+  const nameCounts = {};
+  state.players.forEach(p => { const n = p.name || 'Senza nome'; nameCounts[n] = (nameCounts[n] || 0) + 1; });
   const playerRows = state.players.map(p => {
     const done = Object.keys(p.res || {}).length;
     const isAdmin = state.adminUids.includes(p.id);
+    const name = p.name || 'Senza nome';
+    // se ci sono omonimi, aggiunge un tag con le ultime 4 cifre dell'id per
+    // distinguerli (l'id e' l'unica cosa davvero univoca: i nomi si scelgono
+    // liberamente e possono ripetersi).
+    const nameTag = nameCounts[name] > 1 ? ` · #${esc(p.id.slice(-4))}` : '';
     return `<div class="admin-card-row">
       <div style="flex:1;overflow:hidden;">
-        <div class="tt">${esc(p.name || 'Senza nome')}</div>
+        <div class="tt">${esc(name)}${nameTag}</div>
         <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
       </div>
       <div class="admin-card-row-actions">
@@ -1014,6 +1070,13 @@ root.addEventListener('click', e => {
       else alert('Codice album: ' + ALBUM_CODE);
       break;
     }
+    case 'copy-transfer-code': {
+      if (navigator.clipboard) navigator.clipboard.writeText(state.transferCode).then(() => alert('Codice copiato!')).catch(() => alert('Codice profilo: ' + state.transferCode));
+      else alert('Codice profilo: ' + state.transferCode);
+      break;
+    }
+    case 'show-recover': state.recoverOpen = true; render(); break;
+    case 'recover-profile': recoverProfile(); break;
     case 'reveal-mission': assignMission(); break;
     case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
     case 'skip-mission': {
@@ -1035,6 +1098,7 @@ root.addEventListener('input', e => {
   if (e.target.id === 'name-input') state.name = e.target.value;
   if (e.target.id === 'admin-q') state.newCardQ = e.target.value;
   if (e.target.id === 'admin-a') state.newCardA = e.target.value;
+  if (e.target.id === 'recover-code') state.recoverCode = e.target.value;
 });
 
 function openReveal(){
@@ -1268,7 +1332,9 @@ async function boot(){
             state.res = d.res || {}; state.score = d.score || 0;
             state.order = d.order || [];
             state.missions = d.missions || [];
+            state.transferCode = d.transferCode || '';
           }
+          if (!state.transferCode && state.name){ state.transferCode = genTransferCode(); persistProgress(); }
           if (ensureOrder() && state.name) persistProgress();
           fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
             state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));

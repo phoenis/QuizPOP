@@ -47,6 +47,14 @@ alla home.
   `firestore.rules` aggiornato e di attivare Storage con `storage.rules`
   (punto 4 qui sotto) — altrimenti il caricamento darà errore di permessi.
 
+- **Cambiare telefono**: ogni telefono ha un'identità propria (nessun login),
+  quindi normalmente aprendo il gioco su un secondo telefono si parte da zero.
+  Nel profilo (solo in modalità online) c'è un codice breve — "il tuo profilo
+  su un altro telefono" — da inserire sul nuovo telefono toccando "Hai già un
+  profilo?" nella schermata iniziale: copia lì nome, punti e risposte. Non è
+  una sincronizzazione in tempo reale: si può ripetere quando serve per
+  riprendere i progressi più recenti.
+
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
 Appena inserisci le chiavi Firebase, l'app passa da sola alla **modalità online**
