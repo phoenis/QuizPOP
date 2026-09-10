@@ -156,6 +156,7 @@ const state = {
                  // un tasto scorciatoia nel proprio profilo per il pannello sposi
   transferCode: '', // codice breve per ritrovare lo stesso profilo su un altro telefono
   recoverOpen: false, recoverCode: '',
+  medalCat: null, // indice in CATS della medaglia appena vinta, per renderMedal()
 };
 let fb = null; // firebase handles when online
 
@@ -366,9 +367,26 @@ function afterResult(){
     flip();
     return;
   }
-  // categoria finita: torna alla schermata categorie (o al finale se non
-  // resta nessuna domanda da nessuna parte), sovrascrivendo la sessione
-  // appena conclusa cosi' non resta raggiungibile all'indietro.
+  // categoria finita: se l'ha appena vinta (tutte e cinque giuste), prima
+  // una schermata dedicata a festeggiare la medaglia.
+  const c = CATS[cat];
+  const st = c ? catState(state.res, c) : null;
+  if (st && st.earned){
+    state.medalCat = cat;
+    state.screen = 'medal';
+    replaceScreen('medal');
+    render();
+    return;
+  }
+  afterMedal();
+}
+
+// torna alla schermata categorie (o al finale se non resta nessuna domanda
+// da nessuna parte), sovrascrivendo la sessione appena conclusa cosi' non
+// resta raggiungibile all'indietro. Richiamata direttamente da afterResult()
+// se non c'e' nessuna medaglia da festeggiare, o dal tasto "Continua" della
+// schermata medaglia.
+function afterMedal(){
   const nx = nextOpen(state.res, posOf(state.qi) + 1);
   state.sel = nx === null ? state.qi : nx;
   state.screen = nx === null ? 'finale' : 'home';
@@ -414,6 +432,7 @@ function render(){
     case 'home': html = renderHome(); break;
     case 'quiz': html = renderQuiz(); break;
     case 'result': html = renderResult(); break;
+    case 'medal': html = renderMedal(); break;
     case 'board': html = renderBoard(); break;
     case 'profile': html = renderProfile(); break;
     case 'finale': html = renderFinale(); break;
@@ -747,9 +766,6 @@ function renderResult(){
   const cta = nextOpen(state.res, posOf(state.qi) + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
   const catIdx = catOf(state.qi);
   const variant = catIdx >= 0 ? catIdx + 1 : 'extra';
-  const myCat = CATS[catIdx];
-  const myCatSt = myCat ? catState(state.res, myCat) : null;
-  const medalWon = !!(r.correct && myCatSt && myCatSt.earned);
   return `<div class="screen screen-result cat-tile--${variant}">
     <div class="kicker result-kicker">${kicker}</div>
     <div class="result-pts serif tabular">${r.pts ? '+' + r.pts : '0'}</div>
@@ -757,14 +773,6 @@ function renderResult(){
     <h2 class="result-title">${esc(title)}</h2>
     <hr class="rule sm">
     <p class="result-blurb pretty">${esc(q.s)}</p>
-    ${medalWon ? `<div class="medal-won">
-      <span class="medal-mark">${esc(myCat.mark)}</span>
-      <span class="medal-text">
-        <span class="kicker">Medaglia vinta</span>
-        <span class="medal-name serif">${esc(myCat.medal)}</span>
-        <span class="medal-note">${esc(myCat.note)}</span>
-      </span>
-    </div>` : ''}
     <div class="breakdown">
       <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
       <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular">${r.correct ? '+' + r.bonus : '—'}</span></div>
@@ -776,6 +784,25 @@ function renderResult(){
       <button class="btn-outline block" data-action="after-result">${cta}</button>
       <button class="btn-text" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
     </div>
+  </div>`;
+}
+
+// schermata a tutto schermo che festeggia la medaglia appena vinta (tutte e
+// cinque le domande della categoria giuste), mostrata subito dopo l'ultimo
+// risultato della categoria, prima di tornare alle categorie/al finale.
+function renderMedal(){
+  const c = CATS[state.medalCat];
+  const variant = state.medalCat + 1;
+  return `<div class="screen screen-medal cat-tile--${variant}">
+    <div class="medal-celebrate">
+      <div class="medal-badge-big">${c.mark}</div>
+      <div class="kicker">Medaglia vinta</div>
+      <h1 class="medal-celebrate-title pretty">Congratulazioni, sai tutto su ${esc(c.name)}!</h1>
+      <div class="medal-celebrate-name serif">${esc(c.medal)}</div>
+      <p class="medal-celebrate-note pretty">${esc(c.note)}</p>
+    </div>
+    <div class="result-spacer"></div>
+    <button class="btn-outline block" data-action="after-medal">Continua</button>
   </div>`;
 }
 
@@ -1070,6 +1097,7 @@ root.addEventListener('click', e => {
     }
     case 'reset-order': state.seq = []; render(); break;
     case 'after-result': afterResult(); break;
+    case 'after-medal': afterMedal(); break;
     case 'go': go(el.dataset.screen); break;
     case 'nav-back': history.back(); break;
     case 'open-board-full': state.revealed = true; go('board'); break;
