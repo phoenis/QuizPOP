@@ -7,7 +7,7 @@ const QS = [
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
   {k:'Su Mara', h:'Un giorno tutto suo.', t:'Se Mara potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
   {k:'Su Mara', h:'Un talento che ammette volentieri.', t:'Qual è la cosa che Mara pensa Stefano faccia meglio di lei?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
-  {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+  {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Giallo'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte: questo conquista Stefano.'},
   {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Stefano?', o:['Risotto ai funghi','Zucca','Risotto','Formaggio'], c:3, s:'Il formaggio, sempre e comunque.'},
   {k:'Su Stefano', h:'Un giorno tutto suo.', t:'Se Stefano potesse scegliere una sola cosa da fare per un’intera giornata libera, cosa sceglierebbe?', o:['Trekking','Giocare in famiglia','Collezionare bilance rare','Giocare con gli amici'], c:1, s:'Giocare in famiglia: la sua giornata ideale.'},
@@ -692,7 +692,7 @@ function renderQuizBody(q){
     }).join('');
     const incomplete = state.seq.length !== q.order.length;
     return `<p class="order-helper">Tocca nell’ordine giusto, dal primo all’ultimo.</p>
-      ${rows}
+      <div class="option-group">${rows}</div>
       <button class="btn-outline block" style="margin-top:20px;" data-action="confirm-order" ${incomplete?'disabled':''}>Conferma l’ordine</button>
       <button class="btn-text" style="margin-top:10px;" data-action="reset-order">Ricomincia da capo</button>`;
   }
@@ -705,9 +705,10 @@ function renderQuizBody(q){
 
 function renderOptions(q){
   const letters = 'ABCD';
-  return (q.o || []).map((t, i) => `<button class="option-row" data-action="pick-option" data-idx="${i}">
+  const rows = (q.o || []).map((t, i) => `<button class="option-row" data-action="pick-option" data-idx="${i}">
     <span class="letter">${letters[i]}</span><span class="label">${esc(t)}</span>
   </button>`).join('');
+  return `<div class="option-group">${rows}</div>`;
 }
 
 /*       <button class="btn-text" data-action="nav-back">Torna alle domande</button>
@@ -803,7 +804,7 @@ function renderBoard(){
       <h1 class="board-title">Classifica</h1>
       <hr class="rule sm" style="margin-left:0;">
       <p class="board-explainer pretty">Nessuno vede i punti degli altri. La busta si apre quando Mara e Stefano prendono il microfono.</p>
-      <div style="margin-top:8px;">${rows}</div>
+      <div style="margin-top:8px;"><div class="option-group">${rows}</div></div>
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
         <div class="big serif tabular">${state.score} punti tuoi</div>
