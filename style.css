@@ -30,11 +30,11 @@
 
   --sp-1:4.4px; --sp-2:8.8px; --sp-3:13.2px; --sp-4:17.6px; --sp-6:26.4px; --sp-8:35.2px;
   --r-sm:0.5rem; --r-md:1rem; --r-full:999px;
-  --card-radius:var(--r-sm);
+  --card-radius:var(--r-md);
   --card-text-hover:rgba(255,253,246,.9);
   --shadow-sm:0 1px 2px rgba(46,43,37,.14);
   --shadow-md:0 3px 10px rgba(46,43,37,.16);
-  --shadow-lg:0 12px 32px rgba(46,43,37,.22);
+  --shadow-lg:7px 7px 15px rgba(46,43,37,.22);
 
   --font-primary:'Formata',sans-serif;
   --font-secondary:'Alice',serif;
@@ -77,7 +77,7 @@ input{font-family:inherit;}
   #app{ min-height:874px; max-height:calc(100vh - 48px); border-radius:28px; box-shadow:var(--shadow-lg); overflow-y:auto; }
 }
 
-.screen{ position:relative; display:flex; flex-direction:column; flex:1; min-height:100%; max-height: 100vh; padding:88px 24px 40px 24px; }
+.screen{ position:relative; display:flex; flex-direction:column; flex:1; min-height:100%; padding:88px 24px 40px 24px; }
 
 /* unica scorciatoia di navigazione rimasta fuori dalla pagina: le iniziali
    in alto a destra aprono il profilo (o lo chiudono, con una ×). */
@@ -148,7 +148,7 @@ input{font-family:inherit;}
 /* ===== HUB (home con foto) ===== */
 .screen-hub{ padding:0 0 24px; }
 .hub-hero{ position:relative; flex:1; height:340px; background:var(--neutral-300); overflow:hidden; }
-.hub-hero img{ width:100%; height:100%; object-fit:cover; }
+.hub-hero img{ position:absolute; width:100%; height:100%; object-fit:cover; }
 .hub-hero .fade{ position:absolute; inset:auto 0 0 0; height:150px; background:linear-gradient(to top, var(--cream) 6%, rgba(253,246,228,.86) 46%, rgba(253,246,228,0)); pointer-events:none; }
 .hub-hero .cap{ position:absolute; inset:auto 24px 18px; text-align:center; }
 .hub-hero .cap .names{ font-size:38px; line-height:1; margin-top:4px; }
@@ -201,14 +201,14 @@ input{font-family:inherit;}
    giochi: un colore diverso per categoria (variabili sotto, facili da
    ritoccare), badge di stato in alto a sinistra, glifo decorativo in
    trasparenza sullo sfondo. */
-.cat-cards{ display:flex; flex-direction:column; gap:14px; padding-top:14px; padding-bottom: 14px; margin-top: auto; margin-bottom: auto;}
+.cat-cards{ display:flex; flex-direction:column; gap:5rem; padding-top:6rem; padding-bottom: 14px; margin-top: auto; margin-bottom: auto;}
 .cat-tile{
   --tile-a:var(--accent-400); --tile-b:var(--accent-600);
   position:relative; width:100%; overflow:visible; text-align:left; cursor:pointer;
   display:flex; flex-direction:column; gap:4px;
   background:linear-gradient(135deg, var(--tile-a), var(--tile-b));
   border:0; border-radius:var(--card-radius); padding:1rem;
-  color:#fffdf6; box-shadow:var(--shadow-md);
+  color:#fffdf6; box-shadow: var(--shadow-lg);
   gap: 24px;
 }
 /* .cat-tile--5{ --tile-a:#f6a06b; --tile-b:#d67f48; } */
@@ -226,11 +226,11 @@ input{font-family:inherit;}
 .cat-tile.earned .cat-tile-badge{ /* color:var(--accent-700); */ background-color: transparent; border-color: var(--card-text-hover); color: var(--card-text-hover);}
 .cat-tile-level{ font-size:10.5px; text-transform:uppercase; letter-spacing:.18em; opacity:.85; }
 .cat-tile-heading{display: flex; flex-direction: column; width: 100%; justify-content: space-between; align-items:flex-start;}
-.cat-tile-name{ font-size:22px; line-height:1.15;}
+.cat-tile-name{ font-size:1.5rem; line-height:1.15;}
 .cat-tile-sub{ font-size:12px; opacity:.9; margin-top: 0.2rem;}
 .cat-tile-deco{
-  position:absolute; right:0.75rem; bottom:0.75rem; top:35%;
-  opacity:1; pointer-events:none; height: auto; display: flex; overflow: hidden;
+  position:absolute; right:0.75rem; bottom:auto; top:-3rem;
+  opacity:1; pointer-events:none; height: 6rem; display: flex; overflow: hidden;
 }
 .cat-tile-deco img{height: 100%; object-fit:contain;}
 

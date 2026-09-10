@@ -547,13 +547,14 @@ function renderHome(){
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
     const earned = catQs.length > 0 && doneN === catQs.length;
     return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
-      <span class="cat-tile-heading">
-        <span class="cat-tile-name serif">${esc(name)}</span>
-        <span class="cat-tile-sub">${pct}%</span>
-      </span>
+    
       <span class="cat-tile-top">
         <span class="cat-tile-badge">${earned ? '✓' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.69L9.54 5.98A.998.998 0 0 0 8 6.82"></path></svg>'}</span>
         <span class="cat-tile-level">${earned ? 'Completato' : 'Gioca'}</span>
+      </span>  
+    <span class="cat-tile-heading">
+        <span class="cat-tile-name serif">${esc(name)}</span>
+        <span class="cat-tile-sub">${pct}%</span>
       </span>
       <span class="cat-tile-deco" aria-hidden="true">${icon}</span>
     </button>`;
