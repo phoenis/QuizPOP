@@ -626,6 +626,7 @@ function renderAlbum(){
 function renderHome(){
   if (state.revealed){
     return `<div class="screen screen-home">
+      <div class="topbar end">${avatarButton()}</div>
       <div class="empty-deck full">
         <div class="glyph">✦</div>
         <h2 style="font-size:32px;">Il gioco è chiuso</h2>
