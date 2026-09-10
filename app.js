@@ -542,29 +542,32 @@ function renderHome(){
   const remaining = total - done;
   const sel = (state.sel != null && state.sel < total) ? state.sel : state.order[0];
 
-  // ogni categoria e' una riga cliccabile con l'anello di percentuale
-  // (quante ne hai fatte, non quante giuste: quello resta nelle medaglie).
-  const catRow = (icon, name, sub, catQs, extraClass) => {
+  // ogni categoria e' una tile colorata cliccabile ("livello" = ordine in
+  // elenco), con la percentuale di quante ne hai fatte (non quante giuste:
+  // quello resta nelle medaglie) e un segno di completamento sopra.
+  const catRow = (icon, name, sub, catQs, level, variant) => {
     const doneN = catQs.filter(qi => state.res[qi]).length;
     const pct = catQs.length ? Math.round((doneN / catQs.length) * 100) : 0;
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
-    return `<button class="cat-row ${extraClass||''}" data-action="flip-to" data-i="${target}">
-      <span class="cat-row-icon">${icon}</span>
-      <span class="cat-row-info">
-        <span class="cat-row-name serif">${esc(name)}</span>
-        <span class="cat-row-sub">${esc(sub)}</span>
+    const earned = catQs.length > 0 && doneN === catQs.length;
+    return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
+      <span class="cat-tile-top">
+        <span class="cat-tile-badge">${earned ? '✓' : '›'}</span>
+        <span class="cat-tile-level">Livello ${level}</span>
       </span>
-      <span class="cat-row-ring" style="--pct:${pct};"><span class="cat-row-pct tabular">${pct}%</span></span>
+      <span class="cat-tile-name serif">${esc(name)}</span>
+      <span class="cat-tile-sub">${esc(sub)} · ${pct}%</span>
+      <span class="cat-tile-deco" aria-hidden="true">${icon}</span>
     </button>`;
   };
   const catCards = CATS.map((c, idx) => {
     const st = catState(state.res, c);
     const catQs = state.order.filter(qi => catOf(qi) === idx);
     const sub = st.earned ? st.n + ' domande · ' + c.medal : st.n + ' domande';
-    return catRow(c.mark, c.name, sub, catQs, st.earned ? 'earned' : '');
+    return catRow(c.mark, c.name, sub, catQs, idx + 1, idx + 1);
   }).join('');
   const extraQs = state.order.filter(qi => catOf(qi) < 0);
-  const extraCard = extraQs.length ? catRow('✦', 'Domande extra', extraQs.length + ' domande · pubblicate dagli sposi', extraQs) : '';
+  const extraCard = extraQs.length ? catRow('✦', 'Domande extra', extraQs.length + ' domande · pubblicate dagli sposi', extraQs, CATS.length + 1, 'extra') : '';
 
   let panel;
   if (remaining === 0){
