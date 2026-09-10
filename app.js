@@ -973,6 +973,7 @@ function renderAdmin(){
           ? `<button class="reset-btn" data-action="remove-admin" data-id="${esc(p.id)}">Admin ✓</button>`
           : `<button class="reset-btn" data-action="add-admin" data-id="${esc(p.id)}">Rendi admin</button>`}
         <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
+        <button class="reset-btn" data-action="delete-player" data-id="${esc(p.id)}">Elimina</button>
       </div>
     </div>`;
   }).join('');
@@ -1084,6 +1085,10 @@ root.addEventListener('click', e => {
     }
     case 'add-admin': addAdmin(el.dataset.id); break;
     case 'remove-admin': removeAdmin(el.dataset.id); break;
+    case 'delete-player': {
+      if (confirm('Eliminare questo invitato? Sparisce dalla classifica e dal gioco, non si può annullare.')) deletePlayer(el.dataset.id);
+      break;
+    }
     case 'open-album': window.open(ALBUM_URL, '_blank'); break;
     case 'open-album-store': {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -1315,6 +1320,16 @@ async function deleteExtraCard(id){
 async function resetPlayerAnswers(playerId){
   if (state.mode !== 'online' || !fb) return;
   await fb.setDoc(fb.doc(fb.db, 'players', playerId), { res: {}, score: 0 }, { merge: true });
+}
+
+// toglie un invitato dalla classifica/dal gioco (utenze di prova, doppioni
+// da un altro telefono mai piu' usati, ecc). Non tocca le eventuali foto/
+// video delle sue missioni gia' caricate, che restano visibili nella
+// galleria del pannello sposi.
+async function deletePlayer(playerId){
+  if (state.mode !== 'online' || !fb) return;
+  if (state.adminUids.includes(playerId)) await removeAdmin(playerId);
+  await fb.deleteDoc(fb.doc(fb.db, 'players', playerId));
 }
 
 // invitati con la scorciatoia al pannello sposi nel proprio profilo, oltre a

@@ -115,6 +115,11 @@ per tutti in ogni caso, come riserva.
 
 Da lì potete:
 - vedere quanti invitati stanno giocando e la percentuale di completamento,
+  con un tasto **"Elimina"** per togliere del tutto un invitato (utenze di
+  prova, doppioni da un altro telefono mai più usati...) — non si può
+  annullare. ⚠️ Novità: se avete già attivato Firebase online, ricordatevi di
+  aggiornare le regole (punto 3) con il contenuto aggiornato di
+  `firestore.rules`, altrimenti "Elimina" darà errore di permessi.
 - **aprire il reveal** (la classifica si sblocca in tempo reale su tutti i telefoni),
 - pubblicare una carta extra al volo durante il weekend (diventa visibile a tutti
   gli invitati che non l'hanno ancora fatta). Nota: il form prende solo "domanda" +

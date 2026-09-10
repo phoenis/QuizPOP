@@ -14,7 +14,10 @@ service cloud.firestore {
         request.auth.uid == playerId ||
         (request.resource.data.res == {} && request.resource.data.score == 0)
       );
-      allow delete: if false;
+      // Il pannello sposi puo' anche eliminare un invitato del tutto (utenze
+      // di prova, doppioni...): stesso livello di fiducia delle altre azioni
+      // da pannello sposi, protetto solo dall'indirizzo #sposi.
+      allow delete: if request.auth != null;
     }
     // Stato globale (la busta aperta/chiusa). Scrivibile da chiunque sia autenticato
     // in modo anonimo: il pannello sposi è protetto solo dalla parola d'ordine
