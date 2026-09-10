@@ -577,7 +577,8 @@ function renderMissione(){
     </div>` : '';
 
   return `<div class="screen screen-missione">
-    <button class="btn-text" data-action="nav-back">← Torna alla home</button>
+    <button class="back-fab" data-action="nav-back">←</button>
+    <button class="avatar-fab" data-action="go" data-screen="profile">M</button>
     <div class="mission-wrap">
       <div class="mission-glyph">📸</div>
       <div class="kicker">Missione speciale</div>
@@ -589,8 +590,8 @@ function renderMissione(){
 
 function renderAlbum(){
   return `<div class="screen screen-missione">
-    <button class="btn-text" data-action="nav-back">← Torna alla home</button>
-    <div class="mission-wrap">
+    <button class="back-fab" data-action="nav-back">←</button>
+    <button class="avatar-fab" data-action="go" data-screen="profile">M</button>    <div class="mission-wrap">
       <div class="mission-glyph">📷</div>
       <div class="kicker">Album condiviso</div>
       <h1 style="font-size:26px;">Carica le tue foto su WedShoots</h1>

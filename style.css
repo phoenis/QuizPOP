@@ -178,7 +178,7 @@ input{font-family:inherit;}
 .hub-link-row .arrow{ flex:none; font-size:18px; color:var(--accent-700); }
 
 /* ===== MISSIONE ===== */
-.screen-missione{ padding:58px 24px 40px; }
+/* .screen-missione{ padding:58px 24px 40px; } */
 .screen-missione > .btn-text{ align-self:flex-start; }
 .mission-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; padding:20px 6px; }
 .mission-glyph{ font-size:40px; margin-bottom:4px; }
