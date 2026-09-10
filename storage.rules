@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Video delle missioni speciali: un invitato scrive solo dentro la propria
+    // cartella (stesso controllo delle foto in Firestore), con un limite di
+    // peso per non far esplodere lo spazio gratuito di Firebase Storage.
+    match /missionVideos/{guestId}/{fileName} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == guestId
+                    && request.resource.size < 80 * 1024 * 1024
+                    && request.resource.contentType.matches('video/.*');
+      allow update, delete: if false;
+    }
+  }
+}

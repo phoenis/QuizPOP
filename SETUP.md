@@ -3,7 +3,8 @@
 ## Cosa c'è nel progetto
 - `index.html`, `style.css`, `app.js` — l'app (nessun build, nessuna dipendenza da installare).
 - `firebase-config.js` — le chiavi del progetto Firebase (da compilare, vedi sotto).
-- `firestore.rules` — le regole di sicurezza da incollare nella console Firebase.
+- `firestore.rules` — le regole di sicurezza (database) da incollare nella console Firebase.
+- `storage.rules` — le regole di sicurezza (foto/video) da incollare nella console Firebase.
 - `assets/photos/` — dove mettere le foto vere (vedi sotto).
 - `assets/fonts/` — i file del font Formata (licenza acquistata, non ridistribuirli altrove).
 
@@ -34,13 +35,17 @@ alla home.
   sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
   altro stia già giocando finché ce ne sono di libere — con più invitati che
   missioni, da lì in poi qualche doppione può capitare. L'elenco è in `app.js`,
-  cerca `MISSIONS`. Per completarla si carica una foto (compressa nel telefono
-  prima di salvarla, come la foto di copertina); si può anche "cambiarla" se
-  non piace, o farne un'altra dopo aver completato la prima — a piacere.
-  ⚠️ Questa funzione usa una nuova collezione Firestore (`missionPhotos`): se
-  l'avete già attivata online, aggiornate le regole (punto 3 qui sotto) con
-  il contenuto aggiornato di `firestore.rules`, altrimenti il caricamento
-  delle foto missione darà errore di permessi.
+  cerca `MISSIONS`. Per completarla si carica una **foto** (compressa nel
+  telefono prima di salvarla, come la foto di copertina) oppure un **video**
+  (max 80MB, caricato così com'è su Firebase Storage — i video non richiedono
+  la modalità online funzionino, in locale/demo si può caricare solo foto);
+  si può anche "cambiarla" se non piace, o farne un'altra dopo aver completato
+  la prima — a piacere.
+  ⚠️ Questa funzione usa una collezione Firestore (`missionPhotos`) e, per i
+  video, anche **Firebase Storage**: se attivate online dopo aver già
+  seguito questa guida una volta, ricordatevi di rifare anche il punto 3 con
+  `firestore.rules` aggiornato e di attivare Storage con `storage.rules`
+  (punto 4 qui sotto) — altrimenti il caricamento darà errore di permessi.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
@@ -63,17 +68,22 @@ e apri l'indirizzo che stampa (es. http://localhost:3000).
    regione europea (es. `eur3`) → parti in modalità produzione.
 3. Sempre in Firestore, vai su **Regole** e incolla il contenuto del file `firestore.rules`
    di questo progetto, poi Pubblica.
-4. Nel menu **Build → Authentication** → scheda "Sign-in method" → abilita **Anonimo**.
+4. Nel menu a sinistra apri **Build → Storage** → Inizia → scegli la stessa regione
+   Firestore del punto 2 → parti in modalità produzione. Poi vai su **Regole** e
+   incolla il contenuto del file `storage.rules` di questo progetto, poi Pubblica.
+   (Serve solo per i video delle missioni: se non vi interessa quella funzione
+   potete saltare questo punto, le foto funzionano comunque solo con Firestore.)
+5. Nel menu **Build → Authentication** → scheda "Sign-in method" → abilita **Anonimo**.
    (Serve solo per distinguere un invitato dall'altro, nessuno vede login o password.)
-5. Nelle impostazioni del progetto (icona ingranaggio in alto) → "Le tue app" → aggiungi
+6. Nelle impostazioni del progetto (icona ingranaggio in alto) → "Le tue app" → aggiungi
    una **app Web** (icona `</>`). Dagli un nome qualsiasi e registra.
-6. Firebase mostra un oggetto `firebaseConfig`: copia i valori dentro
+7. Firebase mostra un oggetto `firebaseConfig`: copia i valori dentro
    [firebase-config.js](firebase-config.js), sostituendo le stringhe vuote.
-7. Ricarica la pagina: se le chiavi sono corrette l'app è già in modalità online.
+8. Ricarica la pagina: se le chiavi sono corrette l'app è già in modalità online.
 
-Non serve nessun server da mantenere: Firestore è un database gestito da Google,
-e le chiavi in `firebase-config.js` sono pensate per stare in chiaro in un sito
-pubblico (la sicurezza vera è nelle regole del punto 3).
+Non serve nessun server da mantenere: Firestore/Storage sono servizi gestiti da
+Google, e le chiavi in `firebase-config.js` sono pensate per stare in chiaro in
+un sito pubblico (la sicurezza vera è nelle regole dei punti 3 e 4).
 
 ## Pannello sposi
 Si raggiunge visitando l'indirizzo del sito con `#sposi` in fondo, ad esempio:
@@ -112,7 +122,8 @@ Finché il file non c'è, l'app mostra automaticamente il placeholder grigio
 
 ## Mettere il quiz online sul tuo hosting Aruba
 Il sito è completamente statico: quando è pronto, carica via FTP l'intero contenuto
-di questa cartella (tranne `.git`, `.claude`, `SETUP.md`, `firestore.rules`) in una
+di questa cartella (tranne `.git`, `.claude`, `SETUP.md`, `firestore.rules`,
+`storage.rules`) in una
 sottocartella del tuo spazio Aruba, es. `/quiz/` così sarà raggiungibile su
 `maraestefano.it/quiz/`. Nessun database o linguaggio server richiesto sul tuo hosting:
 tutto il gioco parla direttamente con Firebase dal browser dell'invitato.

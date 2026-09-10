@@ -120,6 +120,13 @@ const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0
 const numIt = n => (n||0).toFixed(1).replace('.', ',');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'g-' + Math.random().toString(36).slice(2) + Date.now());
+// una missione completata puo' essere una foto (dataURL, dentro Firestore) o
+// un video (URL di Firebase Storage): stesso markup, tag diverso.
+function renderMissionMedia(entry, cls){
+  if (!entry || !entry.src) return '';
+  if (entry.kind === 'video') return `<video src="${esc(entry.src)}" class="${cls}" muted playsinline controls></video>`;
+  return `<img src="${esc(entry.src)}" alt="" class="${cls}">`;
+}
 
 /* ============ Stato ============ */
 const state = {
@@ -200,10 +207,12 @@ async function initFirebase(){
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js');
   const firestore = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
   const authMod = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js');
+  const storageMod = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js');
   const app = initializeApp(firebaseConfig);
   const db = firestore.getFirestore(app);
   const auth = authMod.getAuth(app);
-  return { app, db, auth, ...firestore, ...authMod };
+  const storage = storageMod.getStorage(app);
+  return { app, db, auth, storage, ...firestore, ...authMod, ...storageMod };
 }
 
 async function persistProgress(){
@@ -467,11 +476,11 @@ function renderMissione(){
   let body;
   if (inProgress){
     body = `<h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
-      <p class="fine-print">Finché ce ne sono di libere, nessun altro invitato ce l'ha uguale.</p>
-      <input id="mission-file-camera" type="file" accept="image/*" capture="environment" style="display:none;">
-      <input id="mission-file-gallery" type="file" accept="image/*" style="display:none;">
+      <p class="fine-print">Finché ce ne sono di libere, nessun altro invitato ce l'ha uguale. Va bene anche un video (max 80MB).</p>
+      <input id="mission-file-camera" type="file" accept="image/*,video/*" capture="environment" style="display:none;">
+      <input id="mission-file-gallery" type="file" accept="image/*,video/*" style="display:none;">
       <div class="mission-photo-actions">
-        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta una foto</button>
+        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta foto/video</button>
         <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Dalla galleria</button>
       </div>
       <button class="btn-text" style="margin-top:12px;" data-action="skip-mission">Non mi piace, cambiala</button>`;
@@ -490,7 +499,7 @@ function renderMissione(){
     <div class="mission-history">
       ${done.slice().reverse().map(m => `
         <div class="mission-history-row">
-          ${state.missionPhotos[m.index] ? `<img src="${esc(state.missionPhotos[m.index])}" alt="" class="mission-history-thumb">` : ''}
+          ${renderMissionMedia(state.missionPhotos[m.index], 'mission-history-thumb')}
           <span>${esc(MISSIONS[m.index])}</span>
         </div>`).join('')}
     </div>` : '';
@@ -893,7 +902,7 @@ function renderAdmin(){
     .slice()
     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
     .map(m => `<div class="mission-admin-row">
-      <img src="${esc(m.photo)}" alt="" class="mission-admin-thumb">
+      ${renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb')}
       <div style="flex:1;overflow:hidden;">
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
         <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
@@ -1139,30 +1148,53 @@ async function skipMission(){
   await assignMission(cur.index);
 }
 
+const MISSION_VIDEO_MAX_BYTES = 80 * 1024 * 1024;
+
 async function completeMission(file){
   const cur = state.missions[state.missions.length - 1];
   if (!cur || cur.done || !file) return;
-  const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
-  let dataUrl = '';
-  for (const [maxDim, quality] of steps){
-    dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
-    if (dataUrl.length < 500000) break;
-  }
-  if (dataUrl.length >= 500000){
-    alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
-    return;
+  const isVideo = file.type.startsWith('video/');
+  let kind, src;
+  if (isVideo){
+    if (file.size > MISSION_VIDEO_MAX_BYTES){
+      alert('Il video è troppo pesante (max 80MB): provane uno più corto.');
+      return;
+    }
+    if (!(state.mode === 'online' && fb)){
+      alert('I video richiedono la modalità online (Firebase): in locale puoi caricare solo foto.');
+      return;
+    }
+    const ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
+    const path = `missionVideos/${state.guestId}/${cur.index}_${Date.now()}.${ext}`;
+    const storageRef = fb.ref(fb.storage, path);
+    await fb.uploadBytes(storageRef, file, { contentType: file.type });
+    src = await fb.getDownloadURL(storageRef);
+    kind = 'video';
+  } else {
+    const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
+    let dataUrl = '';
+    for (const [maxDim, quality] of steps){
+      dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
+      if (dataUrl.length < 500000) break;
+    }
+    if (dataUrl.length >= 500000){
+      alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
+      return;
+    }
+    src = dataUrl;
+    kind = 'photo';
   }
   cur.done = true;
-  state.missionPhotos = { ...state.missionPhotos, [cur.index]: dataUrl };
+  state.missionPhotos = { ...state.missionPhotos, [cur.index]: { kind, src } };
   render();
   if (state.mode === 'online' && fb){
     await fb.setDoc(fb.doc(fb.db, 'players', state.guestId), { missions: state.missions }, { merge: true });
-    // foto in una collezione separata (non nel documento players): con più
+    // foto/video in una collezione separata (non nel documento players): con più
     // missioni completate si supererebbe presto il limite di 1MB per
     // documento di Firestore se stessero tutte insieme a punteggio/risposte.
     await fb.setDoc(fb.doc(fb.db, 'missionPhotos', state.guestId + '_' + cur.index), {
       guestId: state.guestId, name: state.name, missionIndex: cur.index,
-      photo: dataUrl, createdAt: fb.serverTimestamp(),
+      kind, src, createdAt: fb.serverTimestamp(),
     });
   } else {
     saveLocalProfile();
@@ -1250,7 +1282,7 @@ async function boot(){
           // un inutile spreco di dati sul telefono di ciascuno.
           fb.onSnapshot(fb.query(fb.collection(fb.db, 'missionPhotos'), fb.where('guestId', '==', state.guestId)), qs => {
             const map = {};
-            qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = d.photo; });
+            qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = { kind: d.kind, src: d.src }; });
             state.missionPhotos = map;
             render();
           });
