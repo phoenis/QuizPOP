@@ -496,29 +496,23 @@ function renderJoin(){
   const chips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-join">
-    <div class="kicker">Il gioco</div>
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026</div>
-    <p class="join-intro pretty">Venticinque carte su di noi. Rispondi quando vuoi, nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
+    <p class="join-intro pretty">Divertiti insieme a noi, siamo qui per festeggiare!</p>
     <div class="card join-card">
       <div class="field-block">
-        <div class="field-label">Come ti chiamiamo noi</div>
+        <div class="field-label">Come ti chiami?</div>
         <input id="name-input" class="name-input ${state.joinError?'error':''}" type="text" placeholder="Il tuo nome" value="${esc(state.name)}" maxlength="40">
         ${state.joinError ? `<div class="field-error">Scrivi il tuo nome per continuare</div>` : ''}
-      </div>
-      <div class="field-block">
-        <div class="field-label">Da che parte stai</div>
-        <div class="chips">${chips}</div>
       </div>
       <div class="field-block">
         <div class="field-label">Scegli un avatar (facoltativo)</div>
         <div class="chips">${emojiChips}</div>
       </div>
-      <p class="fine-print">Serve solo per le statistiche finali.</p>
     </div>
-    <img src="assets/mascotte/criceti-mara-ste.png" alt="" class="join-mascot">
     <div class="join-spacer"></div>
     <button class="btn-outline block" data-action="join">Comincia</button>
+    <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
     ${state.recoverOpen ? `
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
@@ -528,7 +522,13 @@ function renderJoin(){
       : `<button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button>`}
   </div>`;
 }
-
+/*       <div class="field-block">
+        <div class="field-label">Da che parte stai</div>
+        <div class="chips">${chips}</div>
+      </div>
+ */
+/*       <p class="fine-print">Serve solo per le statistiche finali.</p>
+ */
 /* <p class="hub-welcome pretty">Benvenuta, <em>${esc(state.name || 'Zia Franca')}</em>. Tutto quello che serve oggi è qui dentro.</p>
  */
 
@@ -550,8 +550,8 @@ function renderHub(){
     <div class="hub-body">
       <button class="hub-tile is-quiz" data-action="go" data-screen="home">
         <span class="wrap">
-          <span class="kicker">Il gioco</span>
-          <span class="title serif">Il quiz su di noi</span>
+          <span class="kicker">Il quiz</span>
+          <span class="title serif">Quanto ne sai sugli sposi?</span>
           <span class="foot">Scala la classifica, vinci un premio</span>
         </span>
         <span class="hub-quiz-ring"><span class="num tabular">${done}</span><span class="den">/${total}</span></span>
@@ -561,9 +561,9 @@ function renderHub(){
           <span class="kicker">Missione</span>
           <span class="title serif">${(() => {
             const last = state.missions[state.missions.length - 1];
-            return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : 'Ce l\'hai già');
+            return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : esc(MISSIONS[last.index]));
           })()}</span>
-          <span class="foot">Porta a termine</span>
+          <span class="foot">Scatta la foto</span>
         </button>
         <button class="hub-tile" data-action="go" data-screen="album">
           <span class="kicker">Album</span>
@@ -573,7 +573,7 @@ function renderHub(){
       </div>
     </div>
           <div class="hub-foot">
-        <div class="names couple-title"><span>M</span><span class="couple-amp">&amp;</span><span>S</span></div>
+        <div class="names couple-title"><span class="letter-span">M</span><span class="couple-amp">&amp;</span><span class="letter-span">S</span></div>
         <div class="hero-dida">16 ottobre 2026</div>
       </div>
   </div>`;
@@ -596,12 +596,12 @@ function renderMissione(){
   let body;
   if (inProgress){
     body = `<div class="card mission-card assigned">
+    <div class="mission-icon-circle"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M21 6h-3.17L16 4h-6v2h5.12l1.83 2H21v12H5v-9H3v9c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2M8 14c0 2.76 2.24 5 5 5s5-2.24 5-5s-2.24-5-5-5s-5 2.24-5 5m5-3c1.65 0 3 1.35 3 3s-1.35 3-3 3s-3-1.35-3-3s1.35-3 3-3M5 6h3V4H5V1H3v3H0v2h3v3h2z"></path></svg></div>
       <div class="assigned-head">
         <div class="kicker">La tua missione</div>
         <span class="mission-pill">Missione ${done.length + 1}</span>
       </div>
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
-      <p class="fine-print" style="margin-top:10px;">Nessun altro invitato ce l'ha uguale. Va bene anche un video (max 80MB).</p>
       <input id="mission-file-camera" type="file" accept="image/*,video/*" capture="environment" style="display:none;">
       <input id="mission-file-gallery" type="file" accept="image/*,video/*" style="display:none;">
       <div class="mission-photo-actions">
@@ -610,7 +610,7 @@ function renderMissione(){
       </div>
       <p class="fine-print" style="text-align:center;"><button class="btn-text" data-action="skip-mission">Non mi piace, cambiala</button></p>
     </div>
-    <img src="assets/mascotte/criceti-festa.png" alt="" class="mission-mascot">`;
+    <img src="assets/mascotte/criceti-festa.png" alt="" class="join-mascot">`;
   } else if (!list.length){
     body = `<div class="card mission-card">
       <div class="mission-icon-circle">📷</div>
@@ -627,8 +627,7 @@ function renderMissione(){
       <h1 style="font-size:24px;margin-top:8px;">Missione completata!</h1>
       <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Se vuoi puoi farne un'altra, oppure fermarti qui.</p>
       <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Fai un'altra missione</button>
-    </div>
-    <img src="assets/mascotte/criceti-festa.png" alt="" class="mission-mascot">`;
+    </div>`;
   }
 
   const missionGallery = [];
