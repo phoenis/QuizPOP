@@ -507,14 +507,12 @@ function renderHub(){
   return `<div class="screen screen-hub">
     <div class="hub-hero">
       ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.style.display='none'">`}
-      <div class="fade">
-        <div class="names couple-title"><span>M</span><span class="couple-amp">&amp;</span><span>S</span></div>
-        <div class="hero-dida">16 ottobre 2026 · Villa Calini</div>
-      </div>
       ${avatarButton()}
+<div class="hub-fade">
+      <h1 class="profile-name">Ciao <span>${state.name}</span>!</h1>
+    </div>  
     </div>
     <div class="hub-cap">
-      <h1 class="profile-name">Ciao <span>${state.name}</span>!</h1>
     </div>
     <div class="hub-body">
       <button class="hub-tile is-quiz" data-action="go" data-screen="home">
@@ -541,6 +539,10 @@ function renderHub(){
         </button>
       </div>
     </div>
+          <div class="hub-foot">
+        <div class="names couple-title"><span>M</span><span class="couple-amp">&amp;</span><span>S</span></div>
+        <div class="hero-dida">16 ottobre 2026 · Villa Calini</div>
+      </div>
   </div>`;
 }
 
