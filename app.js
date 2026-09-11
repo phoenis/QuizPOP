@@ -492,17 +492,18 @@ function renderHub(){
       ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.style.display='none'">`}
       <div class="fade"></div>
       ${avatarButton()}
+      <div class="hub-hero-gradient"></div>
     </div>
     <div class="hub-cap">
       <div class="kicker">16 ottobre 2026 · Villa Calini</div>
       <div class="names couple-title">Mara <span class="amp">&amp;</span> Stefano</div>
     </div>
     <div class="hub-body">
-      <button class="hub-quiz-card" data-action="go" data-screen="home">
+      <button class="hub-tile is-quiz" data-action="go" data-screen="home">
         <span class="wrap">
           <span class="kicker">Il gioco</span>
           <span class="title serif">Il quiz su di noi</span>
-          <span class="sub">Scala la classifica, vinci un premio</span>
+          <span class="foot">Scala la classifica, vinci un premio</span>
         </span>
         <span class="hub-quiz-ring"><span class="num tabular">${done}</span><span class="den">/${total}</span></span>
       </button>
@@ -513,7 +514,7 @@ function renderHub(){
             const last = state.missions[state.missions.length - 1];
             return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : 'Ce l\'hai già');
           })()}</span>
-          <img src="assets/mascotte/criceto-mara.png" alt="">
+          <span class="foot">Porta a termine</span>
         </button>
         <button class="hub-tile" data-action="go" data-screen="album">
           <span class="kicker">Album</span>
@@ -653,7 +654,7 @@ function renderHome(){
     return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
       <span class="cat-tile-text">
         <span class="cat-tile-top">
-          <span class="cat-tile-badge">${earned ? '✓' : '▶'}</span>
+          <span class="cat-tile-badge">${earned ? '✓' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1.2em" height="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.69L9.54 5.98A.998.998 0 0 0 8 6.82"></path></svg>'}</span>
           <span class="cat-tile-level">${earned ? 'Completato' : 'Gioca'}</span>
         </span>
         <span class="cat-tile-name serif">${esc(name)}</span>
