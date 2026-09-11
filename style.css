@@ -167,6 +167,8 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 .join-card .name-input{ text-align:left; color:var(--neutral-500); }
 .name-input::placeholder{ color:var(--neutral-500); opacity:.7; }
+.name-input.error{ border-bottom-color:#b23d2d; }
+.field-error{ font-size:11.5px; color:#b23d2d; margin-top:6px; }
 .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
 .join-card .chips{ justify-content:flex-start; }
 .chip{

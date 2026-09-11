@@ -149,7 +149,7 @@ function renderMissionMedia(entry, cls){
 /* ============ Stato ============ */
 const state = {
   screen: 'boot',
-  name: '', team: 1, avatarEmoji: '', avatarPickerOpen: false,
+  name: '', team: 1, avatarEmoji: '', avatarPickerOpen: false, joinError: false,
   sel: null,
   qi: 0, startedAt: 0, locked: false, seq: [],
   res: {}, score: 0,
@@ -472,7 +472,8 @@ function renderJoin(){
     <div class="card join-card">
       <div class="field-block">
         <div class="field-label">Come ti chiamiamo noi</div>
-        <input id="name-input" class="name-input" type="text" placeholder="Zia Franca" value="${esc(state.name)}" maxlength="40">
+        <input id="name-input" class="name-input ${state.joinError?'error':''}" type="text" placeholder="Il tuo nome" value="${esc(state.name)}" maxlength="40">
+        ${state.joinError ? `<div class="field-error">Scrivi il tuo nome per continuare</div>` : ''}
       </div>
       <div class="field-block">
         <div class="field-label">Da che parte stai</div>
@@ -566,7 +567,7 @@ function renderMissione(){
     body = `<div class="card mission-card assigned">
       <div class="assigned-head">
         <div class="kicker">La tua missione</div>
-        <span class="mission-pill">Solo tua</span>
+        <span class="mission-pill">Missione ${done.length + 1}</span>
       </div>
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
       <p class="fine-print" style="margin-top:10px;">Nessun altro invitato ce l'ha uguale. Va bene anche un video (max 80MB).</p>
@@ -1155,7 +1156,15 @@ root.addEventListener('click', e => {
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
     case 'join': {
       const input = document.getElementById('name-input');
-      state.name = (input && input.value.trim()) || 'Zia Franca';
+      const name = (input && input.value.trim()) || '';
+      if (!name){
+        state.joinError = true;
+        render();
+        document.getElementById('name-input')?.focus();
+        break;
+      }
+      state.joinError = false;
+      state.name = name;
       persistProgress();
       go('hub');
       break;
