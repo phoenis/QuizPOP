@@ -158,6 +158,7 @@ input{font-family:inherit;}
   color:var(--ink); background:transparent;
 }
 .chip.on{ background:var(--accent-600); border-color:var(--accent-600); color:var(--cream); }
+.chip.emoji{ font-size:19px; padding:7px 11px; line-height:1; }
 .fine-print{ font-size:11.5px; color:var(--neutral-700); margin-top:12px; }
 
 /* ===== HUB (home con foto) ===== */
@@ -358,8 +359,8 @@ input{font-family:inherit;}
   background:linear-gradient(135deg, var(--accent-500), var(--accent-700)); color:#fffdf6;
   border:0; box-shadow:var(--shadow-md); padding:18px;
 }
-.avatar{ width:34px; height:34px; min-width:34px; border-radius:50%; border:1px solid var(--neutral-400); display:flex; align-items:center; justify-content:center; font-family:var(--font-primary); font-size:14px; }
-.avatar.lg{ width:78px; height:78px; font-size:27px; border-color:var(--accent-500); color:var(--accent-700); }
+.avatar{ width:34px; height:34px; min-width:34px; border-radius:50%; border:1px solid var(--neutral-400); display:flex; align-items:center; justify-content:center; font-family:var(--font-primary); font-size:14px; padding:0; }
+.avatar.lg{ width:78px; height:78px; font-size:27px; border-color:var(--accent-500); color:var(--accent-700); cursor:pointer; }
 .board-name{ font-size:16px; }
 .board-detail{ font-size:11.5px; color:var(--neutral-700); }
 .board-row.top .board-detail{ color:rgba(255,253,246,.85); }

@@ -16,9 +16,13 @@ caricato via `<link>` in `index.html` — non richiede nessun file locale.
 ## La home
 Dopo l'iscrizione l'invitato arriva su una home con la vostra foto, la card del
 quiz, "Missione speciale" e "Carica le tue foto" (album condiviso). Non c'è una
-barra di navigazione fissa: si torna al profilo con le iniziali in alto a
-destra, e dentro "Le domande" c'è una freccia in alto a sinistra per tornare
-alla home.
+barra di navigazione fissa: si torna al profilo con l'avatar in alto a destra,
+e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
+- **Avatar**: invece di caricare una foto profilo vera, ogni invitato può
+  scegliere un'emoji da una rosa fissa (facoltativo, in iscrizione o dopo dal
+  profilo, tasto "Cambia avatar"). Chi non ne sceglie una resta con le
+  iniziali del nome, come prima. Compare ovunque prima c'erano le iniziali:
+  angolo in alto a destra, profilo, classifica, podio finale.
 - **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`, oppure
   caricala direttamente dal pannello `#sposi` (vedi sotto). Finché non c'è
   nessuna delle due, l'app mostra lo sfondo neutro.

@@ -53,12 +53,12 @@ function catState(res, c){
 }
 const TEAMS = ['Amici di Mara','Famiglia di Mara','Amici di Stefano','Famiglia di Stefano','Colleghi'];
 const RIVALS_DEMO = [
-  {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1},
-  {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2},
-  {id:'demo-3', name:'Chiara & Davide', score:770, res:demoRes(13,6.0), team:0},
-  {id:'demo-4', name:'Nonna Rosa', score:661, res:demoRes(12,9.2), team:3},
+  {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1, avatarEmoji:'🌻'},
+  {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2, avatarEmoji:'🦄'},
+  {id:'demo-3', name:'Chiara & Davide', score:770, res:demoRes(13,6.0), team:0, avatarEmoji:'💖'},
+  {id:'demo-4', name:'Nonna Rosa', score:661, res:demoRes(12,9.2), team:3, avatarEmoji:'🐨'},
   {id:'demo-5', name:'Luca T.', score:534, res:demoRes(10,5.7), team:4},
-  {id:'demo-6', name:'Cugino Pietro', score:288, res:demoRes(6,0), team:2}
+  {id:'demo-6', name:'Cugino Pietro', score:288, res:demoRes(6,0), team:2, avatarEmoji:'🐸'}
 ];
 function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5}; return r; }
 
@@ -115,6 +115,10 @@ const MISSIONS = [
 
 /* ============ Utilità ============ */
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
+// emoji al posto di una foto profilo vera: niente caricamenti, si sceglie da
+// una rosa fissa. Chi non ne sceglie una resta con le iniziali, come prima.
+const AVATAR_EMOJIS = ['🐹','🐰','🦊','🐻','🐼','🐨','🦁','🐸','🦄','🐝','🦋','🌸','🌻','⭐','💖','😎','🥳','🤩','😇','🍕'];
+const avatarGlyph = p => (p && p.avatarEmoji) || initialsOf((p && p.name) || 'Tu');
 const numIt = n => (n||0).toFixed(1).replace('.', ',');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'g-' + Math.random().toString(36).slice(2) + Date.now());
@@ -145,7 +149,7 @@ function renderMissionMedia(entry, cls){
 /* ============ Stato ============ */
 const state = {
   screen: 'boot',
-  name: '', team: 1,
+  name: '', team: 1, avatarEmoji: '', avatarPickerOpen: false,
   sel: null,
   qi: 0, startedAt: 0, locked: false, seq: [],
   res: {}, score: 0,
@@ -209,7 +213,7 @@ function loadLocalProfile(){
 }
 function saveLocalProfile(){
   localStorage.setItem('msquiz_profile', JSON.stringify({
-    guestId: state.guestId, name: state.name, team: state.team,
+    guestId: state.guestId, name: state.name, team: state.team, avatarEmoji: state.avatarEmoji,
     sel: state.sel, res: state.res, score: state.score, order: state.order,
     missions: state.missions,
   }));
@@ -236,7 +240,7 @@ async function persistProgress(){
   if (state.mode === 'online' && fb && state.guestId) {
     const ref = fb.doc(fb.db, 'players', state.guestId);
     await fb.setDoc(ref, {
-      name: state.name, team: state.team, sel: state.sel,
+      name: state.name, team: state.team, avatarEmoji: state.avatarEmoji, sel: state.sel,
       res: state.res, score: state.score, order: state.order,
       missions: state.missions, transferCode: state.transferCode, updatedAt: fb.serverTimestamp(),
     }, { merge: true });
@@ -259,7 +263,7 @@ async function recoverProfile(){
   }
   const oldId = qs.docs[0].id;
   const d = qs.docs[0].data();
-  state.name = d.name || ''; state.team = d.team ?? 1;
+  state.name = d.name || ''; state.team = d.team ?? 1; state.avatarEmoji = d.avatarEmoji || '';
   state.sel = d.sel ?? null;
   state.res = d.res || {}; state.score = d.score || 0;
   state.order = d.order || [];
@@ -404,7 +408,7 @@ function afterMedal(){
 
 function allPlayersWithMe(){
   const board = state.players.length ? state.players.slice() : RIVALS_DEMO.slice();
-  const mine = { id: state.guestId, name: state.name || 'Tu', team: state.team, score: state.score, me: true,
+  const mine = { id: state.guestId, name: state.name || 'Tu', team: state.team, avatarEmoji: state.avatarEmoji, score: state.score, me: true,
     detail: Object.keys(state.res).length + ' carte su ' + allQuestions().length };
   const already = board.some(p => p.id === state.guestId);
   return already
@@ -413,7 +417,7 @@ function allPlayersWithMe(){
 }
 
 function ranked(){
-  return allPlayersWithMe().sort((a, b) => b.score - a.score).map((p, i) => ({ ...p, rank: i + 1, initials: initialsOf(p.name || 'Tu') }));
+  return allPlayersWithMe().sort((a, b) => b.score - a.score).map((p, i) => ({ ...p, rank: i + 1, avatar: avatarGlyph(p) }));
 }
 
 // squadre: media punti a persona, cosi' una squadra piccola non e' svantaggiata rispetto a una grande
@@ -459,6 +463,7 @@ function renderBoot(){
 
 function renderJoin(){
   const chips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
+  const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-join">
     <div class="kicker">Il gioco</div>
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
@@ -472,6 +477,10 @@ function renderJoin(){
       <div class="field-block">
         <div class="field-label">Da che parte stai</div>
         <div class="chips">${chips}</div>
+      </div>
+      <div class="field-block">
+        <div class="field-label">Scegli un avatar (facoltativo)</div>
+        <div class="chips">${emojiChips}</div>
       </div>
       <p class="fine-print">Serve solo per le statistiche finali.</p>
     </div>
@@ -862,7 +871,7 @@ function renderBoard(){
   if (locked){
     const unsealedOrder = allPlayersWithMe().filter(p => !p.me);
     const rows = unsealedOrder.map(p => `<div class="board-row">
-      <div class="avatar">${esc(initialsOf(p.name || 'Tu'))}</div>
+      <div class="avatar">${esc(avatarGlyph(p))}</div>
       <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc((p.detail||'').split('·')[0].trim())}</div></div>
       <div class="board-score hidden">•••</div>
     </div>`).join('');
@@ -943,9 +952,14 @@ function renderProfile(){
       <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
     </div>`;
   }).join('');
+  const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar end">${avatarButton()}</div>
-    <div class="avatar lg" style="margin:0 auto;">${initialsOf(name)}</div>
+    <button class="avatar lg" style="margin:0 auto;" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}</button>
+    <button class="btn-text" style="display:block;margin:8px auto 0;" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? 'Chiudi' : 'Cambia avatar'}</button>
+    ${state.avatarPickerOpen ? `<div class="chips" style="justify-content:center;margin-top:10px;">${emojiChips}
+      ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
+    </div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">${esc(TEAMS[state.team])}</div>
     <div class="stat-strip">
@@ -983,7 +997,7 @@ function renderFinale(){
   const cols = order.map(i => {
     const p = podium[i];
     return `<div class="podium-col">
-      <div class="avatar" style="border-color:var(--accent-500);color:var(--accent-700);">${esc(p.initials)}</div>
+      <div class="avatar" style="border-color:var(--accent-500);color:var(--accent-700);">${esc(p.avatar)}</div>
       <div class="podium-pname">${esc(p.name)}</div>
       <div class="podium-block serif ${p.rank===1?'top':''}" style="height:${p.h}px;">
         <div class="score tabular">${p.score}</div>
@@ -1109,12 +1123,13 @@ function renderAdmin(){
   </div>`;
 }
 
-// unica scorciatoia globale rimasta dopo aver tolto la tabbar: le iniziali
-// dell'invitato in alto a destra aprono il profilo; da dentro il profilo lo
-// stesso posto mostra una "×" per tornare a dove si era prima.
+// unica scorciatoia globale rimasta dopo aver tolto la tabbar: l'avatar
+// (emoji scelta, o le iniziali se non ne ha scelta una) in alto a destra apre
+// il profilo; da dentro il profilo lo stesso posto mostra una "×" per tornare
+// a dove si era prima.
 function avatarButton(){
   if (state.screen === 'profile') return `<button class="avatar-fab" data-action="nav-back">×</button>`;
-  return `<button class="avatar-fab" data-action="go" data-screen="profile">${esc(initialsOf(state.name || 'Tu'))}</button>`;
+  return `<button class="avatar-fab" data-action="go" data-screen="profile">${esc(avatarGlyph(state))}</button>`;
 }
 
 /* ============ Interazione ============ */
@@ -1124,6 +1139,14 @@ root.addEventListener('click', e => {
   const action = el.dataset.action;
   switch (action){
     case 'pick-team': state.team = +el.dataset.team; render(); break;
+    case 'pick-avatar': {
+      state.avatarEmoji = el.dataset.emoji || '';
+      state.avatarPickerOpen = false;
+      if (state.name) persistProgress();
+      render();
+      break;
+    }
+    case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
     case 'join': {
       const input = document.getElementById('name-input');
       state.name = (input && input.value.trim()) || 'Zia Franca';
@@ -1449,7 +1472,7 @@ async function boot(){
           const snap = await fb.getDoc(fb.doc(fb.db, 'players', state.guestId));
           if (snap.exists()){
             const d = snap.data();
-            state.name = d.name || ''; state.team = d.team ?? 1;
+            state.name = d.name || ''; state.team = d.team ?? 1; state.avatarEmoji = d.avatarEmoji || '';
             state.sel = d.sel ?? null;
             state.res = d.res || {}; state.score = d.score || 0;
             state.order = d.order || [];
@@ -1505,7 +1528,7 @@ async function boot(){
     const saved = loadLocalProfile();
     state.guestId = (saved && saved.guestId) || uuid();
     if (saved){
-      state.name = saved.name || ''; state.team = saved.team ?? 1;
+      state.name = saved.name || ''; state.team = saved.team ?? 1; state.avatarEmoji = saved.avatarEmoji || '';
       state.sel = saved.sel ?? null; state.res = saved.res || {}; state.score = saved.score || 0;
       state.order = saved.order || [];
       state.missions = saved.missions || [];
