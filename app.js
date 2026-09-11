@@ -724,18 +724,28 @@ function renderQuizBody(q){
     </div>` + renderOptions(q);
   }
   if (q.order){
+    const total = q.order.length;
+    const doneN = state.seq.length;
+    const remaining = total - doneN;
+    const helper = doneN === 0 ? 'Tocca dal primo all’ultimo'
+      : remaining === 0 ? 'Ordine completo'
+      : remaining === 1 ? 'Manca l’ultima'
+      : `Mancano ancora ${remaining}`;
+    const segs = Array.from({ length: total }, (_, k) => `<span class="order-seg ${k < doneN ? 'on' : ''}"></span>`).join('');
     const rows = q.shown.map(i => {
-      const picked = state.seq.includes(i);
-      const pos = state.seq.indexOf(i) >= 0 ? String(state.seq.indexOf(i) + 1) : '·';
-      return `<button class="option-row ${picked?'picked':''}" data-action="toggle-order" data-i="${i}">
-        <span class="pos serif tabular">${pos}</span><span class="label">${esc(q.order[i])}</span>
+      const seqPos = state.seq.indexOf(i);
+      const picked = seqPos >= 0;
+      return `<button class="option-row" data-action="toggle-order" data-i="${i}">
+        <span class="pos-badge ${picked?'picked':''} tabular">${picked ? seqPos + 1 : '–'}</span><span class="label">${esc(q.order[i])}</span>
       </button>`;
     }).join('');
-    const incomplete = state.seq.length !== q.order.length;
-    return `<p class="order-helper">Tocca nell’ordine giusto, dal primo all’ultimo.</p>
+    return `<div class="order-progress"><span class="order-segs">${segs}</span><span class="order-helper">${helper}</span></div>
       <div class="option-group">${rows}</div>
-      <button class="btn-outline block" style="margin-top:20px;" data-action="confirm-order" ${incomplete?'disabled':''}>Conferma l’ordine</button>
-      <button class="btn-text" style="margin-top:10px;" data-action="reset-order">Ricomincia da capo</button>`;
+      <div style="flex:1;"></div>
+      <div class="quiz-cta">
+        <button class="btn-outline block" data-action="confirm-order" ${remaining?'disabled':''}>Conferma l’ordine</button>
+        <button class="btn-text" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button>
+      </div>`;
   }
   let extra = '';
   if (q.pair){
