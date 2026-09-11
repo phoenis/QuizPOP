@@ -126,6 +126,14 @@ function genTransferCode(){
   for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
   return s;
 }
+// legge un documento missionPhotos gestendo anche quelli salvati prima
+// dell'introduzione dei video, quando il campo si chiamava "photo" invece
+// di kind/src — senza questo, le foto caricate in quel periodo sparirebbero.
+function normalizeMissionMedia(d){
+  if (d.kind || d.src) return { kind: d.kind, src: d.src };
+  if (d.photo) return { kind: 'photo', src: d.photo };
+  return { kind: undefined, src: undefined };
+}
 // una missione completata puo' essere una foto (dataURL, dentro Firestore) o
 // un video (URL di Firebase Storage): stesso markup, tag diverso.
 function renderMissionMedia(entry, cls){
@@ -1459,7 +1467,7 @@ async function boot(){
           // un inutile spreco di dati sul telefono di ciascuno.
           fb.onSnapshot(fb.query(fb.collection(fb.db, 'missionPhotos'), fb.where('guestId', '==', state.guestId)), qs => {
             const map = {};
-            qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = { kind: d.kind, src: d.src }; });
+            qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = normalizeMissionMedia(d); });
             state.missionPhotos = map;
             render();
           });
@@ -1480,7 +1488,7 @@ async function boot(){
           // molto più leggera — vedi sopra).
           if (location.hash === '#sposi'){
             fb.onSnapshot(fb.collection(fb.db, 'missionPhotos'), qs => {
-              state.allMissionPhotos = qs.docs.map(doc => doc.data());
+              state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
               render();
             });
           }
@@ -1504,6 +1512,11 @@ async function boot(){
     }
     state.heroPhoto = localStorage.getItem('msquiz_hero_photo') || '';
     try { state.missionPhotos = JSON.parse(localStorage.getItem('msquiz_mission_photos') || '{}'); } catch { state.missionPhotos = {}; }
+    // compatibilita' con le foto salvate quando ogni voce era ancora una
+    // semplice stringa (dataURL) invece di { kind, src }.
+    Object.keys(state.missionPhotos).forEach(k => {
+      if (typeof state.missionPhotos[k] === 'string') state.missionPhotos[k] = { kind: 'photo', src: state.missionPhotos[k] };
+    });
     try { state.adminUids = JSON.parse(localStorage.getItem('msquiz_admins') || '[]'); } catch { state.adminUids = []; }
     if (ensureOrder() && state.name) saveLocalProfile();
   }
