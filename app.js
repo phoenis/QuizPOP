@@ -505,9 +505,9 @@ function renderHub(){
   const total = allQuestions().length;
   const done = Object.keys(state.res).length;
   return `<div class="screen screen-hub">
-    <div class="hub-hero">
+    <div class="topbar home">${avatarButton()}</div><div class="hub-hero">
       ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.style.display='none'">`}
-      ${avatarButton()}
+      <div class="home-fade-menu"></div> 
 <div class="hub-fade">
       <h1 class="profile-name">Ciao <span>${state.name}</span>!</h1>
           <span class="">Siamo contenti di averti qui con noi ♥</span>
@@ -612,7 +612,7 @@ function renderMissione(){
   return `<div class="screen screen-missione">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      ${avatarButton()}
+      <div class="topbar end">${avatarButton()}</div>
     </div>
     <div class="mission-wrap">
       ${body}
@@ -625,7 +625,7 @@ function renderAlbum(){
   return `<div class="screen screen-missione">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      ${avatarButton()}
+      <div class="topbar end">${avatarButton()}</div>
     </div>
     <div class="mission-wrap">
       <div class="card mission-card">
@@ -720,7 +720,7 @@ function renderHome(){
   return `<div class="screen screen-home">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      ${avatarButton()}
+      <div class="topbar end">${avatarButton()}</div>
     </div>
     <div class="home-header">
       <div>
@@ -1134,8 +1134,8 @@ function renderAdmin(){
 // il profilo; da dentro il profilo lo stesso posto mostra una "×" per tornare
 // a dove si era prima.
 function avatarButton(){
-  if (state.screen === 'profile') return `<button class="avatar-fab" data-action="nav-back">×</button>`;
-  return `<button class="menu-hamburger" data-action="go" data-screen="profile"><span class="avatar-fab">${esc(avatarGlyph(state))}</span></button>`;
+  if (state.screen === 'profile') return `<button class="menu-hamburger" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg></button>`;
+  return `<button class="menu-hamburger" data-action="go" data-screen="profile"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--carbon" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32"><circle cx="16" cy="8" r="2" fill="currentColor"></circle><circle cx="16" cy="16" r="2" fill="currentColor"></circle><circle cx="16" cy="24" r="2" fill="currentColor"></circle></svg></button>`;
 }
 
 /* ============ Interazione ============ */
