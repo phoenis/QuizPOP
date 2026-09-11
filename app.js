@@ -1555,56 +1555,65 @@ async function boot(){
   if (hasFirebaseConfig){
     try {
       fb = await initFirebase();
-      await new Promise(resolve => {
+      // qualunque errore qui dentro (rete, permessi Firebase mal
+      // configurati, ecc.) deve far ripiegare in modalità locale — senza
+      // questo try/catch un errore nella callback di onAuthStateChanged
+      // lascerebbe la promise sospesa per sempre e il gioco bloccato su una
+      // schermata bianca invece che su una rete di sicurezza funzionante.
+      await new Promise((resolve, reject) => {
         fb.onAuthStateChanged(fb.auth, async user => {
-          if (!user){ await fb.signInAnonymously(fb.auth); return; }
-          state.mode = 'online';
-          state.guestId = user.uid;
-          const snap = await fb.getDoc(fb.doc(fb.db, 'players', state.guestId));
-          if (snap.exists()){
-            const d = snap.data();
-            state.name = d.name || ''; state.team = d.team ?? 1; state.avatarEmoji = d.avatarEmoji || '';
-            state.sel = d.sel ?? null;
-            state.res = d.res || {}; state.score = d.score || 0;
-            state.order = d.order || [];
-            state.missions = d.missions || [];
-            state.transferCode = d.transferCode || '';
-          }
-          if (!state.transferCode && state.name){ state.transferCode = genTransferCode(); persistProgress(); }
-          if (ensureOrder() && state.name) persistProgress();
-          fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
-            state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            render();
-          });
-          // solo le proprie foto missione (query filtrata sul server): con
-          // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
-          // un inutile spreco di dati sul telefono di ciascuno.
-          fb.onSnapshot(fb.query(fb.collection(fb.db, 'missionPhotos'), fb.where('guestId', '==', state.guestId)), qs => {
-            const map = {};
-            qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = normalizeMissionMedia(d); });
-            state.missionPhotos = map;
-            render();
-          });
-          fb.onSnapshot(fb.doc(fb.db, 'meta', 'state'), doc => {
-            const d = doc.exists() ? doc.data() : {};
-            state.revealed = !!d.revealed;
-            state.heroPhoto = d.heroPhoto || '';
-            state.adminUids = d.admins || [];
-            render();
-          });
-          fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
-            state.extraCards = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          try {
+            if (!user){ await fb.signInAnonymously(fb.auth); return; }
+            state.mode = 'online';
+            state.guestId = user.uid;
+            const snap = await fb.getDoc(fb.doc(fb.db, 'players', state.guestId));
+            if (snap.exists()){
+              const d = snap.data();
+              state.name = d.name || ''; state.team = d.team ?? 1; state.avatarEmoji = d.avatarEmoji || '';
+              state.sel = d.sel ?? null;
+              state.res = d.res || {}; state.score = d.score || 0;
+              state.order = d.order || [];
+              state.missions = d.missions || [];
+              state.transferCode = d.transferCode || '';
+            }
+            if (!state.transferCode && state.name){ state.transferCode = genTransferCode(); persistProgress(); }
             if (ensureOrder() && state.name) persistProgress();
-            render();
-          });
-          // le foto missione di TUTTI gli invitati, solo per il pannello sposi
-          // (per gli invitati normali resta la query filtrata sulla propria,
-          // molto più leggera — vedi sopra). Non parte qui: si attiva al volo
-          // la prima volta che si entra davvero nel pannello sposi (vedi
-          // ensureAdminMissionsSub(), richiamata da renderAdmin()), cosi'
-          // funziona sia arrivandoci con l'indirizzo #sposi sia con la
-          // scorciatoia dal profilo — che imposta l'indirizzo solo dopo.
-          resolve();
+            fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
+              state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              render();
+            });
+            // solo le proprie foto missione (query filtrata sul server): con
+            // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
+            // un inutile spreco di dati sul telefono di ciascuno.
+            fb.onSnapshot(fb.query(fb.collection(fb.db, 'missionPhotos'), fb.where('guestId', '==', state.guestId)), qs => {
+              const map = {};
+              qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = normalizeMissionMedia(d); });
+              state.missionPhotos = map;
+              render();
+            });
+            fb.onSnapshot(fb.doc(fb.db, 'meta', 'state'), doc => {
+              const d = doc.exists() ? doc.data() : {};
+              state.revealed = !!d.revealed;
+              state.heroPhoto = d.heroPhoto || '';
+              state.adminUids = d.admins || [];
+              render();
+            });
+            fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
+              state.extraCards = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              if (ensureOrder() && state.name) persistProgress();
+              render();
+            });
+            // le foto missione di TUTTI gli invitati, solo per il pannello sposi
+            // (per gli invitati normali resta la query filtrata sulla propria,
+            // molto più leggera — vedi sopra). Non parte qui: si attiva al volo
+            // la prima volta che si entra davvero nel pannello sposi (vedi
+            // ensureAdminMissionsSub(), richiamata da renderAdmin()), cosi'
+            // funziona sia arrivandoci con l'indirizzo #sposi sia con la
+            // scorciatoia dal profilo — che imposta l'indirizzo solo dopo.
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
         });
       });
     } catch (err) {
