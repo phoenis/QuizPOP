@@ -92,12 +92,12 @@ input{font-family:inherit;}
    profilo resta in overlay sopra la foto (vedi .hub-hero). */
 .topbar{ display:flex; justify-content:space-between; align-items:center; }
 .topbar.end{ justify-content:flex-end; }
-.avatar-fab, .back-fab{
-  flex:none; width:44px; height:44px; border-radius:50%;
+.menu-hamburger, .back-fab{
+  flex:none; width:44px; height:44px; border-radius:var(--r-full)%;
   display:flex; align-items:center; justify-content:center; font-size:16px;
   box-shadow:var(--shadow-sm);
 }
-.avatar-fab{ border:1px solid var(--accent-500); background:var(--cream); color:var(--accent-700); font-family:var(--font-primary); }
+.avatar-fab{ display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;/* border:1px solid var(--accent-500); */ background-color:var(--accent-200); border-radius: var(--r-full); padding: 4px; /* color:var(--accent-700); */ font-family:var(--font-primary); line-height: 1; }
 .back-fab{ border:1px solid var(--neutral-400); background:var(--cream); color:var(--ink); font-size:18px; }
 
 .kicker{
@@ -178,7 +178,7 @@ input{font-family:inherit;}
 .hub-fade{ position:absolute; inset:auto 0 0 0; background:linear-gradient(to top, rgba(0,0,0,.6) 20%, rgba(0,0,0,0)); /* z-index: 80; */ display: flex; flex-direction: column; /* justify-content: space-between; */ /* align-items: center; */ padding:0 36px var(--r-lg) 36px; margin-top: 16px; /* line-height: 1.5; */ color: white; /* text-align: center;  *//* align-items: center; justify-content: center; */}
 .hub-foot{/*  position:absolute; */ inset:auto 0 0 0; /* height:110px; */ /* background:linear-gradient(to top, rgba(58,47,34,.75), rgba(58,47,34,0)); */ pointer-events:none; /* z-index: 80; */ display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding:0 1rem 0 1rem; margin-top: 24px; margin-bottom: -24px;}
 .hub-hero .placeholder-label{ position:relative; z-index:1; font-size:9.5px; text-transform:uppercase; letter-spacing:.2em; color:var(--neutral-700); padding:18px; }
-.hub-hero .avatar-fab{ position:absolute; top:14px; right:14px; background:var(--cream); }
+.menu-hamburger{ position:absolute; top:14px; right:14px; background:var(--cream); border-radius: var(--r-full); padding: 4px; border: 0;}
 .hub-cap{ z-index:2; text-align:center; background-color:var(--cream); border-radius:var(--r-lg) var(--r-lg) 0 0; /* height: var(--r-lg); */ background-color: var(--cream); margin: calc(-1 * var(--r-lg)) -16px -1px -16px;}
 .hub-cap .names{ font-size:36px; line-height:1.05; margin-top:6px; }
 .hub-body{ display:flex; flex-direction:column; gap:12px; padding-top:20px; border-radius: var(--r-lg) var(--r-lg) 0 0; z-index: 3;}

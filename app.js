@@ -1135,7 +1135,7 @@ function renderAdmin(){
 // a dove si era prima.
 function avatarButton(){
   if (state.screen === 'profile') return `<button class="avatar-fab" data-action="nav-back">×</button>`;
-  return `<button class="avatar-fab" data-action="go" data-screen="profile">${esc(avatarGlyph(state))}</button>`;
+  return `<button class="menu-hamburger" data-action="go" data-screen="profile"><span class="avatar-fab">${esc(avatarGlyph(state))}</span></button>`;
 }
 
 /* ============ Interazione ============ */
