@@ -55,7 +55,11 @@ body{
 }
 h1,h2,h3,.serif{font-family:var(--font-primary); font-weight:400; margin:0;}
 /* Solo per il titolo "Mara & Stefano" */
-.couple-title{font-family:var(--font-secondary); font-weight:400;}
+.couple-title{font-family:var(--font-secondary); font-weight:400; font-size: 24px; color: var(--cream);}
+.couple-title span{position: relative;}
+.couple-title span:first-child{bottom: 0.3em;font-size: 0.8em;}
+.couple-title span:last-child{top: 0.1em;font-size: 0.8em;}
+.couple-amp{color:var(--accent-400);}
 p{margin:0;}
 button{font-family:inherit; cursor:pointer; background:none;}
 input{font-family:inherit;}
@@ -101,6 +105,11 @@ input{font-family:inherit;}
   color:var(--accent-700); font-family:var(--font-primary);
 }
 .kicker.neutral{color:var(--neutral-700);}
+.hero-dida{  font-size:11px; text-transform:uppercase; letter-spacing:.24em;
+  color:var(--cream); font-family:var(--font-primary); z-index: 88;
+  text-shadow: var(--admin-ground) 1px 0 10px;
+}
+.hub-top{position: absolute;}
 .micro{ font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; color:var(--neutral-700); }
 
 .btn-outline{
@@ -166,10 +175,10 @@ input{font-family:inherit;}
 /* .hub-hero-gradient{z-index:99; width:100%; height:40%; background:linear-gradient(to top, var(--cream) 5%, transparent 90%); position:absolute; inset:auto 0 0 0;} */
 .hub-hero{ position:relative; height:250px; background:var(--neutral-300); /* border-radius:var(--r-md); */ overflow:hidden; flex:1; display:flex; align-items:flex-end; margin: -16px -16px 0 -16px;}
 .hub-hero img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.hub-hero .fade{ position:absolute; inset:auto 0 0 0; height:110px; background:linear-gradient(to top, rgba(58,47,34,.35), rgba(58,47,34,0)); pointer-events:none; }
+.hub-hero .fade{ position:absolute; inset:auto 0 0 0; /* height:110px; */ background:linear-gradient(to top, rgba(58,47,34,.75), rgba(58,47,34,0)); pointer-events:none; z-index: 80; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding:48px 2rem 56px 2rem;}
 .hub-hero .placeholder-label{ position:relative; z-index:1; font-size:9.5px; text-transform:uppercase; letter-spacing:.2em; color:var(--neutral-700); padding:18px; }
 .hub-hero .avatar-fab{ position:absolute; top:14px; right:14px; background:var(--cream); }
-.hub-cap{ z-index:99; text-align:center; background-color:var(--cream); border-radius:var(--r-lg) var(--r-lg) 0 0; padding:16px; padding-top: 24px; background-color: var(--cream); margin: -46px -16px 8px -16px;}
+.hub-cap{ z-index:99; text-align:center; background-color:var(--cream); border-radius:var(--r-lg) var(--r-lg) 0 0; padding:20px 16px 0 16px; background-color: var(--cream); margin: -46px -16px 0 -16px;}
 .hub-cap .names{ font-size:36px; line-height:1.05; margin-top:6px; }
 .hub-body{ display:flex; flex-direction:column; gap:12px; padding-top:20px; }
 
@@ -375,7 +384,7 @@ input{font-family:inherit;}
 
 /* ===== PROFILO ===== */
 .screen-profile{ text-align:center; }
-.profile-name{ font-size:28px; margin-top:var(--sp-3); }
+.profile-name{ font-size:28px; margin-top:var(--sp-3); font-family: var(--font-secondary);}
 .profile-team{ font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--neutral-700); margin-top:6px; }
 .stat-strip{ display:flex; background:#fffdf6; border:1px solid var(--neutral-300); border-radius:var(--r-md); margin-top:var(--sp-6); box-shadow:var(--shadow-sm); }
 .stat-cell{ flex:1; padding:16px 0; border-left:1px solid var(--neutral-200); }
