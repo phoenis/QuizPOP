@@ -140,11 +140,14 @@ function normalizeMissionMedia(d){
 }
 // una missione completata puo' essere una foto (dataURL, dentro Firestore) o
 // un video (URL di Firebase Storage): stesso markup, tag diverso.
-function renderMissionMedia(entry, cls){
+// idx e' la posizione dentro state.lightboxGallery (impostata da chi chiama,
+// vedi renderMissione()/renderAdmin()): tocca la miniatura per aprirla a
+// schermo intero, scorrendo le altre della stessa lista (renderLightbox()).
+function renderMissionMedia(entry, cls, idx){
   if (!entry || !entry.src) return '';
-  // tocca la miniatura per aprirla a schermo intero (vedi renderLightbox()).
-  if (entry.kind === 'video') return `<video src="${esc(entry.src)}" class="${cls}" muted playsinline controls data-action="open-lightbox" data-kind="video" data-src="${esc(entry.src)}"></video>`;
-  return `<img src="${esc(entry.src)}" alt="" class="${cls}" data-action="open-lightbox" data-kind="photo" data-src="${esc(entry.src)}">`;
+  const trigger = ` data-action="open-lightbox" data-index="${idx}"`;
+  if (entry.kind === 'video') return `<video src="${esc(entry.src)}" class="${cls}" muted playsinline controls${trigger}></video>`;
+  return `<img src="${esc(entry.src)}" alt="" class="${cls}"${trigger}>`;
 }
 
 /* ============ Stato ============ */
@@ -170,7 +173,8 @@ const state = {
   transferCode: '', // codice breve per ritrovare lo stesso profilo su un altro telefono
   recoverOpen: false, recoverCode: '',
   medalCat: null, // indice in CATS della medaglia appena vinta, per renderMedal()
-  lightbox: null, // { kind, src } della foto/video missione aperta a schermo intero
+  lightbox: null, // posizione aperta dentro lightboxGallery, o null se chiusa
+  lightboxGallery: [], // [{ kind, src, name, mission }] della lista mostrata sullo schermo corrente
 };
 let fb = null; // firebase handles when online
 
@@ -453,19 +457,31 @@ function render(){
     case 'admin': html = renderAdmin(); break;
     default: html = renderHub();
   }
-  root.innerHTML = html + (state.lightbox ? renderLightbox() : '');
+  root.innerHTML = html + (state.lightbox != null ? renderLightbox() : '');
 }
 
 // foto/video missione a schermo intero: si apre toccando una miniatura (vedi
-// renderMissionMedia()), si chiude toccando lo sfondo scuro o la ×.
+// renderMissionMedia()), si chiude toccando lo sfondo scuro o la ×. Se la
+// lista ha più di un elemento si può scorrere avanti/indietro, con nome e
+// missione come didascalia.
 function renderLightbox(){
-  const { kind, src } = state.lightbox;
-  const media = kind === 'video'
-    ? `<video src="${esc(src)}" controls autoplay playsinline data-action="lightbox-noop"></video>`
-    : `<img src="${esc(src)}" alt="" data-action="lightbox-noop">`;
+  const items = state.lightboxGallery || [];
+  const item = items[state.lightbox];
+  if (!item) return '';
+  const media = item.kind === 'video'
+    ? `<video src="${esc(item.src)}" controls autoplay playsinline data-action="lightbox-noop"></video>`
+    : `<img src="${esc(item.src)}" alt="" data-action="lightbox-noop">`;
+  const many = items.length > 1;
   return `<div class="lightbox" data-action="close-lightbox">
     <button class="lightbox-close" data-action="close-lightbox">✕</button>
+    ${many ? `<button class="lightbox-nav prev" data-action="lightbox-prev">‹</button>` : ''}
     ${media}
+    ${many ? `<button class="lightbox-nav next" data-action="lightbox-next">›</button>` : ''}
+    <div class="lightbox-caption" data-action="lightbox-noop">
+      <strong>${esc(item.name || 'Senza nome')}</strong>
+      <span>${esc(item.mission || '')}</span>
+      ${many ? `<span class="lightbox-count tabular">${state.lightbox + 1} / ${items.length}</span>` : ''}
+    </div>
   </div>`;
 }
 
@@ -615,15 +631,20 @@ function renderMissione(){
     <img src="assets/mascotte/criceti-festa.png" alt="" class="mission-mascot">`;
   }
 
+  const missionGallery = [];
+  const historyRows = done.slice().reverse().map(m => {
+    const entry = state.missionPhotos[m.index];
+    let mediaHtml = '';
+    if (entry && entry.src){
+      missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: MISSIONS[m.index] });
+      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb', missionGallery.length - 1);
+    }
+    return `<div class="mission-history-row">${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
+  }).join('');
+  state.lightboxGallery = missionGallery;
   const history = done.length ? `
     <div class="section-title" style="text-align:center;">Le tue missioni fatte</div>
-    <div class="mission-history">
-      ${done.slice().reverse().map(m => `
-        <div class="mission-history-row">
-          ${renderMissionMedia(state.missionPhotos[m.index], 'mission-history-thumb')}
-          <span>${esc(MISSIONS[m.index])}</span>
-        </div>`).join('')}
-    </div>` : '';
+    <div class="mission-history">${historyRows}</div>` : '';
 
   return `<div class="screen screen-missione">
     <div class="topbar">
@@ -1042,7 +1063,23 @@ function renderFinale(){
   </div>`;
 }
 
+// tutte le foto/video missione (non solo le proprie), solo per il pannello
+// sposi: si attiva la prima volta che si entra davvero in questa schermata,
+// che sia con l'indirizzo #sposi o con la scorciatoia dal profilo — invece
+// di dipendere da un controllo fatto una volta sola all'avvio dell'app, che
+// mancava proprio nel secondo caso.
+let adminMissionsSubStarted = false;
+function ensureAdminMissionsSub(){
+  if (adminMissionsSubStarted || state.mode !== 'online' || !fb) return;
+  adminMissionsSubStarted = true;
+  fb.onSnapshot(fb.collection(fb.db, 'missionPhotos'), qs => {
+    state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
+    render();
+  });
+}
+
 function renderAdmin(){
+  ensureAdminMissionsSub();
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
   const totalPossible = totalPlayers * totalCards;
@@ -1087,16 +1124,25 @@ function renderAdmin(){
       </div>
     </div>`;
   }).join('');
+  const adminMissionGallery = [];
   const missionRows = state.allMissionPhotos
     .slice()
     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-    .map(m => `<div class="mission-admin-row">
-      ${renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb')}
+    .map(m => {
+      let mediaHtml = '';
+      if (m.src){
+        adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: MISSIONS[m.missionIndex] });
+        mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb', adminMissionGallery.length - 1);
+      }
+      return `<div class="mission-admin-row">
+      ${mediaHtml}
       <div style="flex:1;overflow:hidden;">
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
         <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+    }).join('');
+  state.lightboxGallery = adminMissionGallery;
   return `<div class="screen screen-admin">
     <div class="kicker">Solo per gli sposi</div>
     <h2 class="admin-title couple-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
@@ -1169,8 +1215,20 @@ root.addEventListener('click', e => {
       break;
     }
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
-    case 'open-lightbox': state.lightbox = { kind: el.dataset.kind, src: el.dataset.src }; render(); break;
+    case 'open-lightbox': state.lightbox = +el.dataset.index; render(); break;
     case 'close-lightbox': state.lightbox = null; render(); break;
+    case 'lightbox-prev': {
+      const n = state.lightboxGallery.length;
+      state.lightbox = (state.lightbox - 1 + n) % n;
+      render();
+      break;
+    }
+    case 'lightbox-next': {
+      const n = state.lightboxGallery.length;
+      state.lightbox = (state.lightbox + 1) % n;
+      render();
+      break;
+    }
     case 'lightbox-noop': break;
     case 'join': {
       const input = document.getElementById('name-input');
@@ -1541,13 +1599,11 @@ async function boot(){
           });
           // le foto missione di TUTTI gli invitati, solo per il pannello sposi
           // (per gli invitati normali resta la query filtrata sulla propria,
-          // molto più leggera — vedi sopra).
-          if (location.hash === '#sposi'){
-            fb.onSnapshot(fb.collection(fb.db, 'missionPhotos'), qs => {
-              state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
-              render();
-            });
-          }
+          // molto più leggera — vedi sopra). Non parte qui: si attiva al volo
+          // la prima volta che si entra davvero nel pannello sposi (vedi
+          // ensureAdminMissionsSub(), richiamata da renderAdmin()), cosi'
+          // funziona sia arrivandoci con l'indirizzo #sposi sia con la
+          // scorciatoia dal profilo — che imposta l'indirizzo solo dopo.
           resolve();
         });
       });
