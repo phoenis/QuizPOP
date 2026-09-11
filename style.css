@@ -368,6 +368,7 @@ input{font-family:inherit;}
 .board-score.hidden{ font-size:17px; color:var(--neutral-500); letter-spacing:.14em; }
 .board-rank{ font-family:var(--font-primary); font-size:18px; color:var(--accent-700); min-width:22px; text-align:center; }
 .board-row.top .board-rank{ color:#fffdf6; font-size:20px; }
+.board-row.top .avatar{ border-color:rgba(255,253,246,.5); }
 .you-box{ background:var(--accent-100); border-radius:var(--r-md); padding:20px; text-align:center; margin-top:var(--sp-6); }
 .you-box .big{ font-size:26px; margin-top:4px; }
 .board-footer{ font-size:12px; color:var(--neutral-700); margin-top:var(--sp-4); }
@@ -445,6 +446,7 @@ input{font-family:inherit;}
 }
 .btn-dark:hover{ opacity:.9; }
 .admin-card-row{ display:flex; align-items:center; gap:var(--sp-3); padding:12px 0; border-top:1px solid rgba(247,236,214,.16); text-align:left; }
+.admin-card-row .avatar{ border-color:rgba(247,236,214,.3); color:var(--admin-ink); }
 .admin-card-row .num{ color:var(--accent-400); font-family:var(--font-primary); font-size:16px; min-width:22px; }
 .admin-card-row .kk{ font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; opacity:.55; }
 .admin-card-row .tt{ font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

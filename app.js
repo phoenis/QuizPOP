@@ -897,6 +897,7 @@ function renderBoard(){
   }
   const rows = board.map(p => `<div class="board-row ${p.rank===1?'top':''}">
     <div class="board-rank serif tabular">${p.rank}</div>
+    <div class="avatar">${esc(p.avatar)}</div>
     <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc(p.detail||'')}${p.me?' · tu':''}</div></div>
     <div class="board-score serif tabular">${p.score}</div>
   </div>`).join('');
@@ -1052,6 +1053,7 @@ function renderAdmin(){
     // liberamente e possono ripetersi).
     const nameTag = nameCounts[name] > 1 ? ` · #${esc(p.id.slice(-4))}` : '';
     return `<div class="admin-card-row">
+      <div class="avatar">${esc(avatarGlyph(p))}</div>
       <div style="flex:1;overflow:hidden;">
         <div class="tt">${esc(name)}${nameTag}</div>
         <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
