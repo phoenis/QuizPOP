@@ -142,8 +142,9 @@ function normalizeMissionMedia(d){
 // un video (URL di Firebase Storage): stesso markup, tag diverso.
 function renderMissionMedia(entry, cls){
   if (!entry || !entry.src) return '';
-  if (entry.kind === 'video') return `<video src="${esc(entry.src)}" class="${cls}" muted playsinline controls></video>`;
-  return `<img src="${esc(entry.src)}" alt="" class="${cls}">`;
+  // tocca la miniatura per aprirla a schermo intero (vedi renderLightbox()).
+  if (entry.kind === 'video') return `<video src="${esc(entry.src)}" class="${cls}" muted playsinline controls data-action="open-lightbox" data-kind="video" data-src="${esc(entry.src)}"></video>`;
+  return `<img src="${esc(entry.src)}" alt="" class="${cls}" data-action="open-lightbox" data-kind="photo" data-src="${esc(entry.src)}">`;
 }
 
 /* ============ Stato ============ */
@@ -169,6 +170,7 @@ const state = {
   transferCode: '', // codice breve per ritrovare lo stesso profilo su un altro telefono
   recoverOpen: false, recoverCode: '',
   medalCat: null, // indice in CATS della medaglia appena vinta, per renderMedal()
+  lightbox: null, // { kind, src } della foto/video missione aperta a schermo intero
 };
 let fb = null; // firebase handles when online
 
@@ -451,7 +453,20 @@ function render(){
     case 'admin': html = renderAdmin(); break;
     default: html = renderHub();
   }
-  root.innerHTML = html;
+  root.innerHTML = html + (state.lightbox ? renderLightbox() : '');
+}
+
+// foto/video missione a schermo intero: si apre toccando una miniatura (vedi
+// renderMissionMedia()), si chiude toccando lo sfondo scuro o la ×.
+function renderLightbox(){
+  const { kind, src } = state.lightbox;
+  const media = kind === 'video'
+    ? `<video src="${esc(src)}" controls autoplay playsinline data-action="lightbox-noop"></video>`
+    : `<img src="${esc(src)}" alt="" data-action="lightbox-noop">`;
+  return `<div class="lightbox" data-action="close-lightbox">
+    <button class="lightbox-close" data-action="close-lightbox">✕</button>
+    ${media}
+  </div>`;
 }
 
 function renderBoot(){
@@ -1154,6 +1169,9 @@ root.addEventListener('click', e => {
       break;
     }
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
+    case 'open-lightbox': state.lightbox = { kind: el.dataset.kind, src: el.dataset.src }; render(); break;
+    case 'close-lightbox': state.lightbox = null; render(); break;
+    case 'lightbox-noop': break;
     case 'join': {
       const input = document.getElementById('name-input');
       const name = (input && input.value.trim()) || '';
