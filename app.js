@@ -467,7 +467,7 @@ function renderJoin(){
   return `<div class="screen screen-join">
     <div class="kicker">Il gioco</div>
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
-    <div class="kicker neutral join-sub">16 ottobre 2026 · Villa Calini</div>
+    <div class="kicker neutral join-sub">16 ottobre 2026</div>
     <p class="join-intro pretty">Venticinque carte su di noi. Rispondi quando vuoi, nell’ordine che vuoi — la classifica resta chiusa fino ai discorsi.</p>
     <div class="card join-card">
       <div class="field-block">
@@ -542,7 +542,7 @@ function renderHub(){
     </div>
           <div class="hub-foot">
         <div class="names couple-title"><span>M</span><span class="couple-amp">&amp;</span><span>S</span></div>
-        <div class="hero-dida">16 ottobre 2026 · Villa Calini</div>
+        <div class="hero-dida">16 ottobre 2026</div>
       </div>
   </div>`;
 }
@@ -611,7 +611,7 @@ function renderMissione(){
 
   return `<div class="screen screen-missione">
     <div class="topbar">
-      <button class="back-fab" data-action="nav-back">←</button>
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       ${avatarButton()}
     </div>
     <div class="mission-wrap">
@@ -624,12 +624,12 @@ function renderMissione(){
 function renderAlbum(){
   return `<div class="screen screen-missione">
     <div class="topbar">
-      <button class="back-fab" data-action="nav-back">←</button>
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       ${avatarButton()}
     </div>
     <div class="mission-wrap">
       <div class="card mission-card">
-        <div class="mission-icon-circle">🖼️</div>
+        <div class="mission-icon-circle"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M21 6h-3.17L16 4h-6v2h5.12l1.83 2H21v12H5v-9H3v9c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2M8 14c0 2.76 2.24 5 5 5s5-2.24 5-5s-2.24-5-5-5s-5 2.24-5 5m5-3c1.65 0 3 1.35 3 3s-1.35 3-3 3s-3-1.35-3-3s1.35-3 3-3M5 6h3V4H5V1H3v3H0v2h3v3h2z"></path></svg></div>
         <div class="kicker" style="margin-top:16px;">Album condiviso</div>
         <h1 style="font-size:26px;margin-top:8px;">Le tue foto nel nostro album</h1>
         <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Apri WedShoots e inserisci questo codice per entrare:</p>
@@ -719,7 +719,7 @@ function renderHome(){
 
   return `<div class="screen screen-home">
     <div class="topbar">
-      <button class="back-fab" data-action="nav-back">←</button>
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       ${avatarButton()}
     </div>
     <div class="home-header">
@@ -794,7 +794,7 @@ function renderQuiz(){
   const cat = CATS[catIdx];
   return `<div class="screen screen-quiz cat-tile--${variant}">
     <div class="topbar">
-      <button class="back-fab" data-action="nav-back">←</button>
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       <span class="quiz-counter">Carta ${posOf(state.qi) + 1} / ${allQuestions().length}</span>
     </div>
     <div class="kicker">${esc(q.k)}</div>
@@ -820,7 +820,7 @@ function renderResult(){
   const variant = catIdx >= 0 ? catIdx + 1 : 'extra';
   return `<div class="screen screen-result cat-tile--${variant}">
     <div class="topbar">
-      <button class="back-fab" data-action="nav-back">←</button>
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       <span class="quiz-counter">Carta ${posOf(state.qi) + 1} / ${allQuestions().length}</span>
     </div>
     <div class="result-icon">${r.correct ? '✓' : '✕'}</div>
@@ -960,8 +960,8 @@ function renderProfile(){
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar end">${avatarButton()}</div>
-    <button class="avatar lg" style="margin:0 auto;" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}</button>
-    <button class="btn-text" style="display:block;margin:8px auto 0;" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? 'Chiudi' : 'Cambia avatar'}</button>
+    <button class="avatar lg" style="margin:0 auto;" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" style="display:block;margin:8px auto 0;" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
+    
     ${state.avatarPickerOpen ? `<div class="chips" style="justify-content:center;margin-top:10px;">${emojiChips}
       ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
     </div>` : ''}
