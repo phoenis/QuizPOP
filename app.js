@@ -510,7 +510,7 @@ function renderHub(){
       ${avatarButton()}
 <div class="hub-fade">
       <h1 class="profile-name">Ciao <span>${state.name}</span>!</h1>
-          <span class="foot">Siamo contenti di averi qui con noi ♥</span>
+          <span class="">Siamo contenti di averti qui con noi ♥</span>
     </div>  
     </div>
     <div class="hub-cap">

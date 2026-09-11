@@ -385,7 +385,7 @@ input{font-family:inherit;}
 
 /* ===== PROFILO ===== */
 .screen-profile{ text-align:center; }
-.profile-name{ font-size:28px; margin-top:var(--sp-3); font-family: var(--font-secondary); font-weight: 600;}
+.profile-name{ font-size:28px; margin-top:var(--sp-3); font-family: var(--font-secondary); font-weight: 500;}
 .profile-team{ font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--neutral-700); margin-top:6px; }
 .stat-strip{ display:flex; background:#fffdf6; border:1px solid var(--neutral-300); border-radius:var(--r-md); margin-top:var(--sp-6); box-shadow:var(--shadow-sm); }
 .stat-cell{ flex:1; padding:16px 0; border-left:1px solid var(--neutral-200); }
