@@ -610,7 +610,7 @@ function renderMissione(){
         <button class="btn-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
       </div>
-      <p class="fine-print" style="text-align:center;"><button class="btn-text" data-action="skip-mission">Non mi piace, cambiala</button></p>
+      <p class="fine-print" style="text-align:center;"><button class="btn-text margin-bottom-small" data-action="skip-mission">Non mi piace, cambiala</button></p>
     </div>
     <img src="assets/mascotte/criceti-festa.png" alt="" class="join-mascot">`;
   } else if (!list.length){
@@ -676,7 +676,7 @@ function renderAlbum(){
           <button class="btn-fill" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">Copia</button>
         </div>
         <button class="btn-outline block" style="margin-top:16px;" data-action="open-album">Apri WedShoots ↗</button>
-        <p class="fine-print" style="text-align:center;">Non hai l'app? <button class="btn-text" data-action="open-album-store">Scaricala</button></p>
+        <p class="fine-print" style="text-align:center;">Non hai l'app? <button class="btn-text margin-bottom-small" data-action="open-album-store">Scaricala</button></p>
       </div>
       <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
     </div>
@@ -803,7 +803,7 @@ function renderQuizBody(q){
       <div style="flex:1;"></div>
       <div class="quiz-cta">
         <button class="btn-outline block" data-action="confirm-order" ${remaining?'disabled':''}>Conferma l’ordine</button>
-        <button class="btn-text" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button>
+        <button class="btn-text margin-bottom-small" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button>
       </div>`;
   }
   let extra = '';
@@ -821,7 +821,7 @@ function renderOptions(q){
   return `<div class="option-group">${rows}</div>`;
 }
 
-/*       <button class="btn-text" data-action="nav-back">Torna alle domande</button>
+/*       <button class="btn-text margin-bottom-small" data-action="nav-back">Torna alle domande</button>
       <span class="counter">Domanda ${posOf(state.qi) + 1} di ${allQuestions().length}</span>
  */
 
@@ -875,7 +875,7 @@ function renderResult(){
     <p class="rank-line">${esc(rankLine)}</p>
     <div class="result-cta">
       <button class="btn-outline block" data-action="after-result">${cta}</button>
-      <button class="btn-text" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
+      <button class="btn-text margin-bottom-small" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
     </div>
   </div>`;
 }
