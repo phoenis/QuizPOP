@@ -51,7 +51,7 @@ function catState(res, c){
   const n = c.to - c.from + 1;
   return { done, right, n, earned: right === n, failed: done === n && right < n };
 }
-const TEAMS = ['Amici di Mara','Famiglia di Mara','Amici di Stefano','Famiglia di Stefano','Colleghi'];
+const TEAMS = ['Le Mont-Saint Michel','Palcoyo','Machu Picchu','Calanchi','Etna','Fiume tirino','Etretat'];
 const RIVALS_DEMO = [
   {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1, avatarEmoji:'🌻'},
   {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2, avatarEmoji:'🦄'},
@@ -509,6 +509,10 @@ function renderJoin(){
         <div class="field-label">Scegli un avatar (facoltativo)</div>
         <div class="chips">${emojiChips}</div>
       </div>
+             <div class="field-block">
+        <div class="field-label">Che escursione hai intrapreso?</div>
+        <div class="chips">${chips}</div>
+      </div>
     </div>
     <div class="join-spacer"></div>
     <button class="btn-outline block" data-action="join">Comincia</button>
@@ -522,10 +526,7 @@ function renderJoin(){
       : `<button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button>`}
   </div>`;
 }
-/*       <div class="field-block">
-        <div class="field-label">Da che parte stai</div>
-        <div class="chips">${chips}</div>
-      </div>
+/*
  */
 /*       <p class="fine-print">Serve solo per le statistiche finali.</p>
  */
