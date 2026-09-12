@@ -537,7 +537,12 @@ function renderHub(){
   const total = allQuestions().length;
   const done = Object.keys(state.res).length;
   return `<div class="screen screen-hub">
-    <div class="topbar home">${avatarButton()}</div><div class="hub-hero">
+    <div class="topbar home">
+          <div class="hub-foot">
+        <div class="names couple-title"><span class="letter-span">M</span><span class="couple-amp">&amp;</span><span class="letter-span">S</span></div>
+        <div class="hero-dida">16 ottobre 2026</div>
+      </div>
+      ${avatarButton()}</div><div class="hub-hero">
       ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.style.display='none'">`}
       <div class="home-fade-menu"></div> 
 <div class="hub-fade">
@@ -572,10 +577,6 @@ function renderHub(){
         </button>
       </div>
     </div>
-          <div class="hub-foot">
-        <div class="names couple-title"><span class="letter-span">M</span><span class="couple-amp">&amp;</span><span class="letter-span">S</span></div>
-        <div class="hero-dida">16 ottobre 2026</div>
-      </div>
   </div>`;
 }
 
