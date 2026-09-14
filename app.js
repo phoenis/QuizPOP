@@ -559,12 +559,6 @@ function renderJoin(){
       : `<button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button>`}
   </div>`;
 }
-/*
- */
-/*       <p class="fine-print">Serve solo per le statistiche finali.</p>
- */
-/* <p class="hub-welcome pretty">Benvenuta, <em>${esc(state.name || 'Zia Franca')}</em>. Tutto quello che serve oggi è qui dentro.</p>
- */
 
 function renderHub(){
   ensureOrder();
@@ -613,14 +607,6 @@ function renderHub(){
     </div>
   </div>`;
 }
-
-/* <button class="hub-link-row" data-action="go" data-screen="board">
-        <span style="flex:1;min-width:0;">
-          <span class="kicker">${state.revealed ? 'Busta aperta' : 'Busta chiusa fino ai discorsi'}</span>
-          <span class="title serif" style="font-size:22px;">Classifica</span>
-        </span>
-        <span class="arrow">→</span>
-      </button> */
 
 function renderMissione(){
   const list = state.missions;
@@ -855,10 +841,6 @@ function renderOptions(q){
   </button>`).join('');
   return `<div class="option-group">${rows}</div>`;
 }
-
-/*       <button class="btn-text margin-bottom-small" data-action="nav-back">Torna alle domande</button>
-      <span class="counter">Domanda ${posOf(state.qi) + 1} di ${allQuestions().length}</span>
- */
 
 function renderQuiz(){
   const q = Q(state.qi);
