@@ -325,7 +325,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .rank-line{ font-size:11.5px; color:var(--neutral-700); margin-top:16px; line-height:1.5; }
 .screen-result .rank-line{ color:rgba(255,253,246,.85); }
 .result-cta{ margin-top:auto; padding-top:14px; display:flex; flex-direction:row; flex-wrap: wrap; gap:8px; align-items:stretch; padding-bottom: 12px; justify-content: center;  margin-top: 16px;}
-.result-cta button{ min-width: 12rem;}
+/* .result-cta button{ min-width: 12rem;} */
 .screen-result .btn-text{ color:rgba(255,253,246,.85); }
 
 .button{

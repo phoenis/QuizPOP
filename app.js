@@ -617,11 +617,9 @@ function renderMissione(){
   let body;
   if (inProgress){
     body = `
-    <div class="assigned-head">
-        <div class="kicker">La tua missione</div>
-      </div>
       
     <div class="card mission-card">
+        <div class="kicker">La tua missione</div>
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
       <input id="mission-file-camera" type="file" accept="image/*,video/*" capture="environment" style="display:none;">
       <input id="mission-file-gallery" type="file" accept="image/*,video/*" style="display:none;">
