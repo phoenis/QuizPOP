@@ -362,8 +362,13 @@ function pick(idx){
 // ogni cambio di schermata e' una voce nella cronologia del browser, cosi' il
 // tasto "indietro" del telefono torna alla schermata precedente invece di
 // uscire dall'app (vedi anche il listener 'popstate' e boot()).
+// hasAppHistory diventa true al primo pushScreen(): solo da quel momento in
+// poi e' garantito che ci sia davvero una schermata precedente nella
+// cronologia del tab (vedi 'close-admin', che altrimenti con un link diretto
+// #sposi userebbe history.back() per uscire dall'app invece che dal pannello).
+let hasAppHistory = false;
 function pushScreen(screen){
-  try { history.pushState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
+  try { history.pushState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); hasAppHistory = true; } catch {}
 }
 function replaceScreen(screen){
   try { history.replaceState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
@@ -437,6 +442,32 @@ function computeTeams(){
 
 /* ============ Rendering ============ */
 const root = document.getElementById('app');
+let lastScreen = null; // per resettare lo scroll solo quando cambia davvero schermata, non ad ogni render()
+
+// riporta la pagina in cima: serve perché root.innerHTML viene rimpiazzato ad
+// ogni render() (vedi sotto), ma lo scroll della finestra/di #app non si
+// resetta da solo — altrimenti aprendo una nuova schermata (o una modale)
+// dopo aver scrollato in fondo alla precedente, ci si ritroverebbe già in
+// fondo anche lì. #app scrolla lui stesso solo da desktop in su (vedi
+// style.css, @media min-width:481px); da mobile scrolla la finestra.
+function resetScroll(){
+  root.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+
+// quando una modale/il lightbox si apre sopra la schermata corrente (senza
+// cambiarla), salva qui la posizione di scroll da ripristinare alla chiusura
+// — altrimenti richiudendola ci si ritroverebbe in cima invece che dove si
+// era rimasti. E' una pila (non una singola posizione) cosi' funziona anche
+// annidato: es. si apre "mostra tutti" e poi, da li' dentro, una foto missione.
+let scrollStack = [];
+function saveScroll(){
+  scrollStack.push({ y: window.scrollY, rootTop: root.scrollTop });
+}
+function restoreScroll(){
+  const s = scrollStack.pop();
+  if (s){ root.scrollTop = s.rootTop; window.scrollTo(0, s.y); }
+}
 
 function render(){
   let html = '';
@@ -456,7 +487,10 @@ function render(){
     case 'admin': html = renderAdmin(); break;
     default: html = renderHub();
   }
+  const screenChanged = state.screen !== lastScreen;
+  lastScreen = state.screen;
   root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.lightbox != null ? renderLightbox() : '');
+  if (screenChanged) resetScroll();
 }
 
 // foto/video missione a schermo intero: si apre toccando una miniatura (vedi
@@ -634,12 +668,14 @@ function renderMissione(){
   const missionGallery = [];
   const historyRows = done.slice().reverse().map(m => {
     const entry = state.missionPhotos[m.index];
-    let mediaHtml = '';
+    let mediaHtml = '', openAttr = '';
     if (entry && entry.src){
       missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: MISSIONS[m.index] });
-      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb', missionGallery.length - 1);
+      const idx = missionGallery.length - 1;
+      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb', idx);
+      openAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
     }
-    return `<div class="mission-history-row">${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
+    return `<div class="mission-history-row">${mediaHtml}<span${openAttr}>${esc(MISSIONS[m.index])}</span></div>`;
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
@@ -1251,8 +1287,8 @@ root.addEventListener('click', e => {
       break;
     }
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
-    case 'open-lightbox': state.lightbox = +el.dataset.index; render(); break;
-    case 'close-lightbox': state.lightbox = null; render(); break;
+    case 'open-lightbox': saveScroll(); state.lightbox = +el.dataset.index; render(); resetScroll(); break;
+    case 'close-lightbox': state.lightbox = null; render(); restoreScroll(); break;
     case 'lightbox-prev': {
       const n = state.lightboxGallery.length;
       state.lightbox = (state.lightbox - 1 + n) % n;
@@ -1301,12 +1337,20 @@ root.addEventListener('click', e => {
     case 'after-medal': afterMedal(); break;
     case 'go': go(el.dataset.screen); break;
     case 'nav-back': history.back(); break;
-    case 'close-admin': go(state.name ? 'hub' : 'join'); break;
+    case 'close-admin': {
+      // se c'e' davvero una schermata precedente (es. si e' arrivati qui dal
+      // tasto "Pannello sposi" nel profilo), ci si torna; altrimenti (link
+      // diretto #sposi, senza cronologia precedente) si esce esplicitamente
+      // sull'hub/join, vedi hasAppHistory sopra.
+      if (hasAppHistory) history.back();
+      else go(state.name ? 'hub' : 'join');
+      break;
+    }
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
-    case 'open-admin-modal': state.adminModal = el.dataset.target; render(); break;
-    case 'close-admin-modal': state.adminModal = null; render(); break;
+    case 'open-admin-modal': saveScroll(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
+    case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); break;
     case 'delete-extra-card': {
       if (confirm('Eliminare questa carta extra? Non si può annullare.')) deleteExtraCard(el.dataset.id);
       break;
