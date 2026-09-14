@@ -136,13 +136,11 @@ function normalizeMissionMedia(d){
   if (d.photo) return { kind: 'photo', src: d.photo };
   return { kind: undefined, src: undefined };
 }
-// idx e' la posizione dentro state.lightboxGallery (impostata da chi chiama,
-// vedi renderMissione()/renderAdmin()): tocca la miniatura per aprirla a
-// schermo intero, scorrendo le altre della stessa lista (renderLightbox()).
-function renderMissionMedia(entry, cls, idx){
+// solo la miniatura: il tocco per aprirla a schermo intero (renderLightbox())
+// e' sull'intera riga che la contiene, vedi renderMissione()/renderAdmin().
+function renderMissionMedia(entry, cls){
   if (!entry || !entry.src) return '';
-  const trigger = ` data-action="open-lightbox" data-index="${idx}"`;
-  return `<img src="${esc(entry.src)}" alt="" class="${cls}"${trigger}>`;
+  return `<img src="${esc(entry.src)}" alt="" class="${cls}">`;
 }
 
 /* ============ Stato ============ */
@@ -716,14 +714,14 @@ function renderMissione(){
   const missionGallery = [];
   const historyRows = done.slice().reverse().map(m => {
     const entry = state.missionPhotos[m.index];
-    let mediaHtml = '', openAttr = '';
+    let mediaHtml = '', rowAttr = '';
     if (entry && entry.src){
       missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: MISSIONS[m.index] });
       const idx = missionGallery.length - 1;
-      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb', idx);
-      openAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
+      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb');
+      rowAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
     }
-    return `<div class="mission-history-row">${mediaHtml}<span${openAttr}>${esc(MISSIONS[m.index])}</span></div>`;
+    return `<div class="mission-history-row"${rowAttr}>${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
@@ -1225,16 +1223,16 @@ function renderAdmin(){
     .slice()
     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
     .map(m => {
-      let mediaHtml = '', openAttr = '';
+      let mediaHtml = '', rowAttr = '';
       if (m.src){
         adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: MISSIONS[m.missionIndex] });
         const idx = adminMissionGallery.length - 1;
-        mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb', idx);
-        openAttr = ` data-action="open-lightbox" data-index="${idx}"`;
+        mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb');
+        rowAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
       }
-      return `<div class="mission-admin-row">
+      return `<div class="mission-admin-row"${rowAttr}>
       ${mediaHtml}
-      <div style="flex:1;overflow:hidden;${m.src ? 'cursor:pointer;' : ''}"${openAttr}>
+      <div style="flex:1;overflow:hidden;">
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
         <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
       </div>
