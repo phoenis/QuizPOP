@@ -668,12 +668,14 @@ function renderMissione(){
   const missionGallery = [];
   const historyRows = done.slice().reverse().map(m => {
     const entry = state.missionPhotos[m.index];
-    let mediaHtml = '';
+    let mediaHtml = '', openAttr = '';
     if (entry && entry.src){
       missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: MISSIONS[m.index] });
-      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb', missionGallery.length - 1);
+      const idx = missionGallery.length - 1;
+      mediaHtml = renderMissionMedia(entry, 'mission-history-thumb', idx);
+      openAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
     }
-    return `<div class="mission-history-row">${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
+    return `<div class="mission-history-row">${mediaHtml}<span${openAttr}>${esc(MISSIONS[m.index])}</span></div>`;
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
