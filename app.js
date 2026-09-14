@@ -1117,6 +1117,7 @@ function renderFinale(){
         <img src="assets/mascotte/cricetini-cuore.png" alt="">
         <h2 style="font-size:28px;">Le hai fatte tutte!</h2>
         <p class="pretty">I risultati si vedranno dopo il taglio della torta, quando verrà annunciato il vincitore.</p>
+        <button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>
       </div>
     </div>`;
   }
