@@ -437,6 +437,18 @@ function computeTeams(){
 
 /* ============ Rendering ============ */
 const root = document.getElementById('app');
+let lastScreen = null; // per resettare lo scroll solo quando cambia davvero schermata, non ad ogni render()
+
+// riporta la pagina in cima: serve perché root.innerHTML viene rimpiazzato ad
+// ogni render() (vedi sotto), ma lo scroll della finestra/di #app non si
+// resetta da solo — altrimenti aprendo una nuova schermata (o una modale)
+// dopo aver scrollato in fondo alla precedente, ci si ritroverebbe già in
+// fondo anche lì. #app scrolla lui stesso solo da desktop in su (vedi
+// style.css, @media min-width:481px); da mobile scrolla la finestra.
+function resetScroll(){
+  root.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
 
 function render(){
   let html = '';
@@ -456,7 +468,10 @@ function render(){
     case 'admin': html = renderAdmin(); break;
     default: html = renderHub();
   }
+  const screenChanged = state.screen !== lastScreen;
+  lastScreen = state.screen;
   root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.lightbox != null ? renderLightbox() : '');
+  if (screenChanged) resetScroll();
 }
 
 // foto/video missione a schermo intero: si apre toccando una miniatura (vedi
@@ -1251,7 +1266,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
-    case 'open-lightbox': state.lightbox = +el.dataset.index; render(); break;
+    case 'open-lightbox': state.lightbox = +el.dataset.index; render(); resetScroll(); break;
     case 'close-lightbox': state.lightbox = null; render(); break;
     case 'lightbox-prev': {
       const n = state.lightboxGallery.length;
@@ -1305,7 +1320,7 @@ root.addEventListener('click', e => {
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
-    case 'open-admin-modal': state.adminModal = el.dataset.target; render(); break;
+    case 'open-admin-modal': state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); break;
     case 'delete-extra-card': {
       if (confirm('Eliminare questa carta extra? Non si può annullare.')) deleteExtraCard(el.dataset.id);
