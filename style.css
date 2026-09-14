@@ -84,7 +84,6 @@ input{font-family:inherit;}
 }
 
 .margin-bottom-small{margin-bottom:12px;}
-.margin-top-medium{margin-top: 16px;}
 
 .screen{ position:relative; display:flex; flex-direction:column; flex:1; padding:16px 16px 16px 16px; }
 
@@ -112,7 +111,6 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 .kicker.neutral{color:var(--neutral-700);}
 .hero-dida{  display: none; font-weight:400; font-size:0.9em; text-transform:uppercase; }
-.hub-top{position: absolute;}
 .micro{ font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; color:var(--neutral-700); }
 
 
@@ -168,7 +166,6 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 );
 }
 .hub-foot{ inset:auto 0 0 0; pointer-events:none; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap:0.5rem; color: white; padding:0 0 0 1rem; }
-.hub-hero .placeholder-label{ position:relative; z-index:1; font-size:9.5px; text-transform:uppercase; letter-spacing:.2em; color:var(--neutral-700); padding:18px; }
 
 .hub-cap{ z-index:2; text-align:center; background-color:var(--cream); border-radius:var(--r-lg) var(--r-lg) 0 0; margin: calc(-1 * var(--r-lg)) -16px -1px -16px;}
 .hub-cap .names{ font-size:36px; line-height:1.05; margin-top:6px; }
@@ -209,14 +206,10 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 /* ===== MISSIONE / ALBUM (card centrata su crema) ===== */
 .mission-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:10px 0; }
 .mission-card{ width:100%; text-align:center; margin-top:auto; margin-bottom:auto; }
-.mission-card.assigned{ border:1px solid var(--accent-600); text-align:left; }
 .mission-icon-circle{
   display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:28px;
 }
-.mission-glyph{ font-size:40px; margin-bottom:4px; }
 .mission-text{ font-size:26px; line-height:1.2; margin-top:8px; text-wrap:pretty; text-align: center;}
-.assigned-head{ display:flex; align-items:center; justify-content:space-between; }
-.mission-pill{ background:var(--accent-100); color:var(--accent-700); border-radius:var(--r-full); padding:7px 12px; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; }
 .mission-history{ display:flex; flex-direction:column; gap:10px; }
 .mission-history-row{ display:flex; align-items:center; gap:12px; border:1px solid var(--neutral-300); border-radius:var(--r-md); padding:10px; font-size:13.5px; }
 .mission-history-thumb{ flex:none; width:48px; height:48px; object-fit:cover; border-radius:var(--r-md); cursor:pointer; }
@@ -343,6 +336,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .btn-text{ border:0; background:none; color:var(--neutral-700); font-size:13px; text-decoration:underline; text-underline-offset:3px; }
 
 .button.is-fill.is-negative{color: #241d15; background-color: white; border-color: white;}
+.button.is-copied, .button.small.is-copied{ background:#4a7c43; border-color:#4a7c43; color:#fff; }
 .button.is-outline:hover{ background:var(--accent-100); }
 .button.is-outline:disabled{ opacity:.45; cursor:default; }
 .button.is-outline.block{ width:100%; margin-bottom:12px; }
@@ -466,8 +460,6 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .admin-card-row .kk{ font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; opacity:.55; }
 .admin-card-row .tt{ font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .admin-card-row .cnt{ margin-left:auto; font-size:11px; opacity:.6; white-space:nowrap; }
-.admin-card-row .del{ background:none; border:0; color:rgba(247,236,214,.5); font-size:15px; line-height:1; padding:4px 0 4px 10px; }
-.admin-card-row .del:hover{ color:var(--accent-400); }
 .avatar-icon{position: absolute; bottom: 0; right: 0; width: 1.6rem; padding: 0.25em; color: white; background-color: var(--accent-600); border-radius: var(--r-full);}
 .avatar-icon svg{width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;}
 .reset-btn{ background:none; border:1px solid rgba(247,236,214,.28); border-radius:var(--r-full); color:rgba(247,236,214,.7); font-size:11px; padding:7px 12px; white-space:nowrap; }

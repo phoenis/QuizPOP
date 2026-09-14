@@ -172,6 +172,7 @@ const state = {
   adminModal: null, // 'invitati' | 'missioni' | 'domande' | null: quale lista e' aperta a tutto schermo nel pannello sposi
   adminModalContent: {}, // { invitati, missioni, domande }: html completo di ogni lista, ricalcolato a ogni renderAdmin()
   dialog: null, // { kind: 'alert'|'confirm', message, onConfirm? } al posto di alert()/confirm() nativi, vedi openAlert()/openConfirm()
+  copiedFlash: null, // 'album' | 'transfer' | null: quale bottone "Copia" mostra "Copiato!" al momento, vedi flashCopied()
 };
 let fb = null; // firebase handles when online
 
@@ -479,6 +480,16 @@ function openConfirm(message, onConfirm){
   state.dialog = { kind: 'confirm', message, onConfirm };
   render();
 }
+// feedback breve sul bottone stesso ("Copiato!" + classe verde per 1s) invece
+// di aprire una modale — usato dopo aver copiato un codice negli appunti.
+function flashCopied(key){
+  state.copiedFlash = key;
+  render();
+  setTimeout(() => {
+    if (state.copiedFlash === key){ state.copiedFlash = null; render(); }
+  }, 1000);
+}
+
 function renderDialog(){
   const d = state.dialog;
   if (!d) return '';
@@ -715,7 +726,7 @@ function renderAlbum(){
         <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
-          <button class="button is-fill" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">Copia</button>
+          <button class="button is-fill${state.copiedFlash==='album'?' is-copied':''}" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
         </div>
         <div class="result-cta">
           <button class="button is-outline" data-action="open-album">Apri WedShoots ↗</button>
@@ -1061,7 +1072,7 @@ function renderProfile(){
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
         <span class="album-code tabular">${esc(state.transferCode)}</span>
-        <button class="button is-outline small" data-action="copy-transfer-code">Copia codice</button>
+        <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia codice'}</button>
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
     ${state.adminUids.includes(state.guestId) ? `<button class="button is-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
@@ -1145,7 +1156,6 @@ function renderAdmin(){
     const answers = state.players.filter(p => p.res && p.res[i]).length;
     const correct = state.players.filter(p => p.res && p.res[i] && p.res[i].correct).length;
     const correctPct = answers ? Math.round((correct / answers) * 100) : null;
-    const isExtra = i >= QS.length;
     return `<div class="admin-card-row">
       <div class="num">${i + 1}</div>
       <div style="flex:1;overflow:hidden;">
@@ -1153,7 +1163,6 @@ function renderAdmin(){
         <div class="tt">${esc(x.t)}</div>
       </div>
       <div class="cnt">${answers} risposte${correctPct != null ? ` · ${correctPct}% giuste` : ''}</div>
-      ${isExtra ? `<button class="del" data-action="delete-extra-card" data-id="${esc(x.id)}">✕</button>` : ''}
     </div>`;
   });
   const nameCounts = {};
@@ -1332,7 +1341,6 @@ root.addEventListener('click', e => {
       break;
     }
     case 'flip': flip(); break;
-    case 'select-cell': state.sel = +el.dataset.i; render(); break;
     case 'flip-to': state.sel = +el.dataset.i; flip(); break;
     case 'pick-option': pick(+el.dataset.idx); break;
     case 'toggle-order': {
@@ -1365,10 +1373,6 @@ root.addEventListener('click', e => {
     case 'close-board': closeReveal(); break;
     case 'open-admin-modal': saveScroll(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); break;
-    case 'delete-extra-card': {
-      openConfirm('Eliminare questa carta extra? Non si può annullare.', () => deleteExtraCard(el.dataset.id));
-      break;
-    }
     case 'reset-player-answers': {
       openConfirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.', () => resetPlayerAnswers(el.dataset.id));
       break;
@@ -1386,12 +1390,12 @@ root.addEventListener('click', e => {
       break;
     }
     case 'copy-album-code': {
-      if (navigator.clipboard) navigator.clipboard.writeText(ALBUM_CODE).then(() => openAlert('Codice copiato!')).catch(() => openAlert('Codice album: ' + ALBUM_CODE));
+      if (navigator.clipboard) navigator.clipboard.writeText(ALBUM_CODE).then(() => flashCopied('album')).catch(() => openAlert('Codice album: ' + ALBUM_CODE));
       else openAlert('Codice album: ' + ALBUM_CODE);
       break;
     }
     case 'copy-transfer-code': {
-      if (navigator.clipboard) navigator.clipboard.writeText(state.transferCode).then(() => openAlert('Codice copiato!')).catch(() => openAlert('Codice profilo: ' + state.transferCode));
+      if (navigator.clipboard) navigator.clipboard.writeText(state.transferCode).then(() => flashCopied('transfer')).catch(() => openAlert('Codice profilo: ' + state.transferCode));
       else openAlert('Codice profilo: ' + state.transferCode);
       break;
     }
@@ -1556,15 +1560,6 @@ async function completeMission(file){
     });
   } else {
     saveLocalProfile();
-  }
-}
-
-async function deleteExtraCard(id){
-  if (state.mode === 'online' && fb){
-    await fb.deleteDoc(fb.doc(fb.db, 'extraCards', id));
-  } else {
-    state.extraCards = state.extraCards.filter(c => c.id !== id);
-    render();
   }
 }
 
