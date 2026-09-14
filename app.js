@@ -62,8 +62,6 @@ const RIVALS_DEMO = [
 ];
 function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5}; return r; }
 
-const KIND_LABELS = ['Vero o falso','Chi ha detto cosa','Foto','Ordina','A coppie'];
-
 // Album condiviso WedShoots: pagina ufficiale "download" di wedshoots.com con
 // l'ID album già incorporato, pensata apposta per l'invito — dovrebbe aprire
 // l'app se già installata, altrimenti mandare allo store giusto da sola.
@@ -163,7 +161,6 @@ const state = {
   extraCards: [],
   mode: 'local',
   guestId: null,
-  newCardType: 0, newCardQ: '', newCardA: '',
   heroPhoto: '',
   missions: [], // [{ index, done }] — una per ogni missione presa (anche più di una)
   missionPhotos: {}, // { [missionIndex]: dataURL } — solo le proprie, per mostrarle
@@ -175,6 +172,8 @@ const state = {
   medalCat: null, // indice in CATS della medaglia appena vinta, per renderMedal()
   lightbox: null, // posizione aperta dentro lightboxGallery, o null se chiusa
   lightboxGallery: [], // [{ kind, src, name, mission }] della lista mostrata sullo schermo corrente
+  adminModal: null, // 'invitati' | 'missioni' | 'domande' | null: quale lista e' aperta a tutto schermo nel pannello sposi
+  adminModalContent: {}, // { invitati, missioni, domande }: html completo di ogni lista, ricalcolato a ogni renderAdmin()
 };
 let fb = null; // firebase handles when online
 
@@ -457,7 +456,7 @@ function render(){
     case 'admin': html = renderAdmin(); break;
     default: html = renderHub();
   }
-  root.innerHTML = html + (state.lightbox != null ? renderLightbox() : '');
+  root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.lightbox != null ? renderLightbox() : '');
 }
 
 // foto/video missione a schermo intero: si apre toccando una miniatura (vedi
@@ -1079,6 +1078,21 @@ function ensureAdminMissionsSub(){
   });
 }
 
+const ADMIN_PREVIEW_COUNT = 4;
+const ADMIN_MODAL_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande' };
+
+// "mostra tutti": se una lista ha piu' righe dell'anteprima, apre la stessa
+// lista per intero in una modale (vedi renderAdminModal()) invece di
+// allungare la pagina — l'anteprima e la modale condividono lo stesso html
+// di riga, quindi restano sempre coerenti tra loro.
+function adminSection(key, rowsArr, emptyLabel){
+  state.adminModalContent[key] = rowsArr.join('');
+  const preview = rowsArr.slice(0, ADMIN_PREVIEW_COUNT).join('');
+  const showAll = rowsArr.length > ADMIN_PREVIEW_COUNT
+    ? `<button class="btn-text show-all-btn" data-action="open-admin-modal" data-target="${key}">Mostra tutti (${rowsArr.length})</button>` : '';
+  return (preview || `<p class="fine-print" style="color:rgba(247,236,214,.6);">${emptyLabel}</p>`) + showAll;
+}
+
 function renderAdmin(){
   ensureAdminMissionsSub();
   const totalPlayers = state.players.length;
@@ -1086,8 +1100,10 @@ function renderAdmin(){
   const totalPossible = totalPlayers * totalCards;
   const totalDone = state.players.reduce((sum, p) => sum + Object.keys(p.res || {}).length, 0);
   const pct = totalPossible ? Math.round((totalDone / totalPossible) * 100) : 0;
-  const items = allQuestions().map((x, i) => {
+  const questionRows = allQuestions().map((x, i) => {
     const answers = state.players.filter(p => p.res && p.res[i]).length;
+    const correct = state.players.filter(p => p.res && p.res[i] && p.res[i].correct).length;
+    const correctPct = answers ? Math.round((correct / answers) * 100) : null;
     const isExtra = i >= QS.length;
     return `<div class="admin-card-row">
       <div class="num">${i + 1}</div>
@@ -1095,11 +1111,10 @@ function renderAdmin(){
         <div class="kk">${esc(x.k)}</div>
         <div class="tt">${esc(x.t)}</div>
       </div>
-      <div class="cnt">${answers} risposte</div>
+      <div class="cnt">${answers} risposte${correctPct != null ? ` · ${correctPct}% giuste` : ''}</div>
       ${isExtra ? `<button class="del" data-action="delete-extra-card" data-id="${esc(x.id)}">✕</button>` : ''}
     </div>`;
-  }).join('');
-  const typeChips = KIND_LABELS.map((l, i) => `<button class="type-chip ${state.newCardType===i?'on':''}" data-action="admin-type" data-i="${i}">${esc(l)}</button>`).join('');
+  });
   const nameCounts = {};
   state.players.forEach(p => { const n = p.name || 'Senza nome'; nameCounts[n] = (nameCounts[n] || 0) + 1; });
   const playerRows = state.players.map(p => {
@@ -1124,27 +1139,30 @@ function renderAdmin(){
         <button class="reset-btn" data-action="delete-player" data-id="${esc(p.id)}">Elimina</button>
       </div>
     </div>`;
-  }).join('');
+  });
   const adminMissionGallery = [];
   const missionRows = state.allMissionPhotos
     .slice()
     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
     .map(m => {
-      let mediaHtml = '';
+      let mediaHtml = '', openAttr = '';
       if (m.src){
         adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: MISSIONS[m.missionIndex] });
-        mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb', adminMissionGallery.length - 1);
+        const idx = adminMissionGallery.length - 1;
+        mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb', idx);
+        openAttr = ` data-action="open-lightbox" data-index="${idx}"`;
       }
       return `<div class="mission-admin-row">
       ${mediaHtml}
-      <div style="flex:1;overflow:hidden;">
+      <div style="flex:1;overflow:hidden;${m.src ? 'cursor:pointer;' : ''}"${openAttr}>
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
         <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
       </div>
     </div>`;
-    }).join('');
+    });
   state.lightboxGallery = adminMissionGallery;
   return `<div class="screen screen-admin">
+    <div class="topbar end">${avatarButton()}</div>
     <div class="kicker">Solo per gli sposi</div>
     <h2 class="admin-title couple-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
     <div class="admin-stats">
@@ -1177,18 +1195,30 @@ function renderAdmin(){
     </div>`}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
     <p class="fine-print" style="color:rgba(247,236,214,.6);">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
-    ${playerRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuno ha ancora giocato.</p>`}` : ''}
+    ${adminSection('invitati', playerRows, 'Nessuno ha ancora giocato.')}` : ''}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Missioni completate</div>
     <div class="mission-admin-list">
-      ${missionRows || `<p class="fine-print" style="color:rgba(247,236,214,.6);">Nessuna missione completata ancora.</p>`}
+      ${adminSection('missioni', missionRows, 'Nessuna missione completata ancora.')}
     </div>` : ''}
     <div class="section-title" style="color:rgba(247,236,214,.6);">Le domande</div>
-    ${items}
-    <div class="section-title" style="color:rgba(247,236,214,.6);">Nuova domanda</div>
-    <div class="type-chips">${typeChips}</div>
-    <input id="admin-q" class="admin-input" type="text" placeholder="Scrivi la domanda…" value="${esc(state.newCardQ)}">
-    <input id="admin-a" class="admin-input" type="text" placeholder="Risposta giusta" value="${esc(state.newCardA)}">
-    <button class="btn-dark" style="margin-top:20px;" data-action="admin-publish">Pubblica agli invitati</button>
+    ${adminSection('domande', questionRows, 'Nessuna domanda.')}
+  </div>`;
+}
+
+// lista completa (invitati/missioni/domande) a schermo intero: si apre dal
+// bottone "Mostra tutti" di renderAdmin(), che ha gia' salvato l'html di ogni
+// riga in state.adminModalContent cosi' anteprima e modale restano identiche.
+function renderAdminModal(){
+  const key = state.adminModal;
+  if (!key) return '';
+  return `<div class="admin-modal" data-action="close-admin-modal">
+    <div class="admin-modal-sheet" data-action="lightbox-noop">
+      <div class="admin-modal-head">
+        <div class="section-title" style="margin:0;color:rgba(247,236,214,.6);">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
+        <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
+      </div>
+      <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
+    </div>
   </div>`;
 }
 
@@ -1198,6 +1228,11 @@ function renderAdmin(){
 // a dove si era prima.
 function avatarButton(){
   if (state.screen === 'profile') return `<button class="menu-hamburger" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg></button>`;
+  // il pannello sposi si raggiunge quasi sempre con il link diretto #sposi (senza
+  // una schermata precedente nella cronologia del browser): la X qui non puo'
+  // fare nav-back come nel profilo, altrimenti si esce dall'app. Chiude sempre
+  // esplicitamente sull'hub (vedi 'close-admin').
+  if (state.screen === 'admin') return `<button class="menu-hamburger" data-action="close-admin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg></button>`;
   return `<button class="menu-hamburger" data-action="go" data-screen="profile"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--carbon" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32"><circle cx="16" cy="8" r="2" fill="currentColor"></circle><circle cx="16" cy="16" r="2" fill="currentColor"></circle><circle cx="16" cy="24" r="2" fill="currentColor"></circle></svg></button>`;
 }
 
@@ -1266,11 +1301,12 @@ root.addEventListener('click', e => {
     case 'after-medal': afterMedal(); break;
     case 'go': go(el.dataset.screen); break;
     case 'nav-back': history.back(); break;
+    case 'close-admin': go(state.name ? 'hub' : 'join'); break;
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
-    case 'admin-type': state.newCardType = +el.dataset.i; render(); break;
-    case 'admin-publish': publishCard(); break;
+    case 'open-admin-modal': state.adminModal = el.dataset.target; render(); break;
+    case 'close-admin-modal': state.adminModal = null; render(); break;
     case 'delete-extra-card': {
       if (confirm('Eliminare questa carta extra? Non si può annullare.')) deleteExtraCard(el.dataset.id);
       break;
@@ -1323,8 +1359,6 @@ root.addEventListener('change', e => {
 });
 root.addEventListener('input', e => {
   if (e.target.id === 'name-input') state.name = e.target.value;
-  if (e.target.id === 'admin-q') state.newCardQ = e.target.value;
-  if (e.target.id === 'admin-a') state.newCardA = e.target.value;
   if (e.target.id === 'recover-code') state.recoverCode = e.target.value;
 });
 
@@ -1487,19 +1521,6 @@ async function completeMission(file){
   } else {
     saveLocalProfile();
   }
-}
-
-async function publishCard(){
-  const t = state.newCardQ.trim(), a = state.newCardA.trim();
-  if (!t || !a) return;
-  const card = { k: KIND_LABELS[state.newCardType], h: 'Carta pubblicata dagli sposi.', t, o: [a, 'Nessuna delle precedenti'], c: 0, s: 'Risposta aggiunta dagli sposi durante il matrimonio.' };
-  if (state.mode === 'online' && fb){
-    await fb.addDoc(fb.collection(fb.db, 'extraCards'), { ...card, createdAt: fb.serverTimestamp() });
-  } else {
-    state.extraCards.push({ ...card, id: uuid() });
-  }
-  state.newCardQ = ''; state.newCardA = '';
-  render();
 }
 
 async function deleteExtraCard(id){
