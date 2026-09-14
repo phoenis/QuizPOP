@@ -37,19 +37,21 @@ const QS = [
   {k:'Andiamo in viaggio', h:'Ultimo indizio.', t:'A quale tavolo appartiene quest’ultima storia?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
 ];
 const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
-// categorie da 5 domande: una medaglia se le indovini tutte, chiusa per sempre se ne sbagli anche una
+// categorie da 5 domande: una medaglia se ne indovini almeno l'80% (4 su 5),
+// chiusa per sempre se scendi sotto quella soglia con tutte e cinque fatte
 const CATS = [
-  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Tutte e cinque su di lei'},
-  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Tutte e cinque sulla vita insieme'},
-  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Tutte e cinque sul matrimonio'},
-  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Tutte e cinque sulle storie dei tavoli'},
+  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Almeno 4 su 5 su di lei'},
+  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Almeno 4 su 5 sulla vita insieme'},
+  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Almeno 4 su 5 sul matrimonio'},
+  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Almeno 4 su 5 sulle storie dei tavoli'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
   let done = 0, right = 0;
   for (let i = c.from; i <= c.to; i++){ if (res[i]){ done++; if (res[i].correct) right++; } }
   const n = c.to - c.from + 1;
-  return { done, right, n, earned: right === n, failed: done === n && right < n };
+  const needed = Math.ceil(n * 0.8);
+  return { done, right, n, earned: right >= needed, failed: done === n && right < needed };
 }
 const TEAMS = ['Le Mont-Saint Michel','Palcoyo','Machu Picchu','Calanchi','Etna','Fiume tirino','Etretat'];
 const RIVALS_DEMO = [
@@ -412,7 +414,7 @@ function afterResult(){
     flip();
     return;
   }
-  // categoria finita: se l'ha appena vinta (tutte e cinque giuste), prima
+  // categoria finita: se l'ha appena vinta (almeno l'80% giuste), prima
   // una schermata dedicata a festeggiare la medaglia.
   const c = CATS[cat];
   const st = c ? catState(state.res, c) : null;
@@ -958,8 +960,8 @@ function renderResult(){
   </div>`;
 }
 
-// schermata a tutto schermo che festeggia la medaglia appena vinta (tutte e
-// cinque le domande della categoria giuste), mostrata subito dopo l'ultimo
+// schermata a tutto schermo che festeggia la medaglia appena vinta (almeno
+// l'80% delle domande della categoria giuste), mostrata subito dopo l'ultimo
 // risultato della categoria, prima di tornare alle categorie/al finale.
 function renderMedal(){
   const c = CATS[state.medalCat];
@@ -1108,6 +1110,16 @@ function renderProfile(){
 }
 
 function renderFinale(){
+  if (!state.revealed){
+    return `<div class="screen screen-finale">
+      <div class="topbar end">${avatarButton()}</div>
+      <div class="empty-deck full">
+        <img src="assets/mascotte/cricetini-cuore.png" alt="">
+        <h2 style="font-size:28px;">Le hai fatte tutte!</h2>
+        <p class="pretty">I risultati si vedranno dopo il taglio della torta, quando verrà annunciato il vincitore.</p>
+      </div>
+    </div>`;
+  }
   const board = ranked();
   const mine = board.find(p => p.me);
   const podium = board.slice(0, 3).map(p => ({
