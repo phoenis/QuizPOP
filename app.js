@@ -171,6 +171,7 @@ const state = {
   lightboxGallery: [], // [{ kind, src, name, mission }] della lista mostrata sullo schermo corrente
   adminModal: null, // 'invitati' | 'missioni' | 'domande' | null: quale lista e' aperta a tutto schermo nel pannello sposi
   adminModalContent: {}, // { invitati, missioni, domande }: html completo di ogni lista, ricalcolato a ogni renderAdmin()
+  dialog: null, // { kind: 'alert'|'confirm', message, onConfirm? } al posto di alert()/confirm() nativi, vedi openAlert()/openConfirm()
 };
 let fb = null; // firebase handles when online
 
@@ -258,7 +259,7 @@ async function recoverProfile(){
   if (!code || state.mode !== 'online' || !fb) return;
   const qs = await fb.getDocs(fb.query(fb.collection(fb.db, 'players'), fb.where('transferCode', '==', code)));
   if (qs.empty){
-    alert('Nessun profilo trovato con questo codice.');
+    openAlert('Nessun profilo trovato con questo codice.');
     return;
   }
   const oldId = qs.docs[0].id;
@@ -283,18 +284,19 @@ async function recoverProfile(){
 // all'altro). In locale cancella il profilo salvato sul telefono; online
 // chiude la sessione anonima cosi' la prossima e' un profilo nuovo di zecca
 // — quello vecchio resta comunque recuperabile con il suo codice.
-async function logout(){
+function logout(){
   const warn = state.mode === 'online' && state.transferCode
     ? `Uscire da questo profilo? Potrai ritrovarlo in qualunque momento con il codice ${state.transferCode}.`
     : 'Uscire da questo profilo? Su questo telefono si ricomincia da zero.';
-  if (!confirm(warn)) return;
-  if (state.mode === 'online' && fb){
-    await fb.signOut(fb.auth);
-  } else {
-    localStorage.removeItem('msquiz_profile');
-    localStorage.removeItem('msquiz_mission_photos');
-  }
-  location.reload();
+  openConfirm(warn, async () => {
+    if (state.mode === 'online' && fb){
+      await fb.signOut(fb.auth);
+    } else {
+      localStorage.removeItem('msquiz_profile');
+      localStorage.removeItem('msquiz_mission_photos');
+    }
+    location.reload();
+  });
 }
 
 // trova la prossima domanda senza risposta seguendo l'ordine casuale dell'invitato,
@@ -464,6 +466,34 @@ function restoreScroll(){
   if (s){ root.scrollTop = s.rootTop; window.scrollTo(0, s.y); }
 }
 
+// sostituisce alert()/confirm() nativi (fuori stile, bloccanti) con una
+// modale coerente col resto dell'app. openAlert mostra solo un messaggio con
+// "OK"; openConfirm mostra "Annulla"/"Conferma" ed esegue onConfirm solo se
+// si conferma — a differenza di confirm(), non è bloccante: chi chiama non
+// riceve un valore, l'azione parte in modo asincrono dal click su "Conferma".
+function openAlert(message){
+  state.dialog = { kind: 'alert', message };
+  render();
+}
+function openConfirm(message, onConfirm){
+  state.dialog = { kind: 'confirm', message, onConfirm };
+  render();
+}
+function renderDialog(){
+  const d = state.dialog;
+  if (!d) return '';
+  const isConfirm = d.kind === 'confirm';
+  return `<div class="dialog-overlay" data-action="dialog-cancel">
+    <div class="dialog-card" data-action="dialog-noop">
+      <p class="dialog-message pretty">${esc(d.message)}</p>
+      <div class="dialog-actions">
+        ${isConfirm ? `<button class="btn-text" data-action="dialog-cancel">Annulla</button>` : ''}
+        <button class="button is-fill" data-action="dialog-confirm">${isConfirm ? 'Conferma' : 'OK'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 function render(){
   let html = '';
   switch (state.screen){
@@ -484,7 +514,7 @@ function render(){
   }
   const screenChanged = state.screen !== lastScreen;
   lastScreen = state.screen;
-  root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.lightbox != null ? renderLightbox() : '');
+  root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.lightbox != null ? renderLightbox() : '') + (state.dialog ? renderDialog() : '');
   if (screenChanged) resetScroll();
 }
 
@@ -1277,6 +1307,15 @@ root.addEventListener('click', e => {
       break;
     }
     case 'lightbox-noop': break;
+    case 'dialog-confirm': {
+      const cb = state.dialog && state.dialog.onConfirm;
+      state.dialog = null;
+      cb && cb();
+      render();
+      break;
+    }
+    case 'dialog-cancel': state.dialog = null; render(); break;
+    case 'dialog-noop': break;
     case 'join': {
       const input = document.getElementById('name-input');
       const name = (input && input.value.trim()) || '';
@@ -1327,17 +1366,17 @@ root.addEventListener('click', e => {
     case 'open-admin-modal': saveScroll(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); break;
     case 'delete-extra-card': {
-      if (confirm('Eliminare questa carta extra? Non si può annullare.')) deleteExtraCard(el.dataset.id);
+      openConfirm('Eliminare questa carta extra? Non si può annullare.', () => deleteExtraCard(el.dataset.id));
       break;
     }
     case 'reset-player-answers': {
-      if (confirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.')) resetPlayerAnswers(el.dataset.id);
+      openConfirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.', () => resetPlayerAnswers(el.dataset.id));
       break;
     }
     case 'add-admin': addAdmin(el.dataset.id); break;
     case 'remove-admin': removeAdmin(el.dataset.id); break;
     case 'delete-player': {
-      if (confirm('Eliminare questo invitato? Sparisce dalla classifica e dal gioco, non si può annullare.')) deletePlayer(el.dataset.id);
+      openConfirm('Eliminare questo invitato? Sparisce dalla classifica e dal gioco, non si può annullare.', () => deletePlayer(el.dataset.id));
       break;
     }
     case 'open-album': window.open(ALBUM_URL, '_blank'); break;
@@ -1347,13 +1386,13 @@ root.addEventListener('click', e => {
       break;
     }
     case 'copy-album-code': {
-      if (navigator.clipboard) navigator.clipboard.writeText(ALBUM_CODE).then(() => alert('Codice copiato!')).catch(() => alert('Codice album: ' + ALBUM_CODE));
-      else alert('Codice album: ' + ALBUM_CODE);
+      if (navigator.clipboard) navigator.clipboard.writeText(ALBUM_CODE).then(() => openAlert('Codice copiato!')).catch(() => openAlert('Codice album: ' + ALBUM_CODE));
+      else openAlert('Codice album: ' + ALBUM_CODE);
       break;
     }
     case 'copy-transfer-code': {
-      if (navigator.clipboard) navigator.clipboard.writeText(state.transferCode).then(() => alert('Codice copiato!')).catch(() => alert('Codice profilo: ' + state.transferCode));
-      else alert('Codice profilo: ' + state.transferCode);
+      if (navigator.clipboard) navigator.clipboard.writeText(state.transferCode).then(() => openAlert('Codice copiato!')).catch(() => openAlert('Codice profilo: ' + state.transferCode));
+      else openAlert('Codice profilo: ' + state.transferCode);
       break;
     }
     case 'show-recover': state.recoverOpen = true; render(); break;
@@ -1362,12 +1401,12 @@ root.addEventListener('click', e => {
     case 'reveal-mission': assignMission(); break;
     case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
     case 'skip-mission': {
-      if (confirm('Cambiare missione? Non potrai più tornare a questa.')) skipMission();
+      openConfirm('Cambiare missione? Non potrai più tornare a questa.', skipMission);
       break;
     }
     case 'admin-hero-pick': document.getElementById('admin-hero-file').click(); break;
     case 'admin-hero-remove': {
-      if (confirm('Togliere la foto di copertina? Torna il placeholder.')) removeHeroPhoto();
+      openConfirm('Togliere la foto di copertina? Torna il placeholder.', removeHeroPhoto);
       break;
     }
   }
@@ -1427,7 +1466,7 @@ async function uploadHeroPhoto(file){
     if (dataUrl.length < 700000) break;
   }
   if (dataUrl.length >= 700000){
-    alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice o meno ad alta risoluzione.');
+    openAlert('La foto è troppo pesante anche dopo la compressione: provane una più semplice o meno ad alta risoluzione.');
     return;
   }
   state.heroPhoto = dataUrl;
@@ -1499,7 +1538,7 @@ async function completeMission(file){
     if (dataUrl.length < 500000) break;
   }
   if (dataUrl.length >= 500000){
-    alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
+    openAlert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
     return;
   }
   const kind = 'photo', src = dataUrl;
