@@ -500,7 +500,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .dialog-overlay{
   position:fixed; inset:0; z-index:110; background:rgba(36,29,21,.55);
   display:flex; align-items:center; justify-content:center; padding:24px;
-  animation:v3rise .15s both;
+  animation:v3fade .22s ease-out both;
 }
 .dialog-card{
   width:100%; max-width:340px; background:#fffdf6; border-radius:var(--r-md);
@@ -513,12 +513,16 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 /* ===== animations ===== */
 @keyframes v3pop{ 0%{ opacity:0; transform:scale(.86);} 60%{ transform:scale(1.04);} 100%{ opacity:1; transform:scale(1);} }
 @keyframes v3rise{ from{ opacity:0; transform:translateY(12px);} to{ opacity:1; transform:none; } }
+/* dissolvenza morbida (solo opacita' + zoom minimo, niente scivolata) per gli
+   overlay centrati — lightbox e dialog — dove lo slide-up di v3rise dava un
+   effetto "flash" invece che morbido. */
+@keyframes v3fade{ from{ opacity:0; transform:scale(.98);} to{ opacity:1; transform:scale(1);} }
 
 /* ===== LIGHTBOX (foto missione a schermo intero) ===== */
 .lightbox{
   position:fixed; inset:0; z-index:100; background:rgba(36,29,21,.92);
   display:flex; align-items:center; justify-content:center; padding:24px;
-  animation:v3rise .15s both;
+  animation:v3fade .22s ease-out both;
 }
 .lightbox img{ max-width:100%; max-height:calc(100% - 70px); border-radius:var(--r-md); box-shadow:var(--shadow-md); }
 .lightbox-close{
