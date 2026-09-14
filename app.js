@@ -548,13 +548,13 @@ function renderJoin(){
       </div>
     </div>
     <div class="join-spacer"></div>
-    <button class="btn-outline block" data-action="join">Comincia</button>
+    <button class="button is-outline block" data-action="join">Comincia</button>
     <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
     ${state.recoverOpen ? `
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
         <input id="recover-code" class="name-input" style="font-size:20px;letter-spacing:.1em;text-transform:uppercase;text-align:center;" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
-        <button class="btn-outline block" style="margin-top:10px;" data-action="recover-profile">Recupera profilo</button>
+        <button class="button is-outline block" data-action="recover-profile">Recupera profilo</button>
       </div>`
       : `<button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button>`}
   </div>`;
@@ -630,38 +630,37 @@ function renderMissione(){
 
   let body;
   if (inProgress){
-    body = `<div class="card mission-card assigned">
-    <div class="mission-icon-circle"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M21 6h-3.17L16 4h-6v2h5.12l1.83 2H21v12H5v-9H3v9c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2M8 14c0 2.76 2.24 5 5 5s5-2.24 5-5s-2.24-5-5-5s-5 2.24-5 5m5-3c1.65 0 3 1.35 3 3s-1.35 3-3 3s-3-1.35-3-3s1.35-3 3-3M5 6h3V4H5V1H3v3H0v2h3v3h2z"></path></svg></div>
-      <div class="assigned-head">
+    body = `
+    <div class="assigned-head">
         <div class="kicker">La tua missione</div>
-        <span class="mission-pill">Missione ${done.length + 1}</span>
       </div>
+      
+    <div class="card mission-card">
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
       <input id="mission-file-camera" type="file" accept="image/*,video/*" capture="environment" style="display:none;">
       <input id="mission-file-gallery" type="file" accept="image/*,video/*" style="display:none;">
-      <div class="mission-photo-actions">
-        <button class="btn-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
-        <button class="btn-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
+      <div class="result-cta">
+        <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
+        <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
+      <p class="fine-print" style="text-align:center;"><button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button></p>
       </div>
-      <p class="fine-print" style="text-align:center;"><button class="btn-text margin-bottom-small" data-action="skip-mission">Non mi piace, cambiala</button></p>
-    </div>
-    <img src="assets/mascotte/criceti-festa.png" alt="" class="join-mascot">`;
+    </div>`;
   } else if (!list.length){
     body = `<div class="card mission-card">
       <div class="mission-icon-circle">📷</div>
-      <div class="kicker" style="margin-top:16px;">Missione speciale</div>
       <h1 style="font-size:26px;margin-top:8px;text-wrap:pretty;">Hai una missione fotografica ad aspettarti</h1>
       <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
-      <button class="btn-outline block" style="margin-top:22px;" data-action="reveal-mission">Scopri la tua missione</button>
+      <button class="button is-outline block" data-action="reveal-mission">Scopri la tua missione</button>
     </div>
-    <img src="assets/mascotte/criceto-mara.png" alt="" class="mission-mascot">`;
+    <img src="assets/mascotte/criceto-missione.png" alt="" class="mission-mascot">`;
   } else {
     body = `<div class="card mission-card">
       <div class="mission-icon-circle">🎉</div>
-      <div class="kicker" style="margin-top:16px;">Missione speciale</div>
       <h1 style="font-size:24px;margin-top:8px;">Missione completata!</h1>
-      <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Se vuoi puoi farne un'altra, oppure fermarti qui.</p>
-      <button class="btn-outline block" style="margin-top:20px;" data-action="reveal-mission">Fai un'altra missione</button>
+      <p class="sub-text pretty" >Vuoi giocare ancora? </p>
+      <div class="result-cta">
+      <button class="button is-outline" data-action="reveal-mission">Fai un'altra missione</button>
+      </div>
     </div>`;
   }
 
@@ -679,7 +678,7 @@ function renderMissione(){
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
-    <div class="section-title" style="text-align:center;">Le tue missioni fatte</div>
+    <div class="section-title" style="text-align:center;">Missioni completate: ${done.length}</div>
     <div class="mission-history">${historyRows}</div>` : '';
 
   return `<div class="screen screen-missione">
@@ -702,16 +701,17 @@ function renderAlbum(){
     </div>
     <div class="mission-wrap">
       <div class="card mission-card">
-        <div class="mission-icon-circle"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M21 6h-3.17L16 4h-6v2h5.12l1.83 2H21v12H5v-9H3v9c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2M8 14c0 2.76 2.24 5 5 5s5-2.24 5-5s-2.24-5-5-5s-5 2.24-5 5m5-3c1.65 0 3 1.35 3 3s-1.35 3-3 3s-3-1.35-3-3s1.35-3 3-3M5 6h3V4H5V1H3v3H0v2h3v3h2z"></path></svg></div>
-        <div class="kicker" style="margin-top:16px;">Album condiviso</div>
+        <div class="kicker">Album condiviso</div>
         <h1 style="font-size:26px;margin-top:8px;">Le tue foto nel nostro album</h1>
-        <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Apri WedShoots e inserisci questo codice per entrare:</p>
+        <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
-          <button class="btn-fill" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">Copia</button>
+          <button class="button is-fill" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">Copia</button>
         </div>
-        <button class="btn-outline block" style="margin-top:16px;" data-action="open-album">Apri WedShoots ↗</button>
-        <p class="fine-print" style="text-align:center;">Non hai l'app? <button class="btn-text margin-bottom-small" data-action="open-album-store">Scaricala</button></p>
+        <div class="result-cta">
+          <button class="button is-outline" data-action="open-album">Apri WedShoots ↗</button>
+        </div>
+          <p class="fine-print">Non hai l'app? <button class="btn-text margin-bottom-small" data-action="open-album-store">Scaricala</button></p>
       </div>
       <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
     </div>
@@ -726,7 +726,7 @@ function renderHome(){
         <div class="glyph">✦</div>
         <h2 style="font-size:32px;">Il gioco è chiuso</h2>
         <p class="pretty">La classifica è stata svelata ai discorsi. Grazie per aver giocato!</p>
-        <button class="btn-outline" data-action="go" data-screen="board">Vedi la classifica</button>
+        <button class="button is-outline" data-action="go" data-screen="board">Vedi la classifica</button>
       </div>
     </div>`;
   }
@@ -773,7 +773,7 @@ function renderHome(){
       <img src="assets/mascotte/cricetini-cuore.png" alt="">
       <h2 style="font-size:28px;">Le hai fatte tutte</h2>
       <p class="pretty">Ora si aspettano i discorsi per sapere com’è andata.</p>
-      <button class="btn-outline" data-action="go" data-screen="finale">Vedi il finale</button>
+      <button class="button is-outline" data-action="go" data-screen="finale">Vedi il finale</button>
     </div>`;
   } else {
     const card = Q(sel);
@@ -786,7 +786,7 @@ function renderHome(){
       <p class="hint pretty">${esc(card.h)}</p>
       ${r
         ? `<p class="done-line">Hai già risposto: ${r.pts ? '+' + r.pts : '0 punti'} · ${numIt(r.used)}s</p>`
-        : `<button class="btn-outline block" style="margin-top:14px;" data-action="flip">Apri la domanda</button>`}
+        : `<button class="button is-outline block" data-action="flip">Apri la domanda</button>`}
     </div>`;
   }
 
@@ -836,8 +836,8 @@ function renderQuizBody(q){
     return `<div class="order-progress"><span class="order-segs">${segs}</span><span class="order-helper">${helper}</span></div>
       <div class="option-group">${rows}</div>
       <div style="flex:1;"></div>
-      <div class="quiz-cta">
-        <button class="btn-outline block" data-action="confirm-order" ${remaining?'disabled':''}>Conferma l’ordine</button>
+      <div class="result-cta">
+        <button class="button is-fill is-negative" data-action="confirm-order" ${remaining?'disabled':''}>Conferma l’ordine</button>
         <button class="btn-text margin-bottom-small" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button>
       </div>`;
   }
@@ -909,7 +909,7 @@ function renderResult(){
     </div>
     <p class="rank-line">${esc(rankLine)}</p>
     <div class="result-cta">
-      <button class="btn-outline block" data-action="after-result">${cta}</button>
+      <button class="button is-fill is-negative" data-action="after-result">${cta}</button>
       <button class="btn-text margin-bottom-small" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
     </div>
   </div>`;
@@ -932,7 +932,7 @@ function renderMedal(){
       <div class="medal-celebrate-name serif">${esc(c.medal)}</div>
       <p class="medal-celebrate-note pretty">${esc(c.note)}</p>
     </div>
-    <button class="btn-outline block" data-action="after-medal">Continua</button>
+    <button class="button is-outline block" data-action="after-medal">Continua</button>
   </div>`;
 }
 
@@ -1033,13 +1033,13 @@ function renderProfile(){
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar end">${avatarButton()}</div>
-    <button class="avatar lg" style="margin:0 auto;" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" style="display:block;margin:8px auto 0;" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
+    <button class="avatar lg" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
     
     ${state.avatarPickerOpen ? `<div class="chips" style="justify-content:center;margin-top:10px;">${emojiChips}
       ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
     </div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
-    <div class="profile-team">${esc(TEAMS[state.team])}</div>
+    <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
     <div class="stat-strip">
       <div class="stat-cell"><div class="v serif tabular">${state.score}</div><div class="c">Punti</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Carte</div></div>
@@ -1056,10 +1056,10 @@ function renderProfile(){
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
         <span class="album-code tabular">${esc(state.transferCode)}</span>
-        <button class="btn-outline small" data-action="copy-transfer-code">Copia codice</button>
+        <button class="button is-outline small" data-action="copy-transfer-code">Copia codice</button>
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
-    ${state.adminUids.includes(state.guestId) ? `<button class="btn-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
+    ${state.adminUids.includes(state.guestId) ? `<button class="button is-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
     <button class="btn-text" style="margin:16px auto 0;" data-action="logout">Esci da questo profilo</button>
   </div>`;
 }
@@ -1094,7 +1094,7 @@ function renderFinale(){
       <div class="big serif tabular">${mine ? mine.rank + 'º con ' + mine.score + ' punti' : ''}</div>
       <div class="note">${note}</div>
     </div>
-    <button class="btn-outline block" style="margin-top:24px;" data-action="open-board-full">Classifica completa</button>
+    <button class="button is-outline block" data-action="open-board-full">Classifica completa</button>
     <div class="finale-footer">Ci vediamo a ottobre.</div>
   </div>`;
 }
