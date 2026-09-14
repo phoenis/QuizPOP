@@ -173,6 +173,7 @@ const state = {
   adminModalContent: {}, // { invitati, missioni, domande }: html completo di ogni lista, ricalcolato a ogni renderAdmin()
   dialog: null, // { kind: 'alert'|'confirm', message, onConfirm? } al posto di alert()/confirm() nativi, vedi openAlert()/openConfirm()
   copiedFlash: null, // 'album' | 'transfer' | null: quale bottone "Copia" mostra "Copiato!" al momento, vedi flashCopied()
+  downloadingPhotos: false, // true mentre si prepara lo zip di downloadAllMissionPhotos()
 };
 let fb = null; // firebase handles when online
 
@@ -1190,6 +1191,7 @@ function renderAdmin(){
       </div>
     </div>`;
   });
+  const missionPhotoCount = state.allMissionPhotos.filter(m => m.src).length;
   const adminMissionGallery = [];
   const missionRows = state.allMissionPhotos
     .slice()
@@ -1247,6 +1249,7 @@ function renderAdmin(){
     <p class="fine-print" style="color:rgba(247,236,214,.6);">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
     ${adminSection('invitati', playerRows, 'Nessuno ha ancora giocato.')}` : ''}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Missioni completate</div>
+    ${missionPhotoCount ? `<button class="btn-text" style="color:var(--accent-400);" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button>` : ''}
     <div class="mission-admin-list">
       ${adminSection('missioni', missionRows, 'Nessuna missione completata ancora.')}
     </div>` : ''}
@@ -1413,6 +1416,7 @@ root.addEventListener('click', e => {
       openConfirm('Togliere la foto di copertina? Torna il placeholder.', removeHeroPhoto);
       break;
     }
+    case 'download-mission-photos': downloadAllMissionPhotos(); break;
   }
 });
 root.addEventListener('change', e => {
@@ -1578,6 +1582,41 @@ async function deletePlayer(playerId){
   if (state.mode !== 'online' || !fb) return;
   if (state.adminUids.includes(playerId)) await removeAdmin(playerId);
   await fb.deleteDoc(fb.doc(fb.db, 'players', playerId));
+}
+
+// impacchetta in uno zip tutte le foto missione di tutti gli invitati e lo
+// scarica in un colpo solo: JSZip si carica al volo solo quando serve (come
+// i moduli Firebase), per non appesantire il caricamento iniziale dell'app.
+async function downloadAllMissionPhotos(){
+  const photos = state.allMissionPhotos.filter(m => m.kind === 'photo' && m.src);
+  if (!photos.length) return;
+  state.downloadingPhotos = true;
+  render();
+  try {
+    const { default: JSZip } = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
+    const zip = new JSZip();
+    const usedNames = new Set();
+    photos.forEach(m => {
+      const guest = (m.name || 'Senza nome').replace(/[\\/:*?"<>|]/g, '').trim() || 'Senza nome';
+      const mission = (MISSIONS[m.missionIndex] || 'missione').slice(0, 50).replace(/[\\/:*?"<>|]/g, '').trim();
+      const base = `${guest} - ${mission}`.trim();
+      let filename = `${base}.jpg`, n = 2;
+      while (usedNames.has(filename)){ filename = `${base} (${n}).jpg`; n++; }
+      usedNames.add(filename);
+      zip.file(filename, m.src.split(',')[1] || '', { base64: true });
+    });
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'foto-missioni-mara-stefano.zip';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err){
+    openAlert('Non sono riuscito a preparare lo zip: riprova, o controlla la connessione.');
+  } finally {
+    state.downloadingPhotos = false;
+    render();
+  }
 }
 
 // invitati con la scorciatoia al pannello sposi nel proprio profilo, oltre a
