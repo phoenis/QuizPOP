@@ -377,6 +377,32 @@ function go(screen){
   pushScreen(screen);
   render();
 }
+
+// lightbox/modale "mostra tutti"/dialog non cambiano state.screen, quindi
+// senza questo il tasto "indietro" del telefono le ignorerebbe del tutto e
+// navigherebbe alla schermata precedente lasciandole aperte sopra. Ogni
+// apertura registra una voce di history (vedi pushOverlayHistory, invocata
+// da chi apre l'overlay); il popstate risultante — sia che arrivi dal back
+// del device sia da un nostro history.back() per richiudere una voce dopo
+// una chiusura via bottone — chiude l'overlay piu' recente invece di
+// cambiare schermata (vedi il listener 'popstate' piu' sotto). E' un
+// contatore (non un booleano) perche' gli overlay possono annidarsi: es. si
+// apre la modale "mostra tutti" e poi, da li' dentro, una foto missione.
+let overlayHistoryDepth = 0;
+let suppressNextPopstate = false;
+function pushOverlayHistory(){
+  try { history.pushState({ overlay: true }, ''); overlayHistoryDepth++; } catch {}
+}
+// da chiamare quando si chiude un overlay toccando la X/lo sfondo/un
+// bottone (non il tasto indietro): tiene bilanciata la cronologia senza
+// far scattare una navigazione di schermata quando il popstate arriva.
+function closeOverlayHistory(){
+  if (overlayHistoryDepth > 0){
+    suppressNextPopstate = true;
+    overlayHistoryDepth--;
+    history.back();
+  }
+}
 function afterResult(){
   // resta nella stessa categoria finche' ce n'e' una domanda non ancora
   // fatta: apre subito quella, senza passare dalla schermata categorie.
@@ -475,10 +501,12 @@ function restoreScroll(){
 // riceve un valore, l'azione parte in modo asincrono dal click su "Conferma".
 function openAlert(message){
   state.dialog = { kind: 'alert', message };
+  pushOverlayHistory();
   render();
 }
 function openConfirm(message, onConfirm){
   state.dialog = { kind: 'confirm', message, onConfirm };
+  pushOverlayHistory();
   render();
 }
 // feedback breve sul bottone stesso ("Copiato!" + classe verde per 1s) invece
@@ -1304,8 +1332,8 @@ root.addEventListener('click', e => {
       break;
     }
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
-    case 'open-lightbox': saveScroll(); state.lightbox = +el.dataset.index; render(); resetScroll(); break;
-    case 'close-lightbox': state.lightbox = null; render(); restoreScroll(); break;
+    case 'open-lightbox': saveScroll(); pushOverlayHistory(); state.lightbox = +el.dataset.index; render(); resetScroll(); break;
+    case 'close-lightbox': state.lightbox = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'lightbox-prev': {
       const n = state.lightboxGallery.length;
       state.lightbox = (state.lightbox - 1 + n) % n;
@@ -1324,9 +1352,10 @@ root.addEventListener('click', e => {
       state.dialog = null;
       cb && cb();
       render();
+      closeOverlayHistory();
       break;
     }
-    case 'dialog-cancel': state.dialog = null; render(); break;
+    case 'dialog-cancel': state.dialog = null; render(); closeOverlayHistory(); break;
     case 'dialog-noop': break;
     case 'join': {
       const input = document.getElementById('name-input');
@@ -1374,8 +1403,8 @@ root.addEventListener('click', e => {
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
-    case 'open-admin-modal': saveScroll(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
-    case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); break;
+    case 'open-admin-modal': saveScroll(); pushOverlayHistory(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
+    case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'reset-player-answers': {
       openConfirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.', () => resetPlayerAnswers(el.dataset.id));
       break;
@@ -1742,7 +1771,15 @@ async function boot(){
 // il tasto "indietro" del telefono ripercorre le schermate visitate, invece
 // di uscire dall'app: ogni cambio di schermata e' una voce di history (vedi
 // pushScreen), qui la recuperiamo quando l'utente torna indietro (o avanti).
+// Se pero' c'e' un overlay aperto (lightbox/modale "mostra tutti"/dialog),
+// il back chiude solo quello (il piu' recente) e basta — vedi
+// pushOverlayHistory/closeOverlayHistory piu' sopra. Il back su un dialog
+// di conferma equivale sempre ad "Annulla": non esegue mai onConfirm.
 window.addEventListener('popstate', e => {
+  if (suppressNextPopstate){ suppressNextPopstate = false; return; }
+  if (state.dialog){ state.dialog = null; overlayHistoryDepth--; render(); return; }
+  if (state.lightbox != null){ state.lightbox = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
+  if (state.adminModal){ state.adminModal = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
   state.screen = (e.state && e.state.screen) || (state.name ? 'hub' : 'join');
   render();
 });
