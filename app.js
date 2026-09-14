@@ -525,7 +525,7 @@ function renderDialog(){
     <div class="dialog-card" data-action="dialog-noop">
       <p class="dialog-message pretty">${esc(d.message)}</p>
       <div class="dialog-actions">
-        ${isConfirm ? `<button class="btn-text" data-action="dialog-cancel">Annulla</button>` : ''}
+        ${isConfirm ? `<div class="button-alone"><button class="btn-text" data-action="dialog-cancel">Annulla</button></div>` : ''}
         <button class="button is-fill" data-action="dialog-confirm">${isConfirm ? 'Conferma' : 'OK'}</button>
       </div>
     </div>
@@ -617,7 +617,7 @@ function renderJoin(){
         <input id="recover-code" class="name-input" style="font-size:20px;letter-spacing:.1em;text-transform:uppercase;text-align:center;" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
         <button class="button is-outline block" data-action="recover-profile">Recupera profilo</button>
       </div>`
-      : `<button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button>`}
+      : `<div class="button-alone"><button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button></div>`}
   </div>`;
 }
 
@@ -679,7 +679,7 @@ function renderMissione(){
   if (inProgress){
     body = `
       
-    <div class="card mission-card">
+    <div class="card is-centered">
         <div class="kicker">La tua missione</div>
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" style="display:none;">
@@ -687,11 +687,11 @@ function renderMissione(){
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
-      <p class="fine-print" style="text-align:center;"><button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button></p>
+      <p class="fine-print"><a href="" data-action="skip-mission">Non mi piace, cambia</a></p>
       </div>
     </div>`;
   } else if (!list.length){
-    body = `<div class="card mission-card">
+    body = `<div class="card is-centered">
       <div class="mission-icon-circle">📷</div>
       <h1 style="font-size:26px;margin-top:8px;text-wrap:pretty;">Hai una missione fotografica ad aspettarti</h1>
       <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
@@ -701,7 +701,7 @@ function renderMissione(){
     </div>
     <img src="assets/mascotte/criceto-missione.png" alt="" class="mission-mascot">`;
   } else {
-    body = `<div class="card mission-card">
+    body = `<div class="card is-centered">
       <div class="mission-icon-circle">🎉</div>
       <h1 style="font-size:24px;margin-top:8px;">Missione completata!</h1>
       <p class="sub-text pretty" >Vuoi giocare ancora? </p>
@@ -747,7 +747,7 @@ function renderAlbum(){
       <div class="topbar end">${avatarButton()}</div>
     </div>
     <div class="mission-wrap">
-      <div class="card mission-card">
+      <div class="card is-centered">
         <div class="kicker">Album condiviso</div>
         <h1 style="font-size:26px;margin-top:8px;">Le tue foto nel nostro album</h1>
         <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
@@ -758,7 +758,7 @@ function renderAlbum(){
         <div class="result-cta">
           <button class="button is-outline" data-action="open-album">Apri WedShoots ↗</button>
         </div>
-          <p class="fine-print">Non hai l'app? <button class="btn-text margin-bottom-small" data-action="open-album-store">Scaricala</button></p>
+          <p class="fine-print">Non hai l'app? <a href="" data-action="open-album-store">Scaricala</a></p>
       </div>
       <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
     </div>
@@ -885,7 +885,7 @@ function renderQuizBody(q){
       <div style="flex:1;"></div>
       <div class="result-cta">
         <button class="button is-fill is-negative" data-action="confirm-order" ${remaining?'disabled':''}>Conferma l’ordine</button>
-        <button class="btn-text margin-bottom-small" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button>
+        <div class="button-alone"><button class="btn-text" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button></div>
       </div>`;
   }
   let extra = '';
@@ -953,7 +953,7 @@ function renderResult(){
     <p class="rank-line">${esc(rankLine)}</p>
     <div class="result-cta">
       <button class="button is-fill is-negative" data-action="after-result">${cta}</button>
-      <button class="btn-text margin-bottom-small" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button>
+      <div class="button-alone"><button class="btn-text" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button></div>
     </div>
   </div>`;
 }
@@ -1103,7 +1103,7 @@ function renderProfile(){
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
     ${state.adminUids.includes(state.guestId) ? `<button class="button is-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
-    <button class="btn-text" style="margin:16px auto 0;" data-action="logout">Esci da questo profilo</button>
+    <div class="button-alone"><button class="btn-text" style="margin:16px auto 0;" data-action="logout">Esci da questo profilo</button></div>
   </div>`;
 }
 
@@ -1169,7 +1169,7 @@ function adminSection(key, rowsArr, emptyLabel){
   const preview = rowsArr.slice(0, ADMIN_PREVIEW_COUNT).join('');
   const showAll = rowsArr.length > ADMIN_PREVIEW_COUNT
     ? `<button class="btn-text show-all-btn" data-action="open-admin-modal" data-target="${key}">Mostra tutti (${rowsArr.length})</button>` : '';
-  return (preview || `<p class="fine-print" style="color:rgba(247,236,214,.6);">${emptyLabel}</p>`) + showAll;
+  return (preview || `<p class="fine-print">${emptyLabel}</p>`) + showAll;
 }
 
 function renderAdmin(){
@@ -1272,10 +1272,10 @@ function renderAdmin(){
       <button class="reset-btn" data-action="admin-hero-pick">Carica</button>
     </div>`}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
-    <p class="fine-print" style="color:rgba(247,236,214,.6);">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
+    <p class="fine-print">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
     ${adminSection('invitati', playerRows, 'Nessuno ha ancora giocato.')}` : ''}
     ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Missioni completate</div>
-    ${missionPhotoCount ? `<button class="btn-text" style="color:var(--accent-400);" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button>` : ''}
+    ${missionPhotoCount ? `<div class="button-alone"><button class="btn-text" style="color:var(--accent-400);" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
     <div class="mission-admin-list">
       ${adminSection('missioni', missionRows, 'Nessuna missione completata ancora.')}
     </div>` : ''}
