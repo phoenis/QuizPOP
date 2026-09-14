@@ -154,6 +154,7 @@ const state = {
   res: {}, score: 0,
   order: [],
   revealed: false,
+  peekCategories: false, // scavalca localmente state.revealed per rivedere le categorie dopo il reveal, vedi 'peek-categories'
   players: [],
   extraCards: [],
   mode: 'local',
@@ -647,8 +648,8 @@ function renderHub(){
       <button class="hub-tile is-quiz" data-action="go" data-screen="home">
         <span class="wrap">
           <span class="kicker">Il quiz</span>
-          <span class="title serif">Quanto ne sai sugli sposi?</span>
-          <span class="foot">Scala la classifica, vinci un premio</span>
+          <span class="title serif">${state.revealed ? 'La classifica è pronta!' : 'Quanto ne sai sugli sposi?'}</span>
+          <span class="foot">${state.revealed ? 'Scopri chi ha vinto' : 'Scala la classifica, vinci un premio'}</span>
         </span>
         <span class="hub-quiz-ring"><span class="num tabular">${done}</span><span class="den">/${total}</span></span>
       </button>
@@ -768,15 +769,10 @@ function renderAlbum(){
 }
 
 function renderHome(){
-  if (state.revealed){
-    return `<div class="screen screen-home">
+  if (state.revealed && !state.peekCategories){
+    return `<div class="screen screen-finale">
       <div class="topbar end">${avatarButton()}</div>
-      <div class="empty-deck full">
-        <div class="glyph">✦</div>
-        <h2 style="font-size:32px;">Il gioco è chiuso</h2>
-        <p class="pretty">La classifica è stata svelata ai discorsi. Grazie per aver giocato!</p>
-        <button class="button is-outline" data-action="go" data-screen="board">Vedi la classifica</button>
-      </div>
+      ${renderClassificaFinale(`<button class="button is-outline block" data-action="peek-categories">Torna alle categorie</button>`)}
     </div>`;
   }
   ensureOrder();
@@ -821,8 +817,8 @@ function renderHome(){
     panel = `<div class="empty-deck cal-empty">
       <img src="assets/mascotte/cricetini-cuore.png" alt="">
       <h2 style="font-size:28px;">Le hai fatte tutte</h2>
-      <p class="pretty">Ora si aspettano i discorsi per sapere com’è andata.</p>
-      <button class="button is-outline" data-action="go" data-screen="finale">Vedi il finale</button>
+      <p class="pretty">${state.revealed ? 'Puoi tornare a vedere la classifica quando vuoi.' : 'Ora si aspettano i discorsi per sapere com’è andata.'}</p>
+      ${state.revealed ? `<button class="button is-outline" data-action="peek-categories">Vedi la classifica</button>` : ''}
     </div>`;
   } else {
     const card = Q(sel);
@@ -854,8 +850,9 @@ function renderHome(){
         <div class="micro">Punti</div>
       </div>
     </div>
+    ${remaining === 0 ? panel : ''}
     <div class="cat-cards">${catCards}${extraCard}</div>
-    ${panel}
+    ${remaining !== 0 ? panel : ''}
   </div>`;
 }
 
@@ -931,7 +928,7 @@ function renderResult(){
   const kicker = r.correct ? 'Risposta giusta' : 'Risposta sbagliata';
   const title = r.correct ? `Giusta in ${numIt(r.used)}s` : 'Non era questa';
   const rankLine = locked
-    ? 'La busta resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
+    ? 'La classifica resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
     : (mine ? `Sei ${mine.rank}º su ${board.length} in questo momento.` : '');
   const cta = nextOpen(state.res, posOf(state.qi) + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
   const catIdx = catOf(state.qi);
@@ -1005,7 +1002,7 @@ function renderBoard(){
       <div class="topbar end">${avatarButton()}</div>
       <div class="kicker">${board.length} invitati · punti nascosti</div>
       <h1 class="board-title">Classifica</h1>
-      <p class="board-explainer pretty" style="margin-top:14px;">Nessuno vede i punti degli altri. La busta si apre quando Mara e Stefano prendono il microfono.</p>
+      <p class="board-explainer pretty" style="margin-top:14px;">Nessuno vede i punti degli altri. La classifica si apre quando Mara e Stefano prendono il microfono.</p>
       <div class="board-list">${rows}</div>
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
@@ -1031,7 +1028,7 @@ function renderBoard(){
   </div>`).join('');
   return `<div class="screen screen-board">
     <div class="topbar end">${avatarButton()}</div>
-    <div class="kicker">${board.length} invitati · busta aperta</div>
+    <div class="kicker">${board.length} invitati · classifica aperta</div>
     <h1 class="board-title">Classifica</h1>
     <div class="board-list">${rows}</div>
     <div class="board-footer">A parità di punti vince chi ha risposto più in fretta.</div>
@@ -1109,18 +1106,11 @@ function renderProfile(){
   </div>`;
 }
 
-function renderFinale(){
-  if (!state.revealed){
-    return `<div class="screen screen-finale">
-      <div class="topbar end">${avatarButton()}</div>
-      <div class="empty-deck full">
-        <img src="assets/mascotte/cricetini-cuore.png" alt="">
-        <h2 style="font-size:28px;">Le hai fatte tutte!</h2>
-        <p class="pretty">I risultati si vedranno dopo il taglio della torta, quando verrà annunciato il vincitore.</p>
-        <button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>
-      </div>
-    </div>`;
-  }
+// podio + posizione personale a classifica aperta: condiviso da renderFinale()
+// (subito dopo l'ultima domanda) e da renderHome() (quando si torna sul quiz
+// dall'hub a classifica gia' aperta) — backButton e' l'unica cosa che cambia
+// tra i due punti d'ingresso: dove porta il tasto per uscire da qui.
+function renderClassificaFinale(backButton){
   const board = ranked();
   const mine = board.find(p => p.me);
   const podium = board.slice(0, 3).map(p => ({
@@ -1140,9 +1130,8 @@ function renderFinale(){
     </div>`;
   }).join('');
   const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Il podio era vicino. Colpa del cugino Pietro.';
-  return `<div class="screen screen-finale">
-    <div class="topbar end">${avatarButton()}</div>
-    <div class="kicker finale-kicker">16 ottobre, 23:10 · si apre la busta</div>
+  return `
+    <div class="kicker finale-kicker">16 ottobre, 23:10 · classifica aperta</div>
     <h1 class="finale-title">Chi conosce<br><span class="couple-title amp">Mara &amp; Stefano</span></h1>
     <div class="podium">${cols}</div>
     <div class="you-line">
@@ -1151,7 +1140,26 @@ function renderFinale(){
       <div class="note">${note}</div>
     </div>
     <button class="button is-outline block" data-action="open-board-full">Classifica completa</button>
+    ${backButton}
     <div class="finale-footer">Ci vediamo a ottobre.</div>
+  `;
+}
+
+function renderFinale(){
+  if (!state.revealed){
+    return `<div class="screen screen-finale">
+      <div class="topbar end">${avatarButton()}</div>
+      <div class="empty-deck full">
+        <img src="assets/mascotte/cricetini-cuore.png" alt="">
+        <h2 style="font-size:28px;">Le hai fatte tutte!</h2>
+        <p class="pretty">I risultati si vedranno dopo il taglio della torta, quando verrà annunciato il vincitore.</p>
+        <button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="screen screen-finale">
+    <div class="topbar end">${avatarButton()}</div>
+    ${renderClassificaFinale(`<button class="button is-outline block" data-action="go" data-screen="home">Torna alle categorie</button>`)}
   </div>`;
 }
 
@@ -1263,7 +1271,7 @@ function renderAdmin(){
     </div>
     <div class="envelope-box">
       <div class="row">
-        <div><div class="micro">La busta</div><div class="big serif">${state.revealed ? 'Aperta a tutti' : 'Chiusa a tutti'}</div></div>
+        <div><div class="micro">La classifica</div><div class="big serif">${state.revealed ? 'Aperta a tutti' : 'Chiusa a tutti'}</div></div>
         <div class="lock">${state.revealed ? '🔓' : '🔒'}</div>
       </div>
       ${state.revealed
@@ -1414,6 +1422,7 @@ root.addEventListener('click', e => {
     case 'open-board-full': state.revealed = true; go('board'); break;
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
+    case 'peek-categories': state.peekCategories = !state.peekCategories; render(); break;
     case 'open-admin-modal': saveScroll(); pushOverlayHistory(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'reset-player-answers': {
