@@ -636,7 +636,9 @@ function renderMissione(){
       <div class="mission-icon-circle">📷</div>
       <h1 style="font-size:26px;margin-top:8px;text-wrap:pretty;">Hai una missione fotografica ad aspettarti</h1>
       <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
-      <button class="button is-outline block" data-action="reveal-mission">Scopri la tua missione</button>
+      <div class="result-cta">
+        <button class="button is-outline" data-action="reveal-mission">Scopri la tua missione</button>
+      </div>
     </div>
     <img src="assets/mascotte/criceto-missione.png" alt="" class="mission-mascot">`;
   } else {
