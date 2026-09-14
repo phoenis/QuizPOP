@@ -136,15 +136,12 @@ function normalizeMissionMedia(d){
   if (d.photo) return { kind: 'photo', src: d.photo };
   return { kind: undefined, src: undefined };
 }
-// una missione completata puo' essere una foto (dataURL, dentro Firestore) o
-// un video (URL di Firebase Storage): stesso markup, tag diverso.
 // idx e' la posizione dentro state.lightboxGallery (impostata da chi chiama,
 // vedi renderMissione()/renderAdmin()): tocca la miniatura per aprirla a
 // schermo intero, scorrendo le altre della stessa lista (renderLightbox()).
 function renderMissionMedia(entry, cls, idx){
   if (!entry || !entry.src) return '';
   const trigger = ` data-action="open-lightbox" data-index="${idx}"`;
-  if (entry.kind === 'video') return `<video src="${esc(entry.src)}" class="${cls}" muted playsinline controls${trigger}></video>`;
   return `<img src="${esc(entry.src)}" alt="" class="${cls}"${trigger}>`;
 }
 
@@ -232,12 +229,10 @@ async function initFirebase(){
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js');
   const firestore = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
   const authMod = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js');
-  const storageMod = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js');
   const app = initializeApp(firebaseConfig);
   const db = firestore.getFirestore(app);
   const auth = authMod.getAuth(app);
-  const storage = storageMod.getStorage(app);
-  return { app, db, auth, storage, ...firestore, ...authMod, ...storageMod };
+  return { app, db, auth, ...firestore, ...authMod };
 }
 
 async function persistProgress(){
@@ -493,7 +488,7 @@ function render(){
   if (screenChanged) resetScroll();
 }
 
-// foto/video missione a schermo intero: si apre toccando una miniatura (vedi
+// foto missione a schermo intero: si apre toccando una miniatura (vedi
 // renderMissionMedia()), si chiude toccando lo sfondo scuro o la ×. Se la
 // lista ha più di un elemento si può scorrere avanti/indietro, con nome e
 // missione come didascalia.
@@ -501,9 +496,7 @@ function renderLightbox(){
   const items = state.lightboxGallery || [];
   const item = items[state.lightbox];
   if (!item) return '';
-  const media = item.kind === 'video'
-    ? `<video src="${esc(item.src)}" controls autoplay playsinline data-action="lightbox-noop"></video>`
-    : `<img src="${esc(item.src)}" alt="" data-action="lightbox-noop">`;
+  const media = `<img src="${esc(item.src)}" alt="" data-action="lightbox-noop">`;
   const many = items.length > 1;
   return `<div class="lightbox" data-action="close-lightbox">
     <button class="lightbox-close" data-action="close-lightbox">✕</button>
@@ -621,8 +614,8 @@ function renderMissione(){
     <div class="card mission-card">
         <div class="kicker">La tua missione</div>
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
-      <input id="mission-file-camera" type="file" accept="image/*,video/*" capture="environment" style="display:none;">
-      <input id="mission-file-gallery" type="file" accept="image/*,video/*" style="display:none;">
+      <input id="mission-file-camera" type="file" accept="image/*" capture="environment" style="display:none;">
+      <input id="mission-file-gallery" type="file" accept="image/*" style="display:none;">
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
@@ -1081,7 +1074,7 @@ function renderFinale(){
   </div>`;
 }
 
-// tutte le foto/video missione (non solo le proprie), solo per il pannello
+// tutte le foto missione (non solo le proprie), solo per il pannello
 // sposi: si attiva la prima volta che si entra davvero in questa schermata,
 // che sia con l'indirizzo #sposi o con la scorciatoia dal profilo — invece
 // di dipendere da un controllo fatto una volta sola all'avvio dell'app, che
@@ -1496,48 +1489,26 @@ async function skipMission(){
   await assignMission(cur.index);
 }
 
-const MISSION_VIDEO_MAX_BYTES = 80 * 1024 * 1024;
-
 async function completeMission(file){
   const cur = state.missions[state.missions.length - 1];
   if (!cur || cur.done || !file) return;
-  const isVideo = file.type.startsWith('video/');
-  let kind, src;
-  if (isVideo){
-    if (file.size > MISSION_VIDEO_MAX_BYTES){
-      alert('Il video è troppo pesante (max 80MB): provane uno più corto.');
-      return;
-    }
-    if (!(state.mode === 'online' && fb)){
-      alert('I video richiedono la modalità online (Firebase): in locale puoi caricare solo foto.');
-      return;
-    }
-    const ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
-    const path = `missionVideos/${state.guestId}/${cur.index}_${Date.now()}.${ext}`;
-    const storageRef = fb.ref(fb.storage, path);
-    await fb.uploadBytes(storageRef, file, { contentType: file.type });
-    src = await fb.getDownloadURL(storageRef);
-    kind = 'video';
-  } else {
-    const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
-    let dataUrl = '';
-    for (const [maxDim, quality] of steps){
-      dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
-      if (dataUrl.length < 500000) break;
-    }
-    if (dataUrl.length >= 500000){
-      alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
-      return;
-    }
-    src = dataUrl;
-    kind = 'photo';
+  const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
+  let dataUrl = '';
+  for (const [maxDim, quality] of steps){
+    dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
+    if (dataUrl.length < 500000) break;
   }
+  if (dataUrl.length >= 500000){
+    alert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
+    return;
+  }
+  const kind = 'photo', src = dataUrl;
   cur.done = true;
   state.missionPhotos = { ...state.missionPhotos, [cur.index]: { kind, src } };
   render();
   if (state.mode === 'online' && fb){
     await fb.setDoc(fb.doc(fb.db, 'players', state.guestId), { missions: state.missions }, { merge: true });
-    // foto/video in una collezione separata (non nel documento players): con più
+    // foto in una collezione separata (non nel documento players): con più
     // missioni completate si supererebbe presto il limite di 1MB per
     // documento di Firestore se stessero tutte insieme a punteggio/risposte.
     await fb.setDoc(fb.doc(fb.db, 'missionPhotos', state.guestId + '_' + cur.index), {
@@ -1566,9 +1537,9 @@ async function resetPlayerAnswers(playerId){
 }
 
 // toglie un invitato dalla classifica/dal gioco (utenze di prova, doppioni
-// da un altro telefono mai piu' usati, ecc). Non tocca le eventuali foto/
-// video delle sue missioni gia' caricate, che restano visibili nella
-// galleria del pannello sposi.
+// da un altro telefono mai piu' usati, ecc). Non tocca le eventuali foto
+// delle sue missioni gia' caricate, che restano visibili nella galleria
+// del pannello sposi.
 async function deletePlayer(playerId){
   if (state.mode !== 'online' || !fb) return;
   if (state.adminUids.includes(playerId)) await removeAdmin(playerId);
