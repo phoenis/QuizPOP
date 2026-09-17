@@ -1117,7 +1117,7 @@ function renderProfile(){
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia codice'}</button>
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
-    ${state.adminUids.includes(state.guestId) ? `<button class="button is-outline small" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
+    ${state.adminUids.includes(state.guestId) ? `<div class="result-cta"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
     <div class="button-alone"><button class="btn-text" data-action="logout">Esci da questo profilo</button></div>
   </div>`;
 }
@@ -1228,10 +1228,12 @@ function renderAdmin(){
     const correct = state.players.filter(p => p.res && p.res[i] && p.res[i].correct).length;
     const correctPct = answers ? Math.round((correct / answers) * 100) : null;
     return `<div class="admin-card-row">
-      <div class="num">${i + 1}</div>
-      <div>
-        <div class="kk">${esc(x.k)}</div>
-        <div class="tt">${esc(x.t)}</div>
+      <div class="admin-card-content">
+        <div class="num">${i + 1}</div>
+        <div>
+          <div class="kk">${esc(x.k)}</div>
+          <div class="tt">${esc(x.t)}</div>
+        </div>
       </div>
       <div class="cnt">${answers} risposte${correctPct != null ? ` · ${correctPct}% giuste` : ''}</div>
     </div>`;
@@ -1247,10 +1249,12 @@ function renderAdmin(){
     // liberamente e possono ripetersi).
     const nameTag = nameCounts[name] > 1 ? ` · #${esc(p.id.slice(-4))}` : '';
     return `<div class="admin-card-row">
-      <div class="avatar">${esc(avatarGlyph(p))}</div>
-      <div>
-        <div class="tt">${esc(name)}${nameTag}</div>
-        <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
+      <div class="admin-card-content">
+        <div class="avatar">${esc(avatarGlyph(p))}</div>
+        <div>
+          <div class="tt">${esc(name)}${nameTag}</div>
+          <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
+        </div>
       </div>
       <div class="admin-card-row-actions">
         ${isAdmin
@@ -1284,7 +1288,9 @@ function renderAdmin(){
     });
   state.lightboxGallery = adminMissionGallery;
   return `<div class="screen screen-admin">
-    ${avatarButton()}
+  <div class="topbar">  
+  ${avatarButton()}
+  </div>
     <div class="kicker">Solo per gli sposi</div>
     <h2 class="admin-title couple-title">Mara <span class="amp">&amp;</span> Stefano</h2>
     <div class="admin-stats">
