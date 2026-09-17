@@ -183,6 +183,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 .hub-quiz-ring .num{ font-size:19px; line-height:1; }
 .hub-quiz-ring .den{ font-size:9px; opacity:.85; }
+.hub-quiz-ring .trophy{ font-size:26px; line-height:1; }
 .hub-tiles{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .hub-tile{
   display:flex; flex-direction:column; text-align:left; cursor:pointer;
