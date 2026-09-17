@@ -584,9 +584,9 @@ function renderLightbox(){
 }
 
 function renderBoot(){
-  return `<div class="screen" style="align-items:center;justify-content:center;text-align:center;padding:40px;">
+  return `<div class="screen screen-boot">
     <div class="kicker">Mara & Stefano</div>
-    <p style="font-size:14px;color:var(--neutral-700);margin-top:14px;">Un attimo…</p>
+    <p class="boot-hint">Un attimo…</p>
   </div>`;
 }
 
@@ -618,10 +618,10 @@ function renderJoin(){
     ${state.recoverOpen ? `
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
-        <input id="recover-code" class="name-input" style="font-size:20px;letter-spacing:.1em;text-transform:uppercase;text-align:center;" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
+        <input id="recover-code" class="name-input is-code" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
         <button class="button is-outline block" data-action="recover-profile">Recupera profilo</button>
       </div>`
-      : `<div class="button-alone"><button class="btn-text" style="margin-top:12px;" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button></div>`}
+      : `<div class="button-alone"><button class="btn-text" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button></div>`}
   </div>`;
 }
 
@@ -636,7 +636,7 @@ function renderHub(){
         <div class="hero-dida">16 ottobre 2026</div>
       </div>
       ${avatarButton()}</div><div class="hub-hero">
-      ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.style.display='none'">`}
+      ${state.heroPhoto ? `<img src="${esc(state.heroPhoto)}" alt="">` : `<img src="assets/photos/hub-hero.jpg" alt="" onerror="this.remove()">`}
       <div class="home-fade-menu"></div> 
 <div class="hub-fade">
       <h1 class="profile-name">Ciao <span>${state.name}</span>!</h1>
@@ -686,8 +686,8 @@ function renderMissione(){
     <div class="card is-centered">
         <div class="kicker">La tua missione</div>
       <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
-      <input id="mission-file-camera" type="file" accept="image/*" capture="environment" style="display:none;">
-      <input id="mission-file-gallery" type="file" accept="image/*" style="display:none;">
+      <input id="mission-file-camera" class="hidden-input" type="file" accept="image/*" capture="environment">
+      <input id="mission-file-gallery" class="hidden-input" type="file" accept="image/*">
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
@@ -698,7 +698,7 @@ function renderMissione(){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">📷</div>
       <h1>Hai una missione fotografica ad aspettarti</h1>
-      <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
+      <p class="sub-text pretty">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
       <div class="result-cta">
         <button class="button is-outline" data-action="reveal-mission">Scopri la tua missione</button>
       </div>
@@ -707,7 +707,7 @@ function renderMissione(){
   } else {
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">🎉</div>
-      <h1 style="font-size:24px;margin-top:8px;">Missione completata!</h1>
+      <h1 class="mission-done-title">Missione completata!</h1>
       <p class="sub-text pretty" >Vuoi giocare ancora? </p>
       <div class="result-cta">
       <button class="button is-outline" data-action="reveal-mission">Fai un'altra missione</button>
@@ -718,18 +718,19 @@ function renderMissione(){
   const missionGallery = [];
   const historyRows = done.slice().reverse().map(m => {
     const entry = state.missionPhotos[m.index];
-    let mediaHtml = '', rowAttr = '';
+    let mediaHtml = '', rowAttr = '', rowClass = 'mission-history-row';
     if (entry && entry.src){
       missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: MISSIONS[m.index] });
       const idx = missionGallery.length - 1;
       mediaHtml = renderMissionMedia(entry, 'mission-history-thumb');
-      rowAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
+      rowClass += ' is-clickable';
+      rowAttr = ` data-action="open-lightbox" data-index="${idx}"`;
     }
-    return `<div class="mission-history-row"${rowAttr}>${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
+    return `<div class="${rowClass}"${rowAttr}>${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
-    <div class="section-title" style="text-align:center;">Missioni completate: ${done.length}</div>
+    <div class="section-title text-center">Missioni completate: ${done.length}</div>
     <div class="mission-history">${historyRows}</div>` : '';
 
   return `<div class="screen screen-missione">
@@ -757,7 +758,7 @@ function renderAlbum(){
         <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
-          <button class="button is-fill${state.copiedFlash==='album'?' is-copied':''}" style="padding:9px 14px;font-size:12.5px;" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
+          <button class="button is-fill is-compact${state.copiedFlash==='album'?' is-copied':''}" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
         </div>
         <div class="result-cta">
           <button class="button is-outline" data-action="open-album">Apri WedShoots ↗</button>
@@ -792,6 +793,7 @@ function renderHome(){
   const catRow = (icon, name, catQs, variant) => {
     const doneN = catQs.filter(qi => state.res[qi]).length;
     const pct = catQs.length ? Math.round((doneN / catQs.length) * 100) : 0;
+    const pctStep = Math.round(pct / 10) * 10;
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
     const earned = catQs.length > 0 && doneN === catQs.length;
     return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
@@ -802,7 +804,7 @@ function renderHome(){
         </span>
         <span class="cat-tile-name serif">${esc(name)}</span>
         <span class="cat-tile-progress">
-          <span class="bar"><span style="width:${pct}%;"></span></span>
+          <span class="bar"><span class="w-${pctStep}"></span></span>
           <span class="pct">${pct}%</span>
         </span>
       </span>
@@ -848,7 +850,7 @@ function renderHome(){
     <div class="home-header">
       <div>
         <div class="kicker">Il quiz</div>
-        <h1 style="font-size:27px;">Quanto ne sai sugli sposi?</h1>
+        <h1>Quanto ne sai sugli sposi?</h1>
       </div>
       <div class="home-score">
         <div class="num serif tabular">${state.score}</div>
@@ -864,7 +866,7 @@ function renderHome(){
 function renderQuizBody(q){
   if (q.photo){
     return `<div class="photo-mat">
-      <div class="ph"><img src="${esc(q.photoSrc||'')}" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>
+      <div class="ph"><img src="${esc(q.photoSrc||'')}" alt="" onerror="this.remove()"></div>
       <div class="caption">Foto degli sposi</div>
     </div>` + renderOptions(q);
   }
@@ -886,10 +888,10 @@ function renderQuizBody(q){
     }).join('');
     return `<div class="order-progress"><span class="order-segs">${segs}</span><span class="order-helper">${helper}</span></div>
       <div class="option-group">${rows}</div>
-      <div style="flex:1;"></div>
+      <div class="flex-spacer"></div>
       <div class="result-cta">
         <button class="button is-fill is-negative" data-action="confirm-order" ${remaining?'disabled':''}>Conferma l’ordine</button>
-        <div class="button-alone"><button class="btn-text" style="align-self:center;" data-action="reset-order">Ricomincia da capo</button></div>
+        <div class="button-alone"><button class="btn-text" data-action="reset-order">Ricomincia da capo</button></div>
       </div>`;
   }
   let extra = '';
@@ -957,7 +959,7 @@ function renderResult(){
     <p class="rank-line">${esc(rankLine)}</p>
     <div class="result-cta">
       <button class="button is-fill is-negative" data-action="after-result">${cta}</button>
-      <div class="button-alone"><button class="btn-text" data-action="nav-back" style="align-self:center;">Basta per ora, torno dopo</button></div>
+      <div class="button-alone"><button class="btn-text" data-action="nav-back">Basta per ora, torno dopo</button></div>
     </div>
   </div>`;
 }
@@ -1012,7 +1014,7 @@ function renderBoard(){
       ${avatarButton()}
       <div class="kicker">${board.length} partecipanti</div>
       <h1 class="board-title">Classifica</h1>
-      <p class="board-explainer pretty" style="margin-top:14px;">Nessuno vede i punti degli altri. La classifica si apre quando Mara e Stefano prendono il microfono.</p>
+      <p class="board-explainer pretty">Nessuno vede i punti degli altri. La classifica si apre quando Mara e Stefano prendono il microfono.</p>
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
         <div class="big serif tabular">${state.score} punti tuoi</div>
@@ -1047,10 +1049,10 @@ function renderBoard(){
     ${tabs}
     ${tab === 'ospiti'
       ? `<div class="board-list">${rows}</div>
-      <div class="sub-text pretty" style="margin-top:14px;">A parità di punti vince chi ha risposto più in fretta.</div>
+      <div class="sub-text pretty">A parità di punti vince chi ha risposto più in fretta.</div>
          `
       : `<div class="board-list">${teamRows}</div>
-      <p class="sub-text pretty" style="margin-top:14px;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
+      <p class="sub-text pretty">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
       `}
   </div>`;
 }
@@ -1084,7 +1086,7 @@ function renderProfile(){
     .sort((a, b) => posOf(a.i) - posOf(b.i)).map(o => {
     const r = state.res[o.i];
     return `<div class="answer-row">
-      <span class="num" style="color:${r.correct?'var(--accent-600)':'var(--neutral-500)'}">${posOf(o.i)+1}</span>
+      <span class="num${r.correct?' is-correct':''}">${posOf(o.i)+1}</span>
       <span class="title">${esc(o.x.t)}</span>
       <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
     </div>`;
@@ -1094,7 +1096,7 @@ function renderProfile(){
     <div class="topbar">${avatarButton()}</div>
     <button class="avatar lg" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
     
-    ${state.avatarPickerOpen ? `<div class="chips" style="justify-content:center;margin-top:10px;">${emojiChips}
+    ${state.avatarPickerOpen ? `<div class="chips centered">${emojiChips}
       ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
     </div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
@@ -1106,7 +1108,7 @@ function renderProfile(){
     </div>
     <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
     <div class="medal-grid">${medalCards}</div>
-    <div class="badge-group" style="margin-top:12px;">
+    <div class="badge-group">
     ${badgeRows}
     </div>
     <div class="section-title">Le tue risposte</div>
@@ -1118,8 +1120,8 @@ function renderProfile(){
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia codice'}</button>
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
-    ${state.adminUids.includes(state.guestId) ? `<button class="button is-outline small" style="margin:20px auto 0;" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
-    <div class="button-alone"><button class="btn-text" style="margin:16px auto 0;" data-action="logout">Esci da questo profilo</button></div>
+    ${state.adminUids.includes(state.guestId) ? `<button class="button is-outline small admin-shortcut-btn" data-action="go" data-screen="admin">Pannello sposi</button>` : ''}
+    <div class="button-alone"><button class="btn-text" data-action="logout">Esci da questo profilo</button></div>
   </div>`;
 }
 
@@ -1130,17 +1132,14 @@ function renderProfile(){
 function renderClassificaFinale(backButton){
   const board = ranked();
   const mine = board.find(p => p.me);
-  const podium = board.slice(0, 3).map(p => ({
-    ...p,
-    h: p.rank === 1 ? 140 : p.rank === 2 ? 96 : 76,
-  }));
+  const podium = board.slice(0, 3);
   const order = [1, 0, 2].filter(i => podium[i]);
   const cols = order.map(i => {
     const p = podium[i];
     return `<div class="podium-col">
-      <div class="avatar"">${esc(p.avatar)}</div>
+      <div class="avatar">${esc(p.avatar)}</div>
       <div class="podium-pname">${esc(p.name)}</div>
-      <div class="podium-block serif ${p.rank===1?'top':''}" style="height:${p.h}px;">
+      <div class="podium-block serif rank-${p.rank} ${p.rank===1?'top':''}">
         <div class="score tabular">${p.score}</div>
         <div class="rk">${p.rank}º</div>
       </div>
@@ -1175,7 +1174,7 @@ function renderFinale(){
     </div>
       <div class="empty-deck full">
         <img src="assets/mascotte/cricetini-cuore.png" alt="">
-        <h2 style="font-size:28px;">Le hai fatte tutte!</h2>
+        <h2>Le hai fatte tutte!</h2>
         <p class="pretty">I risultati si vedranno dopo il taglio della torta, quando verrà annunciato il vincitore.</p>
         <button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>
       </div>
@@ -1233,7 +1232,7 @@ function renderAdmin(){
     const correctPct = answers ? Math.round((correct / answers) * 100) : null;
     return `<div class="admin-card-row">
       <div class="num">${i + 1}</div>
-      <div style="flex:1;overflow:hidden;">
+      <div class="row-info">
         <div class="kk">${esc(x.k)}</div>
         <div class="tt">${esc(x.t)}</div>
       </div>
@@ -1252,7 +1251,7 @@ function renderAdmin(){
     const nameTag = nameCounts[name] > 1 ? ` · #${esc(p.id.slice(-4))}` : '';
     return `<div class="admin-card-row">
       <div class="avatar">${esc(avatarGlyph(p))}</div>
-      <div style="flex:1;overflow:hidden;">
+      <div class="row-info">
         <div class="tt">${esc(name)}${nameTag}</div>
         <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
       </div>
@@ -1271,16 +1270,17 @@ function renderAdmin(){
     .slice()
     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
     .map(m => {
-      let mediaHtml = '', rowAttr = '';
+      let mediaHtml = '', rowAttr = '', rowClass = 'mission-admin-row';
       if (m.src){
         adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: MISSIONS[m.missionIndex] });
         const idx = adminMissionGallery.length - 1;
         mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb');
-        rowAttr = ` style="cursor:pointer;" data-action="open-lightbox" data-index="${idx}"`;
+        rowClass += ' is-clickable';
+        rowAttr = ` data-action="open-lightbox" data-index="${idx}"`;
       }
-      return `<div class="mission-admin-row"${rowAttr}>
+      return `<div class="${rowClass}"${rowAttr}>
       ${mediaHtml}
-      <div style="flex:1;overflow:hidden;">
+      <div class="row-info">
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
         <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
       </div>
@@ -1305,29 +1305,29 @@ function renderAdmin(){
         ? `<button class="btn-dark" data-action="close-board">Riapri il gioco</button>`
         : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
     </div>
-    <div class="section-title" style="color:rgba(247,236,214,.6);">Foto di copertina</div>
+    <div class="section-title">Foto di copertina</div>
     ${state.heroPhoto ? `<div class="hero-upload-box has-photo">
       <img src="${esc(state.heroPhoto)}" alt="" class="hero-upload-preview">
-      <input id="admin-hero-file" type="file" accept="image/*" style="display:none;">
+      <input id="admin-hero-file" class="hidden-input" type="file" accept="image/*">
       <div class="hero-upload-actions">
         <button class="reset-btn" data-action="admin-hero-pick">Cambia foto</button>
         <button class="reset-btn" data-action="admin-hero-remove">Rimuovi</button>
       </div>
     </div>` : `<div class="hero-upload-box">
       <div class="hero-upload-empty">vuota</div>
-      <div style="flex:1;font-size:12.5px;color:rgba(247,236,214,.7);line-height:1.45;">Nessuna foto caricata. Appare in cima alla home.</div>
-      <input id="admin-hero-file" type="file" accept="image/*" style="display:none;">
+      <div class="hero-upload-note">Nessuna foto caricata. Appare in cima alla home.</div>
+      <input id="admin-hero-file" class="hidden-input" type="file" accept="image/*">
       <button class="reset-btn" data-action="admin-hero-pick">Carica</button>
     </div>`}
-    ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Invitati</div>
+    ${state.mode === 'online' ? `<div class="section-title">Invitati</div>
     <p class="fine-print">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
     ${adminSection('invitati', playerRows, 'Nessuno ha ancora giocato.')}` : ''}
-    ${state.mode === 'online' ? `<div class="section-title" style="color:rgba(247,236,214,.6);">Missioni completate</div>
-    ${missionPhotoCount ? `<div class="button-alone"><button class="btn-text" style="color:var(--accent-400);" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
+    ${state.mode === 'online' ? `<div class="section-title">Missioni completate</div>
+    ${missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
     <div class="mission-admin-list">
       ${adminSection('missioni', missionRows, 'Nessuna missione completata ancora.')}
     </div>` : ''}
-    <div class="section-title" style="color:rgba(247,236,214,.6);">Le domande</div>
+    <div class="section-title">Le domande</div>
     ${adminSection('domande', questionRows, 'Nessuna domanda.')}
   </div>`;
 }
@@ -1341,7 +1341,7 @@ function renderAdminModal(){
   return `<div class="admin-modal" data-action="close-admin-modal">
     <div class="admin-modal-sheet" data-action="lightbox-noop">
       <div class="admin-modal-head">
-        <div class="section-title" style="margin:0;color:rgba(247,236,214,.6);">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
+        <div class="section-title">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
         <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
       </div>
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
