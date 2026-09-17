@@ -696,7 +696,7 @@ function renderMissione(){
   } else if (!list.length){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">📷</div>
-      <h1 style="font-size:26px;margin-top:8px;text-wrap:pretty;">Hai una missione fotografica ad aspettarti</h1>
+      <h1>Hai una missione fotografica ad aspettarti</h1>
       <p class="pretty" style="font-size:13.5px;line-height:1.55;color:var(--neutral-700);margin-top:10px;">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
       <div class="result-cta">
         <button class="button is-outline" data-action="reveal-mission">Scopri la tua missione</button>
@@ -734,7 +734,7 @@ function renderMissione(){
   return `<div class="screen screen-missione">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      <div class="topbar end">${avatarButton()}</div>
+      ${avatarButton()}
     </div>
     <div class="mission-wrap">
       ${body}
@@ -747,12 +747,12 @@ function renderAlbum(){
   return `<div class="screen screen-missione">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      <div class="topbar end">${avatarButton()}</div>
+      ${avatarButton()}
     </div>
     <div class="mission-wrap">
       <div class="card is-centered">
         <div class="kicker">Album condiviso</div>
-        <h1 style="font-size:26px;margin-top:8px;">Le tue foto nel nostro album</h1>
+        <h1>Le tue foto nel nostro album</h1>
         <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
@@ -771,8 +771,11 @@ function renderAlbum(){
 function renderHome(){
   if (state.revealed && !state.peekCategories){
     return `<div class="screen screen-finale">
-      <div class="topbar end">${avatarButton()}</div>
-      ${renderClassificaFinale(`<button class="button is-outline block" data-action="peek-categories">Torna alle categorie</button>`)}
+          <div class="topbar">
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
+      ${avatarButton()}
+    </div>
+      ${renderClassificaFinale(`<button class="button is-outline" data-action="peek-categories">Torna alle categorie</button>`)}
     </div>`;
   }
   ensureOrder();
@@ -802,6 +805,7 @@ function renderHome(){
           <span class="pct">${pct}%</span>
         </span>
       </span>
+      <div class="hover"></div>
       <span class="cat-tile-deco" aria-hidden="true">${icon}</span>
     </button>`;
   };
@@ -814,10 +818,10 @@ function renderHome(){
 
   let panel;
   if (remaining === 0){
-    panel = `<div class="empty-deck cal-empty">
-      <img src="assets/mascotte/cricetini-cuore.png" alt="">
-      <h2 style="font-size:28px;">Le hai fatte tutte</h2>
-      <p class="pretty">${state.revealed ? 'Puoi tornare a vedere la classifica quando vuoi.' : 'Ora si aspettano i discorsi per sapere com’è andata.'}</p>
+    panel = `<div class="card is-dashed is-finished">
+      <div class="mission-icon-circle">🎉</div>
+      <h2>Hai risposto a tutto</h2>
+      <p class="sub-text pretty">${state.revealed ? 'Puoi tornare a vedere la classifica quando vuoi.' : 'Per sapere chi ha vinto ti tocca aspettare, <br>si scopre il vincitore dopo il dolce!'}</p>
       ${state.revealed ? `<button class="button is-outline" data-action="peek-categories">Vedi la classifica</button>` : ''}
     </div>`;
   } else {
@@ -838,7 +842,7 @@ function renderHome(){
   return `<div class="screen screen-home">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      <div class="topbar end">${avatarButton()}</div>
+      ${avatarButton()}
     </div>
     <div class="home-header">
       <div>
@@ -998,9 +1002,9 @@ function renderBoard(){
       <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
       <div class="board-score hidden">•••</div>
     </div>`).join('');
-    return `<div class="screen screen-board">
-      <div class="topbar end">${avatarButton()}</div>
-      <div class="kicker">${board.length} invitati · punti nascosti</div>
+    return `<div class="screen">
+      ${avatarButton()}
+      <div class="kicker">${board.length} partecipanti</div>
       <h1 class="board-title">Classifica</h1>
       <p class="board-explainer pretty" style="margin-top:14px;">Nessuno vede i punti degli altri. La classifica si apre quando Mara e Stefano prendono il microfono.</p>
       <div class="board-list">${rows}</div>
@@ -1026,14 +1030,17 @@ function renderBoard(){
     <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
     <div class="board-score serif tabular">${Math.round(g.avg)}</div>
   </div>`).join('');
-  return `<div class="screen screen-board">
-    <div class="topbar end">${avatarButton()}</div>
-    <div class="kicker">${board.length} invitati · classifica aperta</div>
-    <h1 class="board-title">Classifica</h1>
+  return `<div class="screen">
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
+      ${avatarButton()}
+    </div>
+    <div class="kicker">Classifica completa</div>
+    <h1>Ospiti</h1>
+    <div class="sub-text pretty">A parità di punti vince chi ha risposto più in fretta.</div>
     <div class="board-list">${rows}</div>
-    <div class="board-footer">A parità di punti vince chi ha risposto più in fretta.</div>
-    <div class="section-title">Squadre</div>
-    <p class="rank-line" style="margin-top:0;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente da quanti sono.</p>
+    <h1>Squadre</h1>
+    <p class="sub-text pretty"">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
     <div class="board-list">${teamRows}</div>
   </div>`;
 }
@@ -1074,7 +1081,7 @@ function renderProfile(){
   }).join('');
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
-    <div class="topbar end">${avatarButton()}</div>
+    <div class="topbar">${avatarButton()}</div>
     <button class="avatar lg" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
     
     ${state.avatarPickerOpen ? `<div class="chips" style="justify-content:center;margin-top:10px;">${emojiChips}
@@ -1121,7 +1128,7 @@ function renderClassificaFinale(backButton){
   const cols = order.map(i => {
     const p = podium[i];
     return `<div class="podium-col">
-      <div class="avatar" style="border-color:var(--accent-500);color:var(--accent-700);">${esc(p.avatar)}</div>
+      <div class="avatar"">${esc(p.avatar)}</div>
       <div class="podium-pname">${esc(p.name)}</div>
       <div class="podium-block serif ${p.rank===1?'top':''}" style="height:${p.h}px;">
         <div class="score tabular">${p.score}</div>
@@ -1129,26 +1136,27 @@ function renderClassificaFinale(backButton){
       </div>
     </div>`;
   }).join('');
-  const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Il podio era vicino. Colpa del cugino Pietro.';
+  const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Mannaggia, è andata male!';
   return `
-    <div class="kicker finale-kicker">16 ottobre, 23:10 · classifica aperta</div>
-    <h1 class="finale-title">Chi conosce<br><span class="couple-title amp">Mara &amp; Stefano</span></h1>
+    <div class="kicker">Il podio</div>
+    <h1 class="couple-title">Chi ne sa di più?</h1>
     <div class="podium">${cols}</div>
-    <div class="you-line">
-      <div class="micro">Tu</div>
-      <div class="big serif tabular">${mine ? mine.rank + 'º con ' + mine.score + ' punti' : ''}</div>
-      <div class="note">${note}</div>
+    <div class="card is-dashed">
+      <div class="kicker">Tu</div>
+      <h2>${mine ? mine.rank + 'º con ' + mine.score + ' punti' : ''}</h2>
+      <div class="sub-text pretty">${note}</div>
+          <button class="button is-outline" data-action="open-board-full">Classifica completa</button>
     </div>
-    <button class="button is-outline block" data-action="open-board-full">Classifica completa</button>
-    ${backButton}
-    <div class="finale-footer">Ci vediamo a ottobre.</div>
   `;
 }
 
 function renderFinale(){
   if (!state.revealed){
     return `<div class="screen screen-finale">
-      <div class="topbar end">${avatarButton()}</div>
+          <div class="topbar">
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
+      ${avatarButton()}
+    </div>
       <div class="empty-deck full">
         <img src="assets/mascotte/cricetini-cuore.png" alt="">
         <h2 style="font-size:28px;">Le hai fatte tutte!</h2>
@@ -1158,8 +1166,11 @@ function renderFinale(){
     </div>`;
   }
   return `<div class="screen screen-finale">
-    <div class="topbar end">${avatarButton()}</div>
-    ${renderClassificaFinale(`<button class="button is-outline block" data-action="go" data-screen="home">Torna alle categorie</button>`)}
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
+      ${avatarButton()}
+    </div>
+    ${renderClassificaFinale(`<button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>`)}
   </div>`;
 }
 
@@ -1261,9 +1272,9 @@ function renderAdmin(){
     });
   state.lightboxGallery = adminMissionGallery;
   return `<div class="screen screen-admin">
-    <div class="topbar end">${avatarButton()}</div>
+    ${avatarButton()}
     <div class="kicker">Solo per gli sposi</div>
-    <h2 class="admin-title couple-title" style="text-align:left;">Mara <span class="amp">&amp;</span> Stefano</h2>
+    <h2 class="admin-title couple-title">Mara <span class="amp">&amp;</span> Stefano</h2>
     <div class="admin-stats">
       <div class="stat-cell"><div class="v serif tabular">${totalPlayers}</div><div class="c">Giocano</div></div>
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>

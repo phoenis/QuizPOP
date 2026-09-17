@@ -91,7 +91,7 @@ input{font-family:inherit;}
    dello schermo — niente più bottoni "flottanti" con un padding-top dedicato
    per fargli spazio. Sola eccezione: la Home con la foto, dove l'icona
    profilo resta in overlay sopra la foto (vedi .hub-hero). */
-.topbar{ display:flex; justify-content:space-between; align-items:center; z-index: 88;}
+.topbar{ display:flex; justify-content:space-between; align-items:center; z-index: 88; margin-bottom:24px}
 .topbar.end{ justify-content:flex-end; }
 .topbar.home{position: absolute; top: 0; left: 0; right: 0; padding: 16px;}
 .menu-hamburger, .back-fab{
@@ -100,6 +100,7 @@ input{font-family:inherit;}
   box-shadow:var(--shadow-md); padding: 4px;
 border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
+.menu-hamburger:last-child{margin-left: auto;}
 .topbar.home .menu-hamburger{background-color: transparent; color: white; box-shadow: none;}
 
 .menu-hamburger svg{width: 80%; height: 80%;}
@@ -108,6 +109,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .kicker{
   font-size:11px; text-transform:uppercase; letter-spacing:.24em;
   color:var(--accent-700); font-family:var(--font-primary);
+  margin-bottom: 8px;
 }
 .kicker.neutral{color:var(--neutral-700);}
 .hero-dida{  display: none; font-weight:400; font-size:0.9em; text-transform:uppercase; }
@@ -207,6 +209,16 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 /* ===== MISSIONE / ALBUM (card centrata su crema) ===== */
 .mission-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:10px 0; }
 .is-centered{ width:100%; text-align:center; margin-top:auto; margin-bottom:auto; }
+.is-dashed{ width:100%; text-align:center; margin-top:48px; border-style: dashed; border-color: var(--neutral-500); background-color: transparent; box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    flex: 1;
+  }
+  .is-dashed .button{ margin-top: 24px;}
+.is-finished{ min-height: 50dvh;}
+
 .mission-icon-circle{
   display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:28px;
 }
@@ -238,13 +250,15 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .cat-tile--3{ --tile-a:#dcae57; --tile-b:#a97a1e; }
 .cat-tile--4{ --tile-a:#8a9c78; --tile-b:#546143; }
 .cat-tile--extra{ --tile-a:var(--neutral-500); --tile-b:var(--neutral-700); }
-.cat-tile-text{ flex:1; min-width:0; }
+.cat-tile-text{ flex:1; min-width:0; z-index: 2;}
 .cat-tile-top{ display:flex; align-items:center; gap:8px; margin-bottom:24px; }
 .cat-tile-badge{
   flex:none; width:24px; height:24px; border-radius:50%; background:rgba(255,253,246,.9);
   color:var(--tile-b); display:flex; align-items:center; justify-content:center; font-size:12px;
 }
-.cat-tile.earned .cat-tile-badge{ background:transparent; border:1px solid rgba(255,253,246,.9); color:#fffdf6; }
+.cat-tile .hover{ display: none;}
+.cat-tile.earned{opacity: 0.5;}
+/* .cat-tile.earned .hover{ display: block; top:0; left:0; position: absolute; width: 100%; height: 100%; background-color: var(--cream); z-index: 1; opacity: 0.35; backdrop-filter: saturate(0.3);} */
 .cat-tile-level{ font-size:10px; text-transform:uppercase; letter-spacing:.2em; opacity:.9; }
 .cat-tile-name{ font-size:22px; line-height:1.1; margin-top:10px; }
 .cat-tile-progress{ display:flex; align-items:center; gap:8px; margin-top:9px; }
@@ -252,7 +266,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .cat-tile-progress .bar span{ display:block; height:100%; background:#fffdf6; }
 .cat-tile-progress .pct{ font-size:11px; opacity:.9; flex:none; }
 .cat-tile-deco{ display:flex; justify-content: flex-end; flex:none; width:132px; height:102px; margin-top:-93px; margin-left: -50px;}
-.cat-tile-deco img{ max-width:100%; height:100%; object-fit:contain; }
+.cat-tile-deco img{ max-width:100%; height:100%; object-fit:contain; z-index: 2;}
 
 .card-preview{ display:none; }
 
@@ -361,7 +375,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .screen-board{ padding-top:20px; }
 .board-title{ font-size:32px; margin-top:6px; }
 .board-explainer{ font-size:14.5px; line-height:1.75; color:var(--neutral-800); max-width:280px; }
-.board-list{ display:flex; flex-direction:column; gap:9px; margin-top:14px; }
+.board-list{ display:flex; flex-direction:column; gap:9px; margin-top:14px; margin-bottom: 48px;}
 .board-row{
   display:flex; align-items:center; gap:14px; padding:14px 16px;
   background:#fffdf6; border:1px solid var(--neutral-300); border-radius:var(--r-md);
@@ -370,8 +384,8 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
   background:linear-gradient(135deg, var(--accent-500), var(--accent-700)); color:#fffdf6;
   border:0; box-shadow:var(--shadow-md); padding:18px;
 }
-.avatar{ position: relative; width:34px; height:34px; min-width:34px; border-radius:50%; border:1px solid var(--neutral-400); display:flex; align-items:center; justify-content:center; font-family:var(--font-primary); font-size:14px; padding:0; background-color: var(--accent-100);}
-.avatar.lg{ margin:auto; width:78px; height:78px; font-size:27px; border-color:var(--accent-600); cursor:pointer; }
+.avatar{ position: relative; width:34px; height:34px; min-width:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-primary); font-size:14px; padding:0; background-color: var(--accent-200);}
+.avatar.lg{ margin:auto; width:78px; height:78px; font-size:40px; border-color:transparent; cursor:pointer; }
 .board-name{ font-size:16px; }
 .board-detail{ font-size:11.5px; color:var(--neutral-700); }
 .board-row.top .board-detail{ color:rgba(255,253,246,.85); }
@@ -421,14 +435,15 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .screen-finale{ text-align:center; }
 .finale-kicker{ margin-top:20px; }
 .finale-title{ font-size:32px; line-height:1.08; margin-top:7px; }
-.podium{ display:flex; align-items:flex-end; justify-content:center; gap:10px; margin-top:30px; }
+.podium{ display:flex; align-items:flex-end; justify-content:center; gap:10px; margin-top:30px; border-bottom: 1px solid var(--neutral-300); padding-left: 12px; padding-right: 12px; overflow: hidden;}
 .podium-col{ flex:1; text-align:center; }
+.podium-col:nth-child(2) .avatar{width: 48px; height: 48px; font-size: 20px;}
 .podium-col .avatar{ margin:0 auto 8px; }
 .podium-pname{ font-size:12.5px; margin-bottom:8px; }
 .podium-block{
   border-radius:var(--r-md) var(--r-md) 0 0; display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:2px; background:#fffdf6; border:1px solid var(--neutral-300);
-  box-shadow:var(--shadow-sm);
+  box-shadow:var(--shadow-sm); border-bottom: none;
 }
 .podium-block.top{ background:linear-gradient(135deg, var(--accent-500), var(--accent-700)); color:#fffdf6; border:0; box-shadow:var(--shadow-md); }
 .podium-block .score{ font-size:22px; }
@@ -462,7 +477,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .admin-card-row .kk{ font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; opacity:.55; }
 .admin-card-row .tt{ font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .admin-card-row .cnt{ margin-left:auto; font-size:11px; opacity:.6; white-space:nowrap; }
-.avatar-icon{position: absolute; bottom: 0; right: 0; width: 1.6rem; padding: 0.25em; color: white; background-color: var(--accent-600); border-radius: var(--r-full);}
+.avatar-icon{position: absolute; bottom: 0; right: 0; width: 1.6rem; padding: 0.35rem; color: white; background-color: var(--accent-600); border-radius: var(--r-full);}
 .avatar-icon svg{width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;}
 .reset-btn{ background:none; border:1px solid rgba(247,236,214,.28); border-radius:var(--r-full); color:rgba(247,236,214,.7); font-size:11px; padding:7px 12px; white-space:nowrap; }
 .reset-btn:hover{ border-color:var(--accent-400); color:var(--accent-400); }
