@@ -147,7 +147,8 @@ tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
 - Le 25 domande sono divise in 5 categorie da 5 ("Mara", "Stefano", "La loro vita
   insieme", "La giornata di oggi", "I tavoli"), mostrate come 5 card nella
   schermata "Le domande" (una per categoria, con dentro le sue 5 caselle). Le
-  categorie danno anche una medaglia nel profilo se le indovini tutte e cinque.
+  categorie danno anche una medaglia nel profilo a chi risponde a tutte le sue
+  domande, giuste o sbagliate che siano.
 - Ogni invitato vede le domande in un ordine casuale, deciso alla prima apertura
   del gioco sul suo telefono e poi fissato per sempre (ricaricando la pagina
   l'ordine non cambia). Le carte extra pubblicate dagli sposi durante l'evento
