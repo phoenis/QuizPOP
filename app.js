@@ -115,9 +115,33 @@ const MISSIONS = [
 /* ============ Utilità ============ */
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
 // emoji al posto di una foto profilo vera: niente caricamenti, si sceglie da
-// una rosa fissa. Chi non ne sceglie una resta con le iniziali, come prima.
-const AVATAR_EMOJIS = ['🐹','🐰','🦊','🐻','🐼','🐨','🦁','🐸','🦄','🐝','🦋','🌸','🌻','⭐','💖','😎','🥳','🤩','😇','🍕'];
+// un elenco ampio in stile "tastiera emoji" (tipo WhatsApp), diviso a
+// categorie con una tab a testa — vedi renderEmojiPicker(). Chi non ne
+// sceglie una resta con le iniziali, come prima.
+const EMOJI_CATEGORIES = [
+  { icon: '😀', list: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢'] },
+  { icon: '🧑', list: ['👶','🧒','👦','👧','🧑','👨','👩','🧓','👴','👵','😷','🥸','🤠','🥳','🧕','👳','👮','🕵️','👷','🤴','👸','🥷','🦸','🦹','🧙','🧚','🧛','🧜','🧝','👰','🤵'] },
+  { icon: '🐶', list: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧','🐦','🐤','🦄','🐝','🐛','🦋','🐌','🐞','🐢','🐍','🦖','🐬','🐳','🐘','🦒','🐄'] },
+  { icon: '🍔', list: ['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍆','🥕','🌽','🍕','🍔','🍟','🌭','🥪','🌮','🌯','🍣','🍱','🍩','🍪','🍰','🍫','🍿'] },
+  { icon: '⚽', list: ['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸','🥊','🥋','⛳','🏹','🎣','🥇','🎮','🎲','🎯','🎨','🎭','🎬','🎤','🎧'] },
+  { icon: '✈️', list: ['🚗','🚕','🚙','🚌','🚲','🛵','✈️','🚀','🚁','⛵','🚢','🚂','🏰','🏯','🗼','🗽','🎡','🎢','🏖️','🏔️','🌋','🏕️','🌉','🌆'] },
+  { icon: '💡', list: ['💡','🔦','🕯️','📱','💻','⌚','📷','🎁','🎈','🎉','🎊','🎀','💰','💎','🔑','🗝️','📚','✏️','🖊️','🎵','🎶','🔔','📌','📍'] },
+  { icon: '❤️', list: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💕','💞','💓','💗','💖','💘','💝','✨','⭐','🌟','💫','🔥','💯','✔️','❌'] },
+];
 const avatarGlyph = p => (p && p.avatarEmoji) || initialsOf((p && p.name) || 'Tu');
+// griglia a tab (una categoria alla volta, vedi EMOJI_CATEGORIES) usata sia
+// in iscrizione sia nel profilo — solo state.avatarEmojiCat (locale, non
+// persistito) cambia quale categoria e' aperta.
+function renderEmojiPicker(selected){
+  const cat = EMOJI_CATEGORIES[state.avatarEmojiCat] ? state.avatarEmojiCat : 0;
+  const tabs = EMOJI_CATEGORIES.map((c, i) => `<button class="emoji-tab ${i===cat?'active':''}" data-action="pick-avatar-cat" data-cat="${i}">${c.icon}</button>`).join('');
+  const options = EMOJI_CATEGORIES[cat].list.map(e => `<button class="emoji-option ${selected===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
+  return `<div class="emoji-picker">
+    <div class="emoji-picker-tabs">${tabs}</div>
+    <div class="emoji-picker-grid">${options}</div>
+    ${selected ? `<button class="btn-text" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
+  </div>`;
+}
 const numIt = n => (n||0).toFixed(1).replace('.', ',');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'g-' + Math.random().toString(36).slice(2) + Date.now());
@@ -147,7 +171,7 @@ function renderMissionMedia(entry, cls){
 /* ============ Stato ============ */
 const state = {
   screen: 'boot',
-  name: '', team: 1, avatarEmoji: '', avatarPickerOpen: false, joinError: false,
+  name: '', team: 1, avatarEmoji: '', avatarPickerOpen: false, avatarEmojiCat: 0, joinError: false,
   sel: null,
   qi: 0, startedAt: 0, locked: false, seq: [],
   res: {}, score: 0,
@@ -253,6 +277,16 @@ async function persistProgress(){
   }
 }
 
+// codici riservati per Mara e Stefano: al primo utilizzo creano il loro
+// profilo speciale (nome e icona fissi, protetto da "Elimina" nel pannello
+// sposi — vedi isSpecialProfile()); da li' in poi si comportano come un
+// transferCode normale, recuperando quello stesso profilo su ogni telefono.
+const SPECIAL_PROFILES = {
+  'POPSPOSA123!': { name: 'Mara', avatarEmoji: '👰🏻‍♀️' },
+  'POPSPOSO123!': { name: 'Stefano', avatarEmoji: '🤵🏻' },
+};
+const isSpecialProfile = p => !!(p && SPECIAL_PROFILES[(p.transferCode || '').toUpperCase()]);
+
 // recupera lo stesso profilo su un altro telefono cercandolo per transferCode
 // (mostrato nel proprio profilo) e lo clona sul dispositivo corrente: non è
 // una sincronizzazione live, ma si può ripetere in qualunque momento per
@@ -262,6 +296,17 @@ async function recoverProfile(){
   if (!code || state.mode !== 'online' || !fb) return;
   const qs = await fb.getDocs(fb.query(fb.collection(fb.db, 'players'), fb.where('transferCode', '==', code)));
   if (qs.empty){
+    const special = SPECIAL_PROFILES[code];
+    if (special){
+      state.name = special.name; state.team = 1; state.avatarEmoji = special.avatarEmoji;
+      state.sel = null; state.res = {}; state.score = 0; state.order = []; state.missions = [];
+      state.transferCode = code;
+      state.recoverOpen = false; state.recoverCode = '';
+      ensureOrder();
+      await persistProgress();
+      go('hub');
+      return;
+    }
     openAlert('Nessun profilo trovato con questo codice.');
     return;
   }
@@ -591,7 +636,6 @@ function renderBoot(){
 
 function renderJoin(){
   const chips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
-  const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-join">
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
     <div class="kicker neutral join-sub">16 ottobre 2026</div>
@@ -604,7 +648,7 @@ function renderJoin(){
       </div>
       <div class="field-block">
         <div class="field-label">Scegli un avatar (facoltativo)</div>
-        <div class="chips">${emojiChips}</div>
+        ${renderEmojiPicker(state.avatarEmoji)}
       </div>
              <div class="field-block">
         <div class="field-label">Che escursione hai intrapreso?</div>
@@ -619,7 +663,7 @@ function renderJoin(){
     ${state.recoverOpen ? `
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
-        <input id="recover-code" class="name-input" type="text" placeholder="XXXXXX" maxlength="6" value="${esc(state.recoverCode)}">
+        <input id="recover-code" class="name-input" type="text" placeholder="Codice" maxlength="20" value="${esc(state.recoverCode)}">
         <button class="button is-outline block" data-action="recover-profile">Recupera profilo</button>
       </div>`
       : `<div class="button-alone"><button class="btn-text" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button></div>`}
@@ -1092,14 +1136,11 @@ function renderProfile(){
       <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
     </div>`;
   }).join('');
-  const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar">${avatarButton()}</div>
     <button class="avatar lg" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
-    
-    ${state.avatarPickerOpen ? `<div class="chips">${emojiChips}
-      ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
-    </div>` : ''}
+
+    ${state.avatarPickerOpen ? renderEmojiPicker(state.avatarEmoji) : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
     ${state.adminUids.includes(state.guestId) ? `<div class="result-cta"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
@@ -1258,7 +1299,7 @@ function renderAdmin(){
           ? `<button class="reset-btn" data-action="remove-admin" data-id="${esc(p.id)}">Admin ✓</button>`
           : `<button class="reset-btn" data-action="add-admin" data-id="${esc(p.id)}">Rendi admin</button>`}
         <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
-        <button class="reset-btn" data-action="delete-player" data-id="${esc(p.id)}">Elimina</button>
+        ${isSpecialProfile(p) ? '' : `<button class="reset-btn" data-action="delete-player" data-id="${esc(p.id)}">Elimina</button>`}
       </div>
     </div>`;
   });
@@ -1388,6 +1429,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'toggle-avatar-picker': state.avatarPickerOpen = !state.avatarPickerOpen; render(); break;
+    case 'pick-avatar-cat': state.avatarEmojiCat = +el.dataset.cat; render(); break;
     case 'open-lightbox': saveScroll(); pushOverlayHistory(); state.lightbox = +el.dataset.index; render(); resetScroll(); break;
     case 'close-lightbox': state.lightbox = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'lightbox-prev': {
@@ -1667,6 +1709,7 @@ async function resetPlayerAnswers(playerId){
 // del pannello sposi.
 async function deletePlayer(playerId){
   if (state.mode !== 'online' || !fb) return;
+  if (isSpecialProfile(state.players.find(p => p.id === playerId))) return;
   if (state.adminUids.includes(playerId)) await removeAdmin(playerId);
   await fb.deleteDoc(fb.doc(fb.db, 'players', playerId));
 }
