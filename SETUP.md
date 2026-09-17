@@ -18,10 +18,11 @@ quiz, "Missione speciale" e "Carica le tue foto" (album condiviso). Non c'è una
 barra di navigazione fissa: si torna al profilo con l'avatar in alto a destra,
 e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
 - **Avatar**: invece di caricare una foto profilo vera, ogni invitato può
-  scegliere un'emoji da una rosa fissa (facoltativo, in iscrizione o dopo dal
-  profilo, tasto "Cambia avatar"). Chi non ne sceglie una resta con le
-  iniziali del nome, come prima. Compare ovunque prima c'erano le iniziali:
-  angolo in alto a destra, profilo, classifica, podio finale.
+  scegliere un'emoji da un elenco ampio diviso a categorie (tipo tastiera
+  WhatsApp), facoltativo, in iscrizione o dopo dal profilo (tocca il tuo
+  avatar). Chi non ne sceglie una resta con le iniziali del nome, come prima.
+  Compare ovunque prima c'erano le iniziali: angolo in alto a destra,
+  profilo, classifica, podio finale.
 - **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`, oppure
   caricala direttamente dal pannello `#sposi` (vedi sotto). Finché non c'è
   nessuna delle due, l'app mostra lo sfondo neutro.
@@ -58,6 +59,17 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   libera il telefono per iscrivere qualcun altro (o voi stessi con un altro
   nome, per fare una prova). Il profilo lasciato non si cancella: resta
   recuperabile con il suo codice (vedi sopra).
+- **I vostri due profili** (solo in modalità online): oltre ai codici normali
+  generati per ogni invitato, ce ne sono due riservati e sempre validi, per
+  voi due — `SPECIAL_PROFILES` in `app.js`:
+  - Mara: `POPSposa123!` (icona 👰🏻‍♀️)
+  - Stefano: `POPSposo123!` (icona 🤵🏻)
+
+  Toccando "Hai già un profilo?" e inserendo uno di questi due codici (anche
+  su un telefono nuovo) si crea — la prima volta — o si ritrova — le volte
+  dopo — sempre lo stesso profilo, con nome e icona già impostati. Questi due
+  profili non compaiono con il tasto "Elimina" nel pannello sposi: non si
+  possono cancellare per sbaglio.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
