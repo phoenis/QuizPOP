@@ -1145,10 +1145,16 @@ function renderClassificaFinale(backButton){
     </div>`;
   }).join('');
   const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Mannaggia, è andata male!';
+  const teams = computeTeams();
+  const winningTeam = teams.length ? teams.slice().sort((a, b) => b.avg - a.avg)[0] : null;
   return `
     <div class="kicker">Il podio</div>
     <h1 class="couple-title">Chi ne sa di più?</h1>
     <div class="podium">${cols}</div>
+    ${winningTeam ? `<div class="winner-team">
+      <span class="micro">Squadra vincitrice</span>
+      <span class="winner-team-name serif">${esc(winningTeam.label)}</span>
+    </div>` : ''}
     <div class="card is-dashed">
       <div class="kicker">Tu</div>
       <h2>${mine ? mine.rank + 'º con ' + mine.score + ' punti' : ''}</h2>

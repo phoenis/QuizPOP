@@ -451,6 +451,8 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .podium-block.top{ background:linear-gradient(135deg, var(--accent-500), var(--accent-700)); color:#fffdf6; border:0; box-shadow:var(--shadow-md); }
 .podium-block .score{ font-size:22px; }
 .podium-block .rk{ font-size:10px; letter-spacing:.18em; opacity:.8; }
+.winner-team{ text-align:center; margin-top:18px; }
+.winner-team-name{ display:block; font-size:19px; color:var(--accent-700); margin-top:3px; }
 .you-line{ background:var(--accent-100); border-radius:var(--r-md); padding:20px; margin-top:var(--sp-8); }
 .you-line .big{ font-size:27px; margin-top:5px; }
 .you-line .note{ font-size:13px; color:var(--neutral-700); margin-top:6px; }
