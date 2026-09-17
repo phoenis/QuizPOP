@@ -37,21 +37,20 @@ const QS = [
   {k:'Andiamo in viaggio', h:'Ultimo indizio.', t:'A quale tavolo appartiene quest’ultima storia?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — da completare con i tavoli veri.'},
 ];
 const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
-// categorie da 5 domande: una medaglia se ne indovini almeno l'80% (4 su 5),
-// chiusa per sempre se scendi sotto quella soglia con tutte e cinque fatte
+// una medaglia per categoria a chi risponde a tutte le sue domande, giuste o
+// sbagliate che siano: cosi' la puo' vincere chiunque, non solo chi indovina.
 const CATS = [
-  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Almeno 4 su 5 su di lei'},
-  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Almeno 4 su 5 sulla vita insieme'},
-  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Almeno 4 su 5 sul matrimonio'},
-  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Almeno 4 su 5 sulle storie dei tavoli'},
+  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Hai risposto a tutte e 10 le domande su di loro'},
+  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Hai risposto a tutte e 5 le domande sulla vita insieme'},
+  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte e 5 le domande sul matrimonio'},
+  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Hai risposto a tutte e 5 le domande sulle storie dei tavoli'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
   let done = 0, right = 0;
   for (let i = c.from; i <= c.to; i++){ if (res[i]){ done++; if (res[i].correct) right++; } }
   const n = c.to - c.from + 1;
-  const needed = Math.ceil(n * 0.8);
-  return { done, right, n, earned: right >= needed, failed: done === n && right < needed };
+  return { done, right, n, earned: done === n };
 }
 const TEAMS = ['Le Mont-Saint Michel','Palcoyo','Machu Picchu','Calanchi','Etna','Fiume tirino','Etretat'];
 const RIVALS_DEMO = [
@@ -1075,9 +1074,10 @@ function renderProfile(){
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
     { mark: '✷', name: 'Calendario completo', note: 'Tutte le carte del mazzo', locked: done < total },
   ];
-  const badgeRows = extraBadges.map(b => `<div class="badge-row ${b.locked?'locked':''}">
-    <div class="badge-glyph">${b.mark}</div>
-    <div><div class="badge-name">${esc(b.name)}</div><div class="badge-note">${esc(b.note)}</div></div>
+  const badgeCards = extraBadges.map(b => `<div class="medal-card ${b.locked ? 'locked' : 'earned'}">
+    <div class="glyph-mark">${b.mark}</div>
+    <div class="name serif">${esc(b.name)}</div>
+    <div class="note">${esc(b.note)}</div>
   </div>`).join('');
   const answers = allQuestions().map((x, i) => ({ i, x })).filter(o => state.res[o.i])
     .sort((a, b) => posOf(a.i) - posOf(b.i)).map(o => {
@@ -1105,9 +1105,8 @@ function renderProfile(){
     </div>
     <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
     <div class="medal-grid">${medalCards}</div>
-    <div class="badge-group">
-    ${badgeRows}
-    </div>
+    <div class="section-title">Altri traguardi</div>
+    <div class="medal-grid">${badgeCards}</div>
     <div class="section-title">Le tue risposte</div>
     ${answers || `<div class="empty-note">Ancora niente. Gira la prima carta.</div>`}
     ${state.mode === 'online' && state.transferCode ? `
@@ -1201,19 +1200,13 @@ function ensureAdminMissionsSub(){
   });
 }
 
-const ADMIN_PREVIEW_COUNT = 4;
 const ADMIN_MODAL_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande' };
 
-// "mostra tutti": se una lista ha piu' righe dell'anteprima, apre la stessa
-// lista per intero in una modale (vedi renderAdminModal()) invece di
-// allungare la pagina — l'anteprima e la modale condividono lo stesso html
-// di riga, quindi restano sempre coerenti tra loro.
-function adminSection(key, rowsArr, emptyLabel){
-  state.adminModalContent[key] = rowsArr.join('');
-  const preview = rowsArr.slice(0, ADMIN_PREVIEW_COUNT).join('');
-  const showAll = rowsArr.length > ADMIN_PREVIEW_COUNT
-    ? `<button class="btn-text show-all-btn" data-action="open-admin-modal" data-target="${key}">Mostra tutti (${rowsArr.length})</button>` : '';
-  return (preview || `<p class="fine-print">${emptyLabel}</p>`) + showAll;
+// salva l'html completo di una lista per la modale a schermo intero (vedi
+// renderAdminModal()), aperta toccando il box con l'icona corrispondente
+// invece di allungare la pagina con l'anteprima delle righe.
+function storeAdminList(key, rowsArr, emptyLabel){
+  state.adminModalContent[key] = rowsArr.join('') || `<p class="fine-print">${emptyLabel}</p>`;
 }
 
 function renderAdmin(){
@@ -1287,6 +1280,9 @@ function renderAdmin(){
     </div>`;
     });
   state.lightboxGallery = adminMissionGallery;
+  storeAdminList('invitati', playerRows, 'Nessuno ha ancora giocato.');
+  storeAdminList('missioni', missionRows, 'Nessuna missione completata ancora.');
+  storeAdminList('domande', questionRows, 'Nessuna domanda.');
   return `<div class="screen screen-admin">
   <div class="topbar">  
   ${avatarButton()}
@@ -1321,16 +1317,26 @@ function renderAdmin(){
       <input id="admin-hero-file" type="file" accept="image/*" hidden>
       <button class="reset-btn" data-action="admin-hero-pick">Carica</button>
     </div>`}
-    ${state.mode === 'online' ? `<div class="section-title">Invitati</div>
-    <p class="fine-print">"Rendi admin" aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>
-    ${adminSection('invitati', playerRows, 'Nessuno ha ancora giocato.')}` : ''}
-    ${state.mode === 'online' ? `<div class="section-title">Missioni completate</div>
-    ${missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
-    <div class="mission-admin-list">
-      ${adminSection('missioni', missionRows, 'Nessuna missione completata ancora.')}
-    </div>` : ''}
-    <div class="section-title">Le domande</div>
-    ${adminSection('domande', questionRows, 'Nessuna domanda.')}
+    <div class="section-title">Liste complete</div>
+    <div class="admin-link-grid">
+      ${state.mode === 'online' ? `<button class="admin-link-box" data-action="open-admin-modal" data-target="invitati">
+        <span class="admin-link-icon">👥</span>
+        <span class="admin-link-count tabular">${totalPlayers}</span>
+        <span class="admin-link-label">Invitati</span>
+      </button>` : ''}
+      ${state.mode === 'online' ? `<button class="admin-link-box" data-action="open-admin-modal" data-target="missioni">
+        <span class="admin-link-icon">📷</span>
+        <span class="admin-link-count tabular">${missionRows.length}</span>
+        <span class="admin-link-label">Missioni</span>
+      </button>` : ''}
+      <button class="admin-link-box" data-action="open-admin-modal" data-target="domande">
+        <span class="admin-link-icon">❓</span>
+        <span class="admin-link-count tabular">${totalCards}</span>
+        <span class="admin-link-label">Domande</span>
+      </button>
+    </div>
+    ${state.mode === 'online' ? `<p class="fine-print">"Rendi admin" (dentro "Invitati") aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>` : ''}
+    ${state.mode === 'online' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
   </div>`;
 }
 
