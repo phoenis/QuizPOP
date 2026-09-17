@@ -571,9 +571,9 @@ function renderLightbox(){
   const many = items.length > 1;
   return `<div class="lightbox" data-action="close-lightbox">
     <button class="lightbox-close" data-action="close-lightbox">✕</button>
-    ${many ? `<button class="lightbox-nav prev" data-action="lightbox-prev">‹</button>` : ''}
+    ${many ? `<button class="lightbox-nav prev" data-action="lightbox-prev"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M17.77 3.77L16 2L6 12l10 10l1.77-1.77L9.54 12z"></path></svg></button>` : ''}
     ${media}
-    ${many ? `<button class="lightbox-nav next" data-action="lightbox-next">›</button>` : ''}
+    ${many ? `<button class="lightbox-nav next" data-action="lightbox-next"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M6.23 20.23L8 22l10-10L8 2L6.23 3.77L14.46 12z"></path></svg></button>` : ''}
     <div class="lightbox-caption" data-action="lightbox-noop">
       <strong>${esc(item.name || 'Senza nome')}</strong>
       <span>${esc(item.mission || '')}</span>
@@ -612,7 +612,9 @@ function renderJoin(){
       </div>
     </div>
     <div class="join-spacer"></div>
-    <button class="button is-outline block" data-action="join">Comincia</button>
+    <div class="result-cta">
+      <button class="button is-outline" data-action="join">Comincia</button>
+    </div>
     <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
     ${state.recoverOpen ? `
       <div class="field-block">
@@ -648,11 +650,11 @@ function renderHub(){
       <button class="hub-tile is-quiz" data-action="go" data-screen="home">
         <span class="wrap">
           <span class="kicker">Il quiz</span>
-          <span class="title serif">${state.revealed ? 'La classifica è pronta!' : 'Quanto ne sai sugli sposi?'}</span>
+          <span class="title serif">${state.revealed ? 'La classifica è aperta!' : 'Quanto ne sai sugli sposi?'}</span>
           <span class="foot">${state.revealed ? 'Scopri chi ha vinto' : 'Scala la classifica, vinci un premio'}</span>
         </span>
         <span class="hub-quiz-ring">${state.revealed
-          ? `<span class="trophy">🏆</span>`
+          ? `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--bx" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M21 4h-3V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v1H3a1 1 0 0 0-1 1v3c0 4.31 1.799 6.91 4.819 7.012A6 6 0 0 0 11 17.91V20H9v2h6v-2h-2v-2.09a6.01 6.01 0 0 0 4.181-2.898C20.201 14.91 22 12.31 22 8V5a1 1 0 0 0-1-1M4 8V6h2v6.83C4.216 12.078 4 9.299 4 8m8 8c-2.206 0-4-1.794-4-4V4h8v8c0 2.206-1.794 4-4 4m6-3.17V6h2v2c0 1.299-.216 4.078-2 4.83"></path></svg>`
           : `<span class="num tabular">${done}</span><span class="den">/${total}</span>`}</span>
       </button>
       <div class="hub-tiles">
@@ -1100,6 +1102,7 @@ function renderProfile(){
     </div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
+    ${state.adminUids.includes(state.guestId) ? `<div class="result-cta"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
     <div class="stat-strip">
       <div class="stat-cell"><div class="v serif tabular">${state.score}</div><div class="c">Punti</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Carte</div></div>
@@ -1118,8 +1121,7 @@ function renderProfile(){
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia codice'}</button>
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
-    ${state.adminUids.includes(state.guestId) ? `<div class="result-cta"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
-    <div class="button-alone"><button class="btn-text" data-action="logout">Esci da questo profilo</button></div>
+    <div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>
   </div>`;
 }
 

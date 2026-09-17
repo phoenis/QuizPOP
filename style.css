@@ -122,7 +122,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 
 /* ===== JOIN (iscrizione) ===== */
-.screen-join{ text-align:center; }
+.screen-join{ text-align:center; padding-top: 48px;}
 .join-spacer{ flex:0; min-height:0; margin-top:20px; }
 .join-title{ font-size:38px; line-height:1.05; margin-top:auto; color:var(--ink); }
 .join-sub{ margin-top:8px; }
@@ -183,7 +183,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 .hub-quiz-ring .num{ font-size:19px; line-height:1; }
 .hub-quiz-ring .den{ font-size:9px; opacity:.85; }
-.hub-quiz-ring .trophy{ font-size:26px; line-height:1; }
+.hub-quiz-ring svg{ width: 50%; height: 50%; }
 .hub-tiles{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .hub-tile{
   display:flex; flex-direction:column; text-align:left; cursor:pointer;
@@ -351,6 +351,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .button.is-fill.is-negative{color: #241d15; background-color: white; border-color: white;}
 .button.is-copied, .button.small.is-copied{ background:#4a7c43; border-color:#4a7c43; color:#fff; }
 .button.is-outline:hover{ background:var(--accent-100); }
+.button.is-outline.is-esci{ border-color: var(--ink); color: var(--ink); font-size: 0.9rem; margin-top: 24px;}
 .button.is-outline:disabled{ opacity:.45; cursor:default; }
 .button.is-outline.block{ width:100%; margin-bottom:12px; }
 .button.is-outline.small{ font-family:var(--font-primary); font-size:13.5px; padding:14px 16px; border-color:var(--neutral-400); color:var(--ink); }
@@ -558,9 +559,9 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 .lightbox-nav{
   position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; border:0;
-  background:rgba(255,253,246,.15); color:#fffdf6; font-size:22px; line-height:1;
-  display:flex; align-items:center; justify-content:center;
+  background:var(--cream); color:var(--ink); display:flex; align-items:center; justify-content:center; z-index: 5; box-shadow:var(--shadow-md);
 }
+.lightbox-nav svg{width: 50%; height: 50%;}
 .lightbox-nav.prev{ left:12px; }
 .lightbox-nav.next{ right:12px; }
 .lightbox-caption{
