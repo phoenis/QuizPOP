@@ -651,7 +651,9 @@ function renderHub(){
           <span class="title serif">${state.revealed ? 'La classifica è pronta!' : 'Quanto ne sai sugli sposi?'}</span>
           <span class="foot">${state.revealed ? 'Scopri chi ha vinto' : 'Scala la classifica, vinci un premio'}</span>
         </span>
-        <span class="hub-quiz-ring"><span class="num tabular">${done}</span><span class="den">/${total}</span></span>
+        <span class="hub-quiz-ring">${state.revealed
+          ? `<span class="trophy">🏆</span>`
+          : `<span class="num tabular">${done}</span><span class="den">/${total}</span>`}</span>
       </button>
       <div class="hub-tiles">
         <button class="hub-tile" data-action="go" data-screen="missione">
