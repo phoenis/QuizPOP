@@ -1016,12 +1016,12 @@ function renderBoard(){
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
         <div class="big serif tabular">${state.score} punti tuoi</div>
-        <div class="board-detail" style="margin-top:6px;">${done ? 'Media ' + numIt(avg) + 's su ' + done + ' carte' : 'Nessuna carta girata'}</div>
+        <div class="board-detail">${done ? 'Media ' + numIt(avg) + 's su ' + done + ' carte' : 'Nessuna carta girata'}</div>
       </div>
       ${tabs}
       ${tab === 'ospiti'
         ? `<div class="board-list">${rows}</div>`
-        : `<p class="rank-line" style="margin-top:14px;">Media punti a persona, nascosta come il resto fino al reveal.</p>
+        : `<p class="rank-line">Media punti a persona, nascosta come il resto fino al reveal.</p>
            <div class="board-list">${teamRows}</div>`}
     </div>`;
   }
@@ -1037,19 +1037,21 @@ function renderBoard(){
     <div><div class="board-name">${esc(g.label)}</div><div class="board-detail">${g.count} ${personaLabel(g.count)}</div></div>
     <div class="board-score serif tabular">${Math.round(g.avg)}</div>
   </div>`).join('');
-  return `<div class="screen">
+  return `<div class="screen screen-finale">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       ${avatarButton()}
     </div>
     <div class="kicker">Classifica completa</div>
-    <h1>Classifica</h1>
+    <h1 class="couple-title">Classifica</h1>
     ${tabs}
     ${tab === 'ospiti'
-      ? `<div class="sub-text pretty" style="margin-top:14px;">A parità di punti vince chi ha risposto più in fretta.</div>
-         <div class="board-list">${rows}</div>`
-      : `<p class="sub-text pretty" style="margin-top:14px;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
-         <div class="board-list">${teamRows}</div>`}
+      ? `<div class="board-list">${rows}</div>
+      <div class="sub-text pretty" style="margin-top:14px;">A parità di punti vince chi ha risposto più in fretta.</div>
+         `
+      : `<div class="board-list">${teamRows}</div>
+      <p class="sub-text pretty" style="margin-top:14px;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
+      `}
   </div>`;
 }
 
