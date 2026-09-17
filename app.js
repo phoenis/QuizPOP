@@ -1258,7 +1258,6 @@ function renderAdmin(){
       </div>
     </div>`;
   });
-  const missionPhotoCount = state.allMissionPhotos.filter(m => m.src).length;
   const adminMissionGallery = [];
   const missionRows = state.allMissionPhotos
     .slice()
@@ -1336,7 +1335,6 @@ function renderAdmin(){
       </button>
     </div>
     ${state.mode === 'online' ? `<p class="fine-print">"Rendi admin" (dentro "Invitati") aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>` : ''}
-    ${state.mode === 'online' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
   </div>`;
 }
 
@@ -1346,12 +1344,14 @@ function renderAdmin(){
 function renderAdminModal(){
   const key = state.adminModal;
   if (!key) return '';
+  const missionPhotoCount = state.allMissionPhotos.filter(m => m.src).length;
   return `<div class="admin-modal" data-action="close-admin-modal">
     <div class="admin-modal-sheet" data-action="lightbox-noop">
       <div class="admin-modal-head">
         <div class="section-title">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
         <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
       </div>
+      ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
     </div>
   </div>`;
