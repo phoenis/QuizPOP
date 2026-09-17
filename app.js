@@ -1286,7 +1286,7 @@ function renderAdmin(){
   <div class="topbar">  
   ${avatarButton()}
   </div>
-    <div class="kicker">Solo per gli sposi</div>
+    <div class="kicker">Pannello sposi</div>
     <h2 class="admin-title couple-title">Mara <span class="amp">&amp;</span> Stefano</h2>
     <div class="admin-stats">
       <div class="stat-cell"><div class="v serif tabular">${totalPlayers}</div><div class="c">Giocano</div></div>
@@ -1295,14 +1295,14 @@ function renderAdmin(){
     </div>
     <div class="envelope-box">
       <div class="row">
-        <div><div class="micro">La classifica</div><div class="big serif">${state.revealed ? 'Aperta a tutti' : 'Chiusa a tutti'}</div></div>
-        <div class="lock">${state.revealed ? '🔓' : '🔒'}</div>
+        <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
+        <div class="lock">${state.revealed ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M208 76h-28V56a52 52 0 0 0-104 0v20H48a20 20 0 0 0-20 20v112a20 20 0 0 0 20 20h160a20 20 0 0 0 20-20V96a20 20 0 0 0-20-20M100 56a28 28 0 0 1 56 0v20h-56Zm104 148H52V100h152Z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M208 76H100V56a28 28 0 0 1 28-28c13.51 0 25.65 9.62 28.24 22.39a12 12 0 1 0 23.52-4.78C174.87 21.5 153.1 4 128 4a52.06 52.06 0 0 0-52 52v20H48a20 20 0 0 0-20 20v112a20 20 0 0 0 20 20h160a20 20 0 0 0 20-20V96a20 20 0 0 0-20-20m-4 128H52V100h152Z"></path></svg>'}</div>
       </div>
       ${state.revealed
         ? `<button class="btn-dark" data-action="close-board">Riapri il gioco</button>`
-        : `<button class="btn-dark" data-action="open-board">Apri il reveal adesso</button>`}
+        : `<button class="btn-dark" data-action="open-board">Chiudi e mostra la classifica</button>`}
     </div>
-    <div class="section-title">Foto di copertina</div>
+    <div class="section-title">Impostazioni</div>
     ${state.heroPhoto ? `<div class="hero-upload-box has-photo">
       <img src="${esc(state.heroPhoto)}" alt="" class="hero-upload-preview">
       <input id="admin-hero-file" type="file" accept="image/*" hidden>
@@ -1316,25 +1316,23 @@ function renderAdmin(){
       <input id="admin-hero-file" type="file" accept="image/*" hidden>
       <button class="reset-btn" data-action="admin-hero-pick">Carica</button>
     </div>`}
-    <div class="section-title">Liste complete</div>
     <div class="admin-link-grid">
       ${state.mode === 'online' ? `<button class="admin-link-box" data-action="open-admin-modal" data-target="invitati">
-        <span class="admin-link-icon">👥</span>
+        <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M234.38 210a123.36 123.36 0 0 0-60.78-53.23a76 76 0 1 0-91.2 0A123.36 123.36 0 0 0 21.62 210a12 12 0 1 0 20.77 12c18.12-31.32 50.12-50 85.61-50s67.49 18.69 85.61 50a12 12 0 0 0 20.77-12M76 96a52 52 0 1 1 52 52a52.06 52.06 0 0 1-52-52"></path></svg></span>
         <span class="admin-link-count tabular">${totalPlayers}</span>
         <span class="admin-link-label">Invitati</span>
       </button>` : ''}
       ${state.mode === 'online' ? `<button class="admin-link-box" data-action="open-admin-modal" data-target="missioni">
-        <span class="admin-link-icon">📷</span>
+        <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68"></path></svg></span>
         <span class="admin-link-count tabular">${missionRows.length}</span>
         <span class="admin-link-label">Missioni</span>
       </button>` : ''}
       <button class="admin-link-box" data-action="open-admin-modal" data-target="domande">
-        <span class="admin-link-icon">❓</span>
+        <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M7.92 7.54c-.8-.34-1.14-1.33-.66-2.05C8.23 4.05 9.85 3 11.99 3c2.35 0 3.96 1.07 4.78 2.41c.7 1.15 1.11 3.3.03 4.9c-1.2 1.77-2.35 2.31-2.97 3.45c-.15.27-.24.49-.3.94c-.09.73-.69 1.3-1.43 1.3c-.87 0-1.58-.75-1.48-1.62c.06-.51.18-1.04.46-1.54c.77-1.39 2.25-2.21 3.11-3.44c.91-1.29.4-3.7-2.18-3.7c-1.17 0-1.93.61-2.4 1.34c-.35.57-1.08.75-1.69.5M14 20c0 1.1-.9 2-2 2s-2-.9-2-2s.9-2 2-2s2 .9 2 2"></path></svg></span>
         <span class="admin-link-count tabular">${totalCards}</span>
         <span class="admin-link-label">Domande</span>
       </button>
     </div>
-    ${state.mode === 'online' ? `<p class="fine-print">"Rendi admin" (dentro "Invitati") aggiunge un tasto scorciatoia al pannello sposi nel profilo di quella persona (oltre all'indirizzo #sposi, che resta sempre valido per tutti).</p>` : ''}
   </div>`;
 }
 
