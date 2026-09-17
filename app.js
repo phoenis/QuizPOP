@@ -155,6 +155,7 @@ const state = {
   order: [],
   revealed: false,
   peekCategories: false, // scavalca localmente state.revealed per rivedere le categorie dopo il reveal, vedi 'peek-categories'
+  boardTab: 'ospiti', // 'ospiti' | 'squadre': quale tab e' aperta in renderBoard(), vedi 'board-tab'
   players: [],
   extraCards: [],
   mode: 'local',
@@ -991,6 +992,11 @@ function renderBoard(){
   const done = Object.keys(state.res).length;
   const teams = computeTeams();
   const personaLabel = n => n === 1 ? 'persona' : 'persone';
+  const tab = state.boardTab === 'squadre' ? 'squadre' : 'ospiti';
+  const tabs = `<div class="board-tabs">
+    <button class="board-tab ${tab==='ospiti'?'active':''}" data-action="board-tab" data-tab="ospiti">Ospiti</button>
+    <button class="board-tab ${tab==='squadre'?'active':''}" data-action="board-tab" data-tab="squadre">Squadre</button>
+  </div>`;
   if (locked){
     const unsealedOrder = allPlayersWithMe().filter(p => !p.me);
     const rows = unsealedOrder.map(p => `<div class="board-row">
@@ -1007,15 +1013,16 @@ function renderBoard(){
       <div class="kicker">${board.length} partecipanti</div>
       <h1 class="board-title">Classifica</h1>
       <p class="board-explainer pretty" style="margin-top:14px;">Nessuno vede i punti degli altri. La classifica si apre quando Mara e Stefano prendono il microfono.</p>
-      <div class="board-list">${rows}</div>
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
         <div class="big serif tabular">${state.score} punti tuoi</div>
         <div class="board-detail" style="margin-top:6px;">${done ? 'Media ' + numIt(avg) + 's su ' + done + ' carte' : 'Nessuna carta girata'}</div>
       </div>
-      <div class="section-title">Squadre</div>
-      <p class="rank-line" style="margin-top:0;">Media punti a persona, nascosta come il resto fino al reveal.</p>
-      <div class="board-list">${teamRows}</div>
+      ${tabs}
+      ${tab === 'ospiti'
+        ? `<div class="board-list">${rows}</div>`
+        : `<p class="rank-line" style="margin-top:14px;">Media punti a persona, nascosta come il resto fino al reveal.</p>
+           <div class="board-list">${teamRows}</div>`}
     </div>`;
   }
   const rows = board.map(p => `<div class="board-row ${p.rank===1?'top':''}">
@@ -1036,12 +1043,13 @@ function renderBoard(){
       ${avatarButton()}
     </div>
     <div class="kicker">Classifica completa</div>
-    <h1>Ospiti</h1>
-    <div class="sub-text pretty">A parità di punti vince chi ha risposto più in fretta.</div>
-    <div class="board-list">${rows}</div>
-    <h1>Squadre</h1>
-    <p class="sub-text pretty"">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
-    <div class="board-list">${teamRows}</div>
+    <h1>Classifica</h1>
+    ${tabs}
+    ${tab === 'ospiti'
+      ? `<div class="sub-text pretty" style="margin-top:14px;">A parità di punti vince chi ha risposto più in fretta.</div>
+         <div class="board-list">${rows}</div>`
+      : `<p class="sub-text pretty" style="margin-top:14px;">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
+         <div class="board-list">${teamRows}</div>`}
   </div>`;
 }
 
@@ -1434,6 +1442,7 @@ root.addEventListener('click', e => {
     case 'open-board': openReveal(); break;
     case 'close-board': closeReveal(); break;
     case 'peek-categories': state.peekCategories = !state.peekCategories; render(); break;
+    case 'board-tab': state.boardTab = el.dataset.tab; render(); break;
     case 'open-admin-modal': saveScroll(); pushOverlayHistory(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'reset-player-answers': {

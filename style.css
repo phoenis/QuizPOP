@@ -397,6 +397,9 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .you-box{ background:var(--accent-100); border-radius:var(--r-md); padding:20px; text-align:center; margin-top:var(--sp-6); }
 .you-box .big{ font-size:26px; margin-top:4px; }
 .board-footer{ font-size:12px; color:var(--neutral-700); margin-top:var(--sp-4); }
+.board-tabs{ display:flex; gap:4px; background:var(--neutral-200); border-radius:var(--r-full); padding:4px; margin-top:var(--sp-6); }
+.board-tab{ flex:1; border:0; background:transparent; padding:10px; border-radius:var(--r-full); font-family:var(--font-primary); font-size:14px; color:var(--neutral-700); }
+.board-tab.active{ background:var(--accent-600); color:#fffdf6; box-shadow:var(--shadow-sm); }
 
 /* ===== PROFILO ===== */
 .screen-profile{ text-align:center; }
