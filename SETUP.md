@@ -51,9 +51,11 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   quindi normalmente aprendo il gioco su un secondo telefono si parte da zero.
   Nel profilo (solo in modalità online) c'è un codice breve — "il tuo profilo
   su un altro telefono" — da inserire sul nuovo telefono toccando "Hai già un
-  profilo?" nella schermata iniziale: copia lì nome, punti e risposte. Non è
-  una sincronizzazione in tempo reale: si può ripetere quando serve per
-  riprendere i progressi più recenti.
+  profilo?" nella schermata iniziale: sposta lì nome, punti e risposte (il
+  telefono di prima smette di essere quell'invitato nella classifica e nel
+  pannello sposi, così non compare due volte). Non è una sincronizzazione in
+  tempo reale: si può ripetere quando serve per riprendere i progressi più
+  recenti da un telefono diverso.
 - **Uscire da un profilo**: nel profilo, in fondo, "Esci da questo profilo"
   libera il telefono per iscrivere qualcun altro (o voi stessi con un altro
   nome, per fare una prova). Il profilo lasciato non si cancella: resta
