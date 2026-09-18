@@ -50,8 +50,9 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
 - **Cambiare telefono**: ogni telefono ha un'identità propria (nessun login),
   quindi normalmente aprendo il gioco su un secondo telefono si parte da zero.
   Nel profilo (solo in modalità online) c'è un codice breve — "il tuo profilo
-  su un altro telefono" — da inserire sul nuovo telefono toccando "Hai già un
-  profilo?" nella schermata iniziale: sposta lì nome, punti e risposte (il
+  su un altro telefono" — da inserire sul nuovo telefono all'indirizzo
+  `.../#code` (niente link visibile nella schermata iniziale: come `#sposi`,
+  lo conosce solo chi ha l'indirizzo): sposta lì nome, punti e risposte (il
   telefono di prima smette di essere quell'invitato nella classifica e nel
   pannello sposi, così non compare due volte). Non è una sincronizzazione in
   tempo reale: si può ripetere quando serve per riprendere i progressi più
@@ -66,10 +67,10 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   - Mara: `POPSposa123!` (icona 👰🏻‍♀️)
   - Stefano: `POPSposo123!` (icona 🤵🏻)
 
-  Toccando "Hai già un profilo?" e inserendo uno di questi due codici (anche
-  su un telefono nuovo) si crea — la prima volta — o si ritrova — le volte
-  dopo — sempre lo stesso profilo, con nome e icona già impostati e già con
-  la scorciatoia al pannello sposi nel proprio profilo (non serve più
+  Andando su `.../#code` e inserendo uno di questi due codici (anche su un
+  telefono nuovo) si crea — la prima volta — o si ritrova — le volte dopo —
+  sempre lo stesso profilo, con nome e icona già impostati e già con la
+  scorciatoia al pannello sposi nel proprio profilo (non serve più
   ricordarsi l'indirizzo `#sposi`). Questi due profili non compaiono con il
   tasto "Elimina" nel pannello sposi: non si possono cancellare per sbaglio.
 
