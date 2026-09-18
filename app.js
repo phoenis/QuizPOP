@@ -295,6 +295,11 @@ async function recoverProfile(){
   state.res = d.res || {}; state.score = d.score || 0;
   state.order = d.order || [];
   state.missions = d.missions || [];
+  // il codice va copiato anche lui: altrimenti persistProgress() qui sotto,
+  // trovando state.transferCode vuoto su questo id nuovo, ne genera uno
+  // casuale e lo sovrascrive — perdendo per sempre un codice fisso come
+  // quelli riservati di Mara e Stefano (vedi SPECIAL_PROFILES).
+  state.transferCode = d.transferCode || '';
   state.recoverOpen = false; state.recoverCode = '';
   ensureOrder();
   await persistProgress();
@@ -1383,7 +1388,8 @@ function renderAdminModal(){
         <div class="section-title">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
         <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
       </div>
-      ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>` : ''}
+      ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
+      <div class="button-alone"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>` : ''}
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
     </div>
   </div>`;
@@ -1534,6 +1540,10 @@ root.addEventListener('click', e => {
       break;
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
+    case 'reset-all-missions': {
+      openConfirm('Svuotare tutte le missioni fatte? Cancella le foto caricate da ogni invitato e li fa ripartire da capo con una nuova missione. Non si può annullare.', () => resetAllMissions());
+      break;
+    }
   }
 });
 root.addEventListener('change', e => {
@@ -1689,6 +1699,20 @@ async function completeMission(file){
 async function resetPlayerAnswers(playerId){
   if (state.mode !== 'online' || !fb) return;
   await fb.setDoc(fb.doc(fb.db, 'players', playerId), { res: {}, score: 0 }, { merge: true });
+}
+
+// svuota le missioni fatte da tutti: cancella ogni foto missione caricata
+// finora e azzera il progresso missioni di ciascun invitato (utile per
+// ripulire i test prima del matrimonio). Le risposte al quiz non c'entrano.
+async function resetAllMissions(){
+  if (state.mode !== 'online' || !fb) return;
+  const qs = await fb.getDocs(fb.collection(fb.db, 'missionPhotos'));
+  await Promise.all(qs.docs.map(d => fb.deleteDoc(fb.doc(fb.db, 'missionPhotos', d.id))));
+  await Promise.all(state.players.map(p => fb.setDoc(fb.doc(fb.db, 'players', p.id), { missions: [] }, { merge: true })));
+  if (state.missions.length || Object.keys(state.missionPhotos).length){
+    state.missions = []; state.missionPhotos = {};
+    await persistProgress();
+  }
 }
 
 // toglie un invitato dalla classifica/dal gioco (utenze di prova, doppioni
