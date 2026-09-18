@@ -9,10 +9,12 @@ service cloud.firestore {
       // Un invitato aggiorna solo il proprio profilo. Il pannello sposi puo' anche
       // azzerare le risposte di un invitato (per farlo riprovare in fase di test),
       // ma solo con una scrittura che svuota res e azzera il punteggio: non puo'
-      // toccare altri campi ne' impostare punteggi a piacere.
+      // toccare altri campi ne' impostare punteggi a piacere. Stesso principio
+      // per "svuota tutte le missioni": puo' solo azzerare il campo missions.
       allow update: if request.auth != null && (
         request.auth.uid == playerId ||
-        (request.resource.data.res == {} && request.resource.data.score == 0)
+        (request.resource.data.res == {} && request.resource.data.score == 0) ||
+        request.resource.data.missions == []
       );
       // Il pannello sposi puo' anche eliminare un invitato del tutto (utenze
       // di prova, doppioni...): stesso livello di fiducia delle altre azioni
@@ -42,7 +44,10 @@ service cloud.firestore {
     match /missionPhotos/{docId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.guestId;
-      allow update, delete: if false;
+      allow update: if false;
+      // Il pannello sposi puo' cancellarle tutte con "Svuota tutte le missioni"
+      // (stesso livello di fiducia delle altre azioni da pannello sposi).
+      allow delete: if request.auth != null;
     }
   }
 }

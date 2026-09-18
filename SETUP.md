@@ -136,7 +136,12 @@ Da lì potete:
   distrattore generico), non tutti e sette i tipi di domanda complessi.
 - vedere tutte le **missioni fotografiche completate** da chiunque (foto, testo
   della missione e nome di chi l'ha fatta), sezione "Missioni completate" —
-  visibile solo in modalità online, ordinata dalla più recente.
+  visibile solo in modalità online, ordinata dalla più recente. Da lì anche
+  **"Svuota tutte le missioni"**: cancella tutte le foto caricate finora e fa
+  ripartire ogni invitato da capo con una nuova missione a sorpresa — utile
+  per ripulire i test prima del matrimonio. Non si può annullare. ⚠️ Serve
+  anche qui `firestore.rules` aggiornato (punto 3), altrimenti darà errore di
+  permessi.
 
 ## Foto vere
 Quando è pronta, basta metterla in `assets/` con questo nome esatto
