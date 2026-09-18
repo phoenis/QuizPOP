@@ -504,7 +504,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
   flex-direction: column;
 }
 .admin-modal-sheet{
-  width:100%; max-width:480px; 
+  width:100%; max-width:480px; margin-top: auto; margin-bottom: auto;
   background:var(--admin-ground); border-radius:var(--r-lg) var(--r-lg) 0 0;
   padding:20px 16px calc(20px + env(safe-area-inset-bottom));
   border-radius: var(--r-md); border: 1px solid rgba(247,236,214,.16);
