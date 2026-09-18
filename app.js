@@ -52,7 +52,7 @@ function catState(res, c){
   const n = c.to - c.from + 1;
   return { done, right, n, earned: done === n };
 }
-const TEAMS = ['Le Mont-Saint Michel','Palcoyo','Machu Picchu','Calanchi','Etna','Fiume tirino','Etretat'];
+const TEAMS = ['Machu Picchu','Palcoyo','Étretat','Tirino','Etna','Parco della Majella','Tuckett','XII Apostoli','Le Mont-Saint-Michel','Calanchi'];
 const RIVALS_DEMO = [
   {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1, avatarEmoji:'🌻'},
   {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2, avatarEmoji:'🦄'},
