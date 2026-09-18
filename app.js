@@ -658,8 +658,7 @@ function renderJoin(){
         <div class="result-cta">
           <button class="button is-outline" data-action="recover-profile">Recupera profilo</button>
         </div>
-      </div>`
-      : `<div class="button-alone"><button class="btn-text" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button></div>`}
+      </div>` : ''}
   </div>`;
 }
 
@@ -1527,7 +1526,6 @@ root.addEventListener('click', e => {
       else openAlert('Codice profilo: ' + state.transferCode);
       break;
     }
-    case 'show-recover': state.recoverOpen = true; render(); break;
     case 'recover-profile': recoverProfile(); break;
     case 'logout': logout(); break;
     case 'reveal-mission': assignMission(); break;
@@ -1878,6 +1876,7 @@ async function boot(){
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';
+  else if (location.hash === '#code'){ state.screen = 'join'; state.recoverOpen = true; }
   else state.screen = state.name ? 'hub' : 'join';
   try { history.replaceState({ screen: state.screen }, '', '#' + (state.screen === 'admin' ? 'sposi' : state.screen)); } catch {}
   render();
