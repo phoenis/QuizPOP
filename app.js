@@ -295,6 +295,11 @@ async function recoverProfile(){
   state.res = d.res || {}; state.score = d.score || 0;
   state.order = d.order || [];
   state.missions = d.missions || [];
+  // il codice va copiato anche lui: altrimenti persistProgress() qui sotto,
+  // trovando state.transferCode vuoto su questo id nuovo, ne genera uno
+  // casuale e lo sovrascrive — perdendo per sempre un codice fisso come
+  // quelli riservati di Mara e Stefano (vedi SPECIAL_PROFILES).
+  state.transferCode = d.transferCode || '';
   state.recoverOpen = false; state.recoverCode = '';
   ensureOrder();
   await persistProgress();
