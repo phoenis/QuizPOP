@@ -299,9 +299,16 @@ async function recoverProfile(){
   ensureOrder();
   await persistProgress();
   // il profilo recuperato vive comunque sotto un id nuovo (l'anonimato non
-  // permette di "tornare" a essere lo stesso id di prima): se quello vecchio
-  // era admin, la scorciatoia al pannello sposi va riconcessa anche al nuovo.
-  if (oldId !== state.guestId && state.adminUids.includes(oldId)) await addAdmin(state.guestId);
+  // permette di "tornare" a essere lo stesso id di prima): si riconcede
+  // l'eventuale accesso admin al nuovo id e si cancella il vecchio, che a
+  // questo punto è solo un doppione dello stesso invitato nell'elenco.
+  if (oldId !== state.guestId){
+    if (state.adminUids.includes(oldId)){
+      await addAdmin(state.guestId);
+      await removeAdmin(oldId);
+    }
+    await fb.deleteDoc(fb.doc(fb.db, 'players', oldId));
+  }
   go('hub');
 }
 
