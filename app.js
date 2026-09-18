@@ -75,41 +75,10 @@ const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 
 // Missione fotografica personale: a ogni invitato ne viene assegnata una a
 // caso, evitando (finché ce ne sono di libere) quelle già capitate ad altri.
+// Lista vuota apposta: da riempire in app.js prima del matrimonio — finché
+// resta vuota, la schermata "Missione speciale" mostra un avviso invece di
+// proporre missioni (vedi renderMissione()/assignMission()).
 const MISSIONS = [
-  'Fai un brindisi agli sposi',
-  'Fai un selfie con la sposa',
-  'Fai un selfie con lo sposo',
-  'Fai una foto con tutto il tuo tavolo',
-  'Fai una foto con qualcuno che hai conosciuto oggi',
-  'Vai dagli sposi e fai loro gli auguri',
-  'Regala agli sposi un abbraccio',
-  'Fai un brindisi con la persona seduta accanto a te',
-  'Inizia un coro per gli sposi',
-  'Fai partire un applauso per gli sposi',
-  'Coinvolgi il tuo tavolo in un brindisi',
-  'Convinci almeno tre persone a ballare con te',
-  'Quando parte una canzone che conosci, canta a squarciagola!',
-  'Organizza una foto di gruppo con almeno 6 persone',
-  'Scatta una foto con qualcuno che ha il vestito del tuo stesso colore',
-  'Scatta una foto con un genitore degli sposi',
-  'Trova un invitato con cui condividi un ricordo e fai una foto con lui',
-  'Fai una foto buffa con gli sposi',
-  'Fai una foto con Enrico',
-  'Fai una foto di gruppo originale',
-  'Trova qualcuno che ti racconti un aneddoto sugli sposi',
-  'Fai partire un hip hip urrà per gli sposi',
-  'Fai ballare gli sposi',
-  'Fai una foto con la persona più elegante per te',
-  'Fai una dedica agli sposi',
-  'Racconta agli sposi un ricordo che hai di loro',
-  'Chiedi a qualcuno come ha conosciuto gli sposi',
-  'Fai una dedica agli sposi',
-  'Dai un bacio alla sposa',
-  'Dai un bacio allo sposo',
-  'Dedica una canzone agli sposi',
-  'Dai un bacio ad Enrico',
-  'Proponi un brindisi agli invitati',
-  'Improvvisate un ballo sulla prossima canzone',
 ];
 
 /* ============ Utilità ============ */
@@ -697,7 +666,8 @@ function renderHub(){
           <span class="kicker">Missione</span>
           <span class="title serif">${(() => {
             const last = state.missions[state.missions.length - 1];
-            return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : esc(MISSIONS[last.index]));
+            if (!last) return MISSIONS.length ? 'Scopri la tua missione' : 'Arriva presto';
+            return last.done ? 'Fatta! Ne vuoi un\'altra?' : esc(MISSIONS[last.index]);
           })()}</span>
           <span class="foot">Scatta la foto</span>
         </button>
@@ -733,13 +703,18 @@ function renderMissione(){
       </div>
     </div>`;
   } else if (!list.length){
-    body = `<div class="card is-centered">
+    body = MISSIONS.length ? `<div class="card is-centered">
       <div class="mission-icon-circle">📷</div>
       <h1>Hai una missione fotografica ad aspettarti</h1>
       <p class="sub-text pretty">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
       <div class="result-cta">
         <button class="button is-outline" data-action="reveal-mission">Scopri la tua missione</button>
       </div>
+    </div>
+    <img src="assets/mascotte/criceto-missione.png" alt="" class="mission-mascot">` : `<div class="card is-centered">
+      <div class="mission-icon-circle">📷</div>
+      <h1>Le missioni arrivano presto</h1>
+      <p class="sub-text pretty">Questa parte del gioco non è ancora pronta: torna a trovarci più vicino al giorno del sì.</p>
     </div>
     <img src="assets/mascotte/criceto-missione.png" alt="" class="mission-mascot">`;
   } else {
@@ -1636,6 +1611,7 @@ function takenMissionIndexes(){
 // saltato quella precedente). excludeIndex serve solo per lo "skip": evita
 // di riproporre subito la stessa appena rifiutata.
 async function assignMission(excludeIndex){
+  if (!MISSIONS.length) return; // lista ancora vuota, vedi MISSIONS
   const cur = state.missions[state.missions.length - 1];
   if (cur && !cur.done) return; // ce n'e' gia' una in corso
   const taken = takenMissionIndexes();

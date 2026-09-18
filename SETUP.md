@@ -38,10 +38,12 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
   altro stia già giocando finché ce ne sono di libere — con più invitati che
   missioni, da lì in poi qualche doppione può capitare. L'elenco è in `app.js`,
-  cerca `MISSIONS`. Per completarla si carica una **foto** (compressa nel
-  telefono prima di salvarla, come la foto di copertina); si può anche
-  "cambiarla" se non piace, o farne un'altra dopo aver completato la prima —
-  a piacere.
+  cerca `MISSIONS`: ⚠️ è vuoto apposta, da scrivere prima del matrimonio —
+  finché resta vuoto, la schermata mostra un avviso "arriva presto" invece
+  di proporre missioni rotte. Per completarla si carica una **foto**
+  (compressa nel telefono prima di salvarla, come la foto di copertina); si
+  può anche "cambiarla" se non piace, o farne un'altra dopo aver completato
+  la prima — a piacere.
   ⚠️ Questa funzione usa una collezione Firestore (`missionPhotos`): se
   attivate online dopo aver già seguito questa guida una volta, ricordatevi
   di rifare anche il punto 3 con `firestore.rules` aggiornato, altrimenti il
