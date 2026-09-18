@@ -655,7 +655,9 @@ function renderJoin(){
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
         <input id="recover-code" class="name-input" type="text" placeholder="Codice" maxlength="20" value="${esc(state.recoverCode)}">
-        <button class="button is-outline block" data-action="recover-profile">Recupera profilo</button>
+        <div class="result-cta">
+          <button class="button is-outline" data-action="recover-profile">Recupera profilo</button>
+        </div>
       </div>`
       : `<div class="button-alone"><button class="btn-text" data-action="show-recover">Hai già un profilo? Recuperalo con un codice</button></div>`}
   </div>`;
