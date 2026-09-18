@@ -166,7 +166,7 @@ const state = {
   adminUids: [], // uid di chi, oltre a chi conosce l'indirizzo #sposi, vede anche
                  // un tasto scorciatoia nel proprio profilo per il pannello sposi
   transferCode: '', // codice breve per ritrovare lo stesso profilo su un altro telefono
-  recoverOpen: false, recoverCode: '',
+  recoverCode: '',
   medalCat: null, // indice in CATS della medaglia appena vinta, per renderMedal()
   lightbox: null, // posizione aperta dentro lightboxGallery, o null se chiusa
   lightboxGallery: [], // [{ kind, src, name, mission }] della lista mostrata sullo schermo corrente
@@ -278,7 +278,7 @@ async function recoverProfile(){
       state.name = special.name; state.team = 1; state.avatarEmoji = special.avatarEmoji;
       state.sel = null; state.res = {}; state.score = 0; state.order = []; state.missions = [];
       state.transferCode = code;
-      state.recoverOpen = false; state.recoverCode = '';
+      state.recoverCode = '';
       ensureOrder();
       await persistProgress();
       await addAdmin(state.guestId);
@@ -300,7 +300,7 @@ async function recoverProfile(){
   // casuale e lo sovrascrive — perdendo per sempre un codice fisso come
   // quelli riservati di Mara e Stefano (vedi SPECIAL_PROFILES).
   state.transferCode = d.transferCode || '';
-  state.recoverOpen = false; state.recoverCode = '';
+  state.recoverCode = '';
   ensureOrder();
   await persistProgress();
   // il profilo recuperato vive comunque sotto un id nuovo (l'anonimato non
@@ -575,6 +575,7 @@ function render(){
   switch (state.screen){
     case 'boot': html = renderBoot(); break;
     case 'join': html = renderJoin(); break;
+    case 'code': html = renderRecoverCode(); break;
     case 'hub': html = renderHub(); break;
     case 'missione': html = renderMissione(); break;
     case 'album': html = renderAlbum(); break;
@@ -651,14 +652,28 @@ function renderJoin(){
       <button class="button is-outline" data-action="join">Comincia</button>
     </div>
     <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
-    ${state.recoverOpen ? `
+  </div>`;
+}
+
+// schermata minima raggiungibile solo da .../#code (vedi boot()): a chi ha
+// gia' un profilo (o il codice riservato di Mara/Stefano, vedi
+// SPECIAL_PROFILES) serve solo il campo del codice, non tutto il modulo
+// d'iscrizione di renderJoin().
+function renderRecoverCode(){
+  return `<div class="screen screen-join">
+    <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
+    <div class="kicker neutral join-sub">Recupera il tuo profilo</div>
+    <div class="card join-card">
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
         <input id="recover-code" class="name-input" type="text" placeholder="Codice" maxlength="20" value="${esc(state.recoverCode)}">
-        <div class="result-cta">
-          <button class="button is-outline" data-action="recover-profile">Recupera profilo</button>
-        </div>
-      </div>` : ''}
+      </div>
+    </div>
+    <div class="join-spacer"></div>
+    <div class="result-cta">
+      <button class="button is-outline" data-action="recover-profile">Recupera profilo</button>
+    </div>
+    <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
   </div>`;
 }
 
@@ -1876,7 +1891,7 @@ async function boot(){
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';
-  else if (location.hash === '#code'){ state.screen = 'join'; state.recoverOpen = true; }
+  else if (location.hash === '#code') state.screen = 'code';
   else state.screen = state.name ? 'hub' : 'join';
   try { history.replaceState({ screen: state.screen }, '', '#' + (state.screen === 'admin' ? 'sposi' : state.screen)); } catch {}
   render();
