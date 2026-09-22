@@ -172,6 +172,7 @@ const state = {
   lightboxGallery: [], // [{ kind, src, name, mission }] della lista mostrata sullo schermo corrente
   adminModal: null, // 'invitati' | 'missioni' | 'domande' | null: quale lista e' aperta a tutto schermo nel pannello sposi
   adminModalContent: {}, // { invitati, missioni, domande }: html completo di ogni lista, ricalcolato a ogni renderAdmin()
+  medalModal: null, // indice in CATS, o null: quale medaglia e' aperta a tutto schermo nel profilo (vedi renderMedalModal())
   dialog: null, // { kind: 'alert'|'confirm', message, onConfirm? } al posto di alert()/confirm() nativi, vedi openAlert()/openConfirm()
   copiedFlash: null, // 'album' | 'transfer' | null: quale bottone "Copia" mostra "Copiato!" al momento, vedi flashCopied()
   downloadingPhotos: false, // true mentre si prepara lo zip di downloadAllMissionPhotos()
@@ -604,7 +605,7 @@ function render(){
   }
   const screenChanged = state.screen !== lastScreen;
   lastScreen = state.screen;
-  root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.lightbox != null ? renderLightbox() : '') + (state.dialog ? renderDialog() : '');
+  root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.medalModal != null ? renderMedalModal() : '') + (state.lightbox != null ? renderLightbox() : '') + (state.dialog ? renderDialog() : '');
   if (screenChanged) resetScroll();
 }
 
@@ -1130,11 +1131,11 @@ function renderProfile(){
   const medalCards = CATS.map((c, idx) => {
     const st = catState(state.res, c);
     const note = st.right + ' su ' + st.n + ' giuste';
-    return `<div class="medal-card ${st.earned ? 'earned cat-tile--' + (idx + 1) : 'locked'}">
+    return `<button class="medal-card ${st.earned ? 'earned cat-tile--' + (idx + 1) : 'locked'}" data-action="open-medal-modal" data-cat="${idx}">
       ${c.mark}
       <div class="name serif">${esc(c.name)}</div>
       <div class="note">${note}</div>
-    </div>`;
+    </button>`;
   }).join('');
   const extraBadges = [
     { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
@@ -1145,15 +1146,6 @@ function renderProfile(){
     <div class="name serif">${esc(b.name)}</div>
     <div class="note">${esc(b.note)}</div>
   </div>`).join('');
-  const answers = allQuestions().map((x, i) => ({ i, x })).filter(o => state.res[o.i])
-    .sort((a, b) => posOf(a.i) - posOf(b.i)).map(o => {
-    const r = state.res[o.i];
-    return `<div class="answer-row">
-      <span class="num${r.correct?' is-correct':''}">${posOf(o.i)+1}</span>
-      <span class="title">${esc(o.x.t)}</span>
-      <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
-    </div>`;
-  }).join('');
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar">${avatarButton()}</div>
@@ -1174,8 +1166,6 @@ function renderProfile(){
     <div class="medal-grid">${medalCards}</div>
     <div class="section-title">Altri traguardi</div>
     <div class="medal-grid">${badgeCards}</div>
-    <div class="section-title">Le tue risposte</div>
-    ${answers || `<div class="empty-note">Ancora niente. Gira la prima carta.</div>`}
     ${state.mode === 'online' && state.transferCode ? `
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
@@ -1184,6 +1174,32 @@ function renderProfile(){
       </div>
       <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
     <div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>
+  </div>`;
+}
+
+// risposte e punti di una categoria, a schermo intero: si apre toccando la
+// sua medaglia nel profilo (sostituisce il vecchio elenco unico "Le tue
+// risposte", ora suddiviso per categoria).
+function renderMedalModal(){
+  const idx = state.medalModal;
+  const c = CATS[idx];
+  if (!c) return '';
+  const rows = state.order.filter(qi => catOf(qi) === idx && state.res[qi]).map(qi => {
+    const r = state.res[qi];
+    return `<div class="answer-row">
+      <span class="num${r.correct?' is-correct':''}">${posOf(qi)+1}</span>
+      <span class="title">${esc(Q(qi).t)}</span>
+      <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
+    </div>`;
+  }).join('');
+  return `<div class="admin-modal" data-action="close-medal-modal">
+    <div class="admin-modal-sheet" data-action="lightbox-noop">
+      <div class="admin-modal-head">
+        <div class="section-title">${esc(c.name)}</div>
+        <button class="admin-modal-close" data-action="close-medal-modal">✕</button>
+      </div>
+      <div class="admin-modal-body">${rows || `<p class="fine-print">Ancora niente. Gira la prima carta di questa categoria.</p>`}</div>
+    </div>
   </div>`;
 }
 
@@ -1526,6 +1542,8 @@ root.addEventListener('click', e => {
     case 'board-tab': state.boardTab = el.dataset.tab; render(); break;
     case 'open-admin-modal': saveScroll(); pushOverlayHistory(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
+    case 'open-medal-modal': saveScroll(); pushOverlayHistory(); state.medalModal = +el.dataset.cat; render(); resetScroll(); break;
+    case 'close-medal-modal': state.medalModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'reset-player-answers': {
       openConfirm('Azzerare tutte le risposte e i punti di questo invitato? Non si può annullare.', () => resetPlayerAnswers(el.dataset.id));
       break;
@@ -1920,6 +1938,7 @@ window.addEventListener('popstate', e => {
   if (state.dialog){ state.dialog = null; overlayHistoryDepth--; render(); return; }
   if (state.lightbox != null){ state.lightbox = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
   if (state.adminModal){ state.adminModal = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
+  if (state.medalModal != null){ state.medalModal = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
   state.screen = (e.state && e.state.screen) || (state.name ? 'hub' : 'join');
   render();
 });

@@ -411,7 +411,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .medal-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .medal-card{
   border-radius:var(--r-md); padding:14px; min-height:132px; display:flex; flex-direction:column;
-  background:#fffdf6; border:1px solid var(--neutral-300);
+  background:#fffdf6; border:1px solid var(--neutral-300); text-align:left; width:100%;
 }
 /* var(--tile-a/b) e' impostato solo dalle 4 categorie (cat-tile--N); i due
    traguardi extra (Fulmine, Calendario completo) non hanno una variante e
@@ -428,7 +428,6 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .answer-row .num.is-correct{ color:var(--accent-600); }
 .answer-row .title{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .answer-row .line{ margin-left:auto; white-space:nowrap; }
-.empty-note{ font-size:13px; color:var(--neutral-700); text-align:left; padding:12px 0; }
 
 /* ===== FINALE ===== */
 .screen-finale{ text-align:center; }
