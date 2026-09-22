@@ -13,14 +13,14 @@ const QS = [
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le fa la mamma.'},
 
-  {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Con quale battuta Ste ha conquistato il cuore di Mara?', o:['POP fa il criceto. E 1000 altri modi per usare il microonde','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto. E 1000 altri modi per usare il microonde: da lì non si è più tornati indietro.'},
+  {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Come ha fatto Ste a conquistare il cuore di Mara?', o:['Con la battuta su POP fa il criceto','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto: e 1000 altri da fare con il microonde.'},
   {k:'La loro vita insieme', h:'Chi tarda di più.', t:'Chi dei due ci mette più tempo a prepararsi prima di uscire?', o:['Mara','Ste','Nessuno dei due, sono velocissimi','Dipende dall’occasione'], c:1, s:'Ste: qualche minuto in più, ogni volta.'},
   {k:'La loro vita insieme', h:'Al ristorante succede sempre così.', t:'Chi dei due è più facile che dica «non lo voglio» e poi finisce per mangiare metà di quello dell’altro?', o:['Mara','Ste','Entrambi, a turno','Nessuno dei due'], c:1, s:'Ste: lo dice convinto, poi cambia idea a metà pasto.'},
-  {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:['Su un’app','Al lavoro','Al compleanno di Elisa','In palestra'], c:2, s:'Al compleanno di Elisa: una serata che ha cambiato tutto.'},
+  {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:["Ad un'associazione ludica",'Online','Al compleanno di Elisa','In montagna'], c:2, s:'Al compleanno di Elisa: una serata che ha cambiato tutto.'},
   {k:'La loro vita insieme', h:'Prima di tutti gli altri viaggi.', t:'Quale di questi è stato il primo viaggio fatto da soli?', o:['Toscana','Abruzzo','Francia','Perù'], c:0, s:'Toscana: il primo di tanti.'},
 
   {k:'Il giorno di festa', h:'Un ricordo blu che resterà per sempre.', t:'A cosa servirà la cianotipia fatta durante il rito?', o:['Da appendere in salotto','Copertina per l’album di nozze','Da regalare ai testimoni','Segnalibro per gli invitati'], c:1, s:'Copertina per l’album di nozze: un ricordo del giorno del sì.'},
-  {k:'Il giorno di festa', h:'Parole scelte con cura.', t:'Chi ha letto la dedica d’amore?', o:['Il papà dello sposo','La mamma della sposa','Il testimone dello sposo','La sorella della sposa'], c:1, s:'La mamma della sposa.'},
+  {k:'Il giorno di festa', h:'Parole scelte con cura.', t:'Chi ha letto la dedica d’amore?', o:['Il papà dello sposo','La mamma della sposa','La testimone dello sposo','La cugina della sposa'], c:1, s:'La mamma della sposa.'},
   {k:'Il giorno di festa', h:'Amore è anche questo.', t:'Ste ama Mara nonostante?', o:['Non sappia cucinare','Metta a soqquadro casa per ogni nuova passione','Sia sempre in ritardo','Non guardi mai le partite con lui'], c:1, s:'Metta a soqquadro casa per ogni nuova passione: e ne ha sempre una nuova.'},
   {k:'Il giorno di festa', h:'Un colpo d’occhio sulla sala.', t:'Quanti tavoli ci sono?', o:['7','8','9','10'], c:2, s:'9 tavoli, ognuno con un nome di viaggio.'},
   {k:'Il giorno di festa', h:'Il posto giusto per dirsi sì.', t:'Come si chiama la villa in cui siamo?', o:['Villa Calini','Villa Fiorita','Villa degli Ulivi','Villa Serena'], c:0, s:'Villa Calini.'},
@@ -1022,8 +1022,8 @@ function renderMedal(){
   const c = CATS[state.medalCat];
   const variant = state.medalCat + 1;
   return `<div class="screen screen-medal cat-tile--${variant}">
-    <div class="topbar end">
-      <button class="avatar-fab" data-action="after-medal">✕</button>
+    <div class="topbar">
+      <button class="menu-hamburger" data-action="after-medal"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg></button>
     </div>
     <div class="medal-celebrate">
       <div class="medal-badge-ring">${c.mark}</div>
