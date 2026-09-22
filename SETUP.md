@@ -144,14 +144,6 @@ Da lì potete:
   anche qui `firestore.rules` aggiornato (punto 3), altrimenti darà errore di
   permessi.
 
-## Foto vere
-Quando è pronta, basta metterla in `assets/` con questo nome esatto
-(già collegato nel codice, nessuna modifica da fare):
-- `assets/photos/card-04.jpg` — foto della domanda "dove è stata scattata la prima foto insieme"
-
-Finché il file non c'è, l'app mostra automaticamente il placeholder grigio
-("Foto degli sposi").
-
 ## Mettere il quiz online sul tuo hosting Aruba
 Il sito è completamente statico: quando è pronto, carica via FTP l'intero contenuto
 di questa cartella (tranne `.git`, `.claude`, `SETUP.md`, `firestore.rules`) in una
@@ -164,21 +156,19 @@ tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
   entro 20 secondi (mai mostrati a schermo) dà comunque un piccolo bonus di
   punti in più, che si riduce con il passare del tempo ma non toglie mai il
   punteggio base della domanda.
-- Le 25 domande sono divise in 5 categorie da 5 ("Mara", "Stefano", "La loro vita
-  insieme", "La giornata di oggi", "I tavoli"), mostrate come 5 card nella
-  schermata "Le domande" (una per categoria, con dentro le sue 5 caselle). Le
-  categorie danno anche una medaglia nel profilo a chi risponde a tutte le sue
-  domande, giuste o sbagliate che siano.
+- Le 25 domande sono divise in 4 categorie ("Mara & Stefano" da 10, "La loro
+  vita insieme", "Il giorno di festa" e "Andiamo in viaggio" da 5 ciascuna),
+  mostrate come 4 card nella schermata "Le domande" (una per categoria, con
+  dentro le sue caselle). Le categorie danno anche una medaglia nel profilo a
+  chi risponde a tutte le sue domande, giuste o sbagliate che siano.
 - Ogni invitato vede le domande in un ordine casuale, deciso alla prima apertura
   del gioco sul suo telefono e poi fissato per sempre (ricaricando la pagina
   l'ordine non cambia). Le carte extra pubblicate dagli sposi durante l'evento
   si aggiungono in fondo al mazzo di ciascuno, senza toccare l'ordine già visto.
-- Diverse domande nell'array `QS` sono ancora un placeholder (risposte "Da
-  completare"): le 4 originali "Su Mara", una in più per "Su Stefano" e per
-  "La loro vita insieme", una per "La giornata di oggi", e tutte e 5 quelle
-  della categoria "I tavoli" (che vanno completate con i contenuti veri dei
-  libretti-segnaposto dei tavoli, una volta pronti) — modificatele in
-  `app.js` prima del matrimonio.
+- Restano due domande placeholder (risposte "Da completare") nella categoria
+  "Mara & Stefano": una su cosa Mara non rinuncerebbe mai a portarsi in
+  viaggio, una su una mania di Stefano — cercate `Da completare` in `app.js`
+  e completatele prima del matrimonio.
 - Se un invitato ricarica la pagina a metà di una domanda, torna al mazzo — il
   cronometro di quella domanda continua comunque a correre in background (uscire
   non è un modo per "congelare" il tempo).
