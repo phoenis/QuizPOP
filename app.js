@@ -465,16 +465,29 @@ function afterResult(){
 }
 
 // torna alla schermata categorie (o al finale se non resta nessuna domanda
-// da nessuna parte), sovrascrivendo la sessione appena conclusa cosi' non
-// resta raggiungibile all'indietro. Richiamata direttamente da afterResult()
-// se non c'e' nessuna medaglia da festeggiare, o dal tasto "Continua" della
-// schermata medaglia.
+// da nessuna parte). Richiamata direttamente da afterResult() se non c'e'
+// nessuna medaglia da festeggiare, o dal tasto "Continua" della schermata
+// medaglia.
 function afterMedal(){
   const nx = nextOpen(state.res, posOf(state.qi) + 1);
   state.sel = nx === null ? state.qi : nx;
-  state.screen = nx === null ? 'finale' : 'home';
-  replaceScreen(state.screen);
-  render();
+  if (nx === null){
+    // nessuna domanda da nessuna parte: sovrascrive la sessione appena
+    // conclusa cosi' non resta raggiungibile all'indietro.
+    state.screen = 'finale';
+    replaceScreen('finale');
+    render();
+    return;
+  }
+  // torna alla schermata categorie "consumando" la voce di history aperta da
+  // flip() per questa categoria (invece di sovrascriverla con replaceScreen):
+  // cosi' non se ne accumula una per ogni categoria completata, e "indietro"
+  // dalla schermata categorie porta sempre alla stessa voce di partenza
+  // (quella aperta entrando nel quiz dall'hub) invece che a una categoria
+  // precedente appena finita.
+  state.screen = 'home';
+  if (hasAppHistory) history.back();
+  else { replaceScreen('home'); render(); }
 }
 
 function allPlayersWithMe(){
@@ -1225,7 +1238,7 @@ function renderFinale(){
         <img src="assets/mascotte/cricetini-cuore.png" alt="">
         <h2>Le hai fatte tutte!</h2>
         <p class="pretty">I risultati si vedranno dopo il taglio della torta, quando verrà annunciato il vincitore.</p>
-        <button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>
+        <button class="button is-outline" data-action="nav-back">Torna alle categorie</button>
       </div>
     </div>`;
   }
@@ -1234,7 +1247,7 @@ function renderFinale(){
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
       ${avatarButton()}
     </div>
-    ${renderClassificaFinale(`<button class="button is-outline" data-action="go" data-screen="home">Torna alle categorie</button>`)}
+    ${renderClassificaFinale(`<button class="button is-outline" data-action="nav-back">Torna alle categorie</button>`)}
   </div>`;
 }
 
