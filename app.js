@@ -1,10 +1,9 @@
 import { firebaseConfig } from './firebase-config.js?v=1';
 
 /* ============ Dati del gioco (copia dal design di riferimento) ============ */
-// NB: le domande segnalate "Placeholder" vanno riviste con Mara prima del matrimonio.
 const QS = [
-  {k:'Su Mara', h:'Non parte mai senza.', t:'Qual è una cosa che Mara non rinuncerebbe mai a portarsi in viaggio?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
-  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Da completare 1','Da completare 2','Da completare 3','Da completare 4'], c:0, s:'Placeholder — sostituire con la risposta vera prima del matrimonio.'},
+  {k:'Su Mara', h:'Non parte mai senza.', t:'Qual è una cosa che Mara non rinuncerebbe mai a portarsi in viaggio?', o:['Un libro','La macchina fotografica','Tappi per le orecchie','Il power bank'], c:2, s:'Tappi per le orecchie: non si sa mai chi russa nella stanza accanto.'},
+  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Riordinare il frigo per colore','Andare dal fruttivendolo','Controllare tre volte la scadenza del latte','Cronometrare la doccia'], c:1, s:'Andare dal fruttivendolo: un rito quasi quotidiano.'},
   {k:'Su di loro', h:'Chi si butta, chi pianifica.', t:'Chi dei due è più probabile che inizi un nuovo progetto senza sapere ancora esattamente come finirà?', o:['Mara','Stefano','Nessuno dei due, pianificano sempre tutto','Entrambi, a turno'], c:0, s:'Mara: si lancia e poi si organizza strada facendo.'},
   {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il cibo preferito di Stefano?', o:['Pizza','Formaggio','Risotto ai funghi','Zucca'], c:1, s:'Il formaggio, sempre e comunque.'},
   {k:'Su Mara', h:'Un pomeriggio perfetto.', t:'Quale attività potrebbe convincere Mara a passare un intero pomeriggio senza guardare l’orologio?', o:['Una maratona di serie tv','Lavoretti con il fai da te','Fare shopping','Una lunga corsa'], c:1, s:'Lavoretti con il fai da te: il tempo vola, sempre.'},
