@@ -28,7 +28,7 @@ const QS = [
   // "Andiamo in viaggio": nei libretti-segnaposto ogni tavolo racconta una sua escursione e un
   // aneddoto sul luogo — l'idea è che per rispondere si deve andare a chiedere in giro,
   // così gli invitati si mescolano tra tavoli diversi.
-  {k:'Andiamo in viaggio', h:'Bisogna proprio chiedere in giro.', t:'Dov’eravamo?', o:['Machu Picchu','Étretat','Tirino','Etna'], c:1, s:'Étretat: il tavolo lo racconta nel suo libretto.'},
+  {k:'Andiamo in viaggio', h:'Bisogna proprio chiedere in giro.', t:'Dov’eravamo?', o:['Machu Picchu','Étretat','Tirino','Etna'], c:1, photo:true, photoSrc:'assets/photos/dove-eravamo.jpg', s:'Étretat: il tavolo lo racconta nel suo libretto.'},
   {k:'Andiamo in viaggio', h:'Un sapore da non dimenticare.', t:'Dove hanno mangiato il pane e salamina più buono di sempre?', o:['Parco della Majella','XII Apostoli','Tuckett','Le Mont-Saint-Michel'], c:2, s:'Tuckett: chiedete al loro tavolo per i dettagli.'},
   {k:'Andiamo in viaggio', h:'Due ruote, tanta salita.', t:'In quale occasione Mara e Stefano hanno provato le bici elettriche?', o:['Machu Picchu','Calanchi di Atri','Etna','Le Mont-Saint-Michel'], c:1, s:'Calanchi di Atri: un giro in bici elettrica tra i calanchi.'},
   {k:'Andiamo in viaggio', h:'Un intruso tra le mete.', t:'Quale di queste destinazioni NON compare nei viaggi raccontati nei libretti dei tavoli?', o:['Forte di Fenestrelle','Palcoyo','XII Apostoli','Le Mont-Saint-Michel'], c:0, s:'Forte di Fenestrelle non fa parte dei viaggi raccontati ai tavoli.'},
@@ -919,7 +919,7 @@ function renderQuizBody(q){
   if (q.photo){
     return `<div class="photo-mat">
       <div class="ph"><img src="${esc(q.photoSrc||'')}" alt="" onerror="this.remove()"></div>
-      <div class="caption">Foto degli sposi</div>
+      <div class="caption">${esc(q.photoCaption || 'Foto del viaggio')}</div>
     </div>` + renderOptions(q);
   }
   if (q.order){
