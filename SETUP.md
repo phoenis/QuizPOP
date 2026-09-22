@@ -144,6 +144,14 @@ Da lì potete:
   anche qui `firestore.rules` aggiornato (punto 3), altrimenti darà errore di
   permessi.
 
+## Foto vere
+Quando è pronta, basta metterla in `assets/` con questo nome esatto
+(già collegato nel codice, nessuna modifica da fare):
+- `assets/photos/dove-eravamo.jpg` — foto della domanda "Dov'eravamo?" (categoria "Andiamo in viaggio")
+
+Finché il file non c'è, l'app mostra automaticamente il placeholder grigio
+("Foto del viaggio").
+
 ## Mettere il quiz online sul tuo hosting Aruba
 Il sito è completamente statico: quando è pronto, carica via FTP l'intero contenuto
 di questa cartella (tranne `.git`, `.claude`, `SETUP.md`, `firestore.rules`) in una
