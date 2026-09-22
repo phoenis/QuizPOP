@@ -1192,13 +1192,13 @@ function renderMedalModal(){
       <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
     </div>`;
   }).join('');
-  return `<div class="admin-modal" data-action="close-medal-modal">
-    <div class="admin-modal-sheet" data-action="lightbox-noop">
-      <div class="admin-modal-head">
+  return `<div class="medal-modal" data-action="close-medal-modal">
+    <div class="medal-modal-sheet" data-action="lightbox-noop">
+      <div class="medal-modal-head">
         <div class="section-title">${esc(c.name)}</div>
-        <button class="admin-modal-close" data-action="close-medal-modal">✕</button>
+        <button class="medal-modal-close" data-action="close-medal-modal">✕</button>
       </div>
-      <div class="admin-modal-body">${rows || `<p class="fine-print">Ancora niente. Gira la prima carta di questa categoria.</p>`}</div>
+      <div class="medal-modal-body">${rows || `<p class="fine-print">Ancora niente. Gira la prima carta di questa categoria.</p>`}</div>
     </div>
   </div>`;
 }
