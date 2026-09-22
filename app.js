@@ -3,12 +3,12 @@ import { firebaseConfig } from './firebase-config.js?v=1';
 /* ============ Dati del gioco (copia dal design di riferimento) ============ */
 const QS = [
   {k:'Su Mara', h:'Non parte mai senza.', t:'Qual è una cosa che Mara non rinuncerebbe mai a portarsi in viaggio?', o:['Un libro','La macchina fotografica','Tappi per le orecchie','Il power bank'], c:2, s:'Tappi per le orecchie: non si sa mai chi russa nella stanza accanto.'},
-  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Riordinare il frigo per colore','Andare dal fruttivendolo','Controllare tre volte la scadenza del latte','Cronometrare la doccia'], c:1, s:'Andare dal fruttivendolo: un rito quasi quotidiano.'},
-  {k:'Su di loro', h:'Chi si butta, chi pianifica.', t:'Chi dei due è più probabile che inizi un nuovo progetto senza sapere ancora esattamente come finirà?', o:['Mara','Stefano','Nessuno dei due, pianificano sempre tutto','Entrambi, a turno'], c:0, s:'Mara: si lancia e poi si organizza strada facendo.'},
+  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Tenere in ordine i vestiti','Andare dal fruttivendolo','Pulire il pavimento','Aprire le finestre'], c:1, s:'Andare dal fruttivendolo: un appuntamento fisso.'},
+  {k:'Su di loro', h:'Chi si butta, chi pianifica.', t:'Chi dei due è più probabile che inizi un nuovo progetto senza sapere ancora esattamente come finirà?', o:['Mara','Stefano','Nessuno dei due, pianificano sempre tutto'], c:0, s:'Mara: si lancia e poi si organizza strada facendo.'},
   {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il cibo preferito di Stefano?', o:['Pizza','Formaggio','Risotto ai funghi','Zucca'], c:1, s:'Il formaggio, sempre e comunque.'},
   {k:'Su Mara', h:'Un pomeriggio perfetto.', t:'Quale attività potrebbe convincere Mara a passare un intero pomeriggio senza guardare l’orologio?', o:['Una maratona di serie tv','Lavoretti con il fai da te','Fare shopping','Una lunga corsa'], c:1, s:'Lavoretti con il fai da te: il tempo vola, sempre.'},
   {k:'Su Stefano', h:'Non è proprio il suo forte.', t:'Quale delle seguenti cose Stefano non farebbe mai spontaneamente?', o:['Cucinare','Ballare','Guardare una partita','Fare un pisolino'], c:1, s:'Ballare: solo se strettamente necessario (tipo al matrimonio).'},
-  {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte: questo conquista Stefano.'},
+  {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte.'},
   {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Il giallo'], c:3, s:'Il giallo, senza dubbi.'},
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le fa la mamma.'},
@@ -28,7 +28,7 @@ const QS = [
   // "Andiamo in viaggio": nei libretti-segnaposto ogni tavolo racconta una sua escursione e un
   // aneddoto sul luogo — l'idea è che per rispondere si deve andare a chiedere in giro,
   // così gli invitati si mescolano tra tavoli diversi.
-  {k:'Andiamo in viaggio', h:'Bisogna proprio chiedere in giro.', t:'Dov’eravamo?', o:['Machu Picchu','Étretat','Tirino','Etna'], c:1, photo:true, photoSrc:'assets/photos/dove-eravamo.jpg', s:'Étretat: il tavolo lo racconta nel suo libretto.'},
+  {k:'Andiamo in viaggio', h:'Bisogna proprio chiedere in giro.', t:'Dov’eravamo?', o:['Machu Picchu','Étretat','Tirino','Etna'], c:1, photo:true, photoSrc:'assets/photos/dove-eravamo.avif', s:'Étretat: il tavolo lo racconta nel suo libretto.'},
   {k:'Andiamo in viaggio', h:'Un sapore da non dimenticare.', t:'Dove hanno mangiato il pane e salamina più buono di sempre?', o:['Parco della Majella','XII Apostoli','Tuckett','Le Mont-Saint-Michel'], c:2, s:'Tuckett: chiedete al loro tavolo per i dettagli.'},
   {k:'Andiamo in viaggio', h:'Due ruote, tanta salita.', t:'In quale occasione Mara e Stefano hanno provato le bici elettriche?', o:['Machu Picchu','Calanchi di Atri','Etna','Le Mont-Saint-Michel'], c:1, s:'Calanchi di Atri: un giro in bici elettrica tra i calanchi.'},
   {k:'Andiamo in viaggio', h:'Un intruso tra le mete.', t:'Quale di queste destinazioni NON compare nei viaggi raccontati nei libretti dei tavoli?', o:['Forte di Fenestrelle','Palcoyo','XII Apostoli','Le Mont-Saint-Michel'], c:0, s:'Forte di Fenestrelle non fa parte dei viaggi raccontati ai tavoli.'},
@@ -38,10 +38,10 @@ const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 // una medaglia per categoria a chi risponde a tutte le sue domande, giuste o
 // sbagliate che siano: cosi' la puo' vincere chiunque, non solo chi indovina.
 const CATS = [
-  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Hai risposto a tutte e 10 le domande su di loro'},
-  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Hai risposto a tutte e 5 le domande sulla vita insieme'},
-  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte e 5 le domande sul matrimonio'},
-  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Hai risposto a tutte e 5 le domande sulle storie dei tavoli'},
+  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Hai risposto a tutte le domande sugli sposi'},
+  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Hai risposto a tutte le domande sulla nostra vita'},
+  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte le domande su oggi'},
+  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Hai risposto a tutte le domande sui viaggi'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
@@ -919,7 +919,6 @@ function renderQuizBody(q){
   if (q.photo){
     return `<div class="photo-mat">
       <div class="ph"><img src="${esc(q.photoSrc||'')}" alt="" onerror="this.remove()"></div>
-      <div class="caption">${esc(q.photoCaption || 'Foto del viaggio')}</div>
     </div>` + renderOptions(q);
   }
   if (q.order){
@@ -1027,9 +1026,8 @@ function renderMedal(){
     </div>
     <div class="medal-celebrate">
       <div class="medal-badge-ring">${c.mark}</div>
-      <div class="kicker">Medaglia vinta</div>
-      <h1 class="medal-celebrate-title pretty">Congratulazioni, sai tutto su ${esc(c.name)}!</h1>
-      <div class="medal-celebrate-name serif">${esc(c.medal)}</div>
+      <div class="kicker">Nuova medaglia</div>
+      <h1 class="medal-celebrate-title pretty">Congratulazioni, hai vinto la medaglia "${esc(c.name)}"!</h1>
       <p class="medal-celebrate-note pretty">${esc(c.note)}</p>
     </div>
     <button class="button is-outline block" data-action="after-medal">Continua</button>
