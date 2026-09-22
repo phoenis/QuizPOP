@@ -165,10 +165,6 @@ tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
   del gioco sul suo telefono e poi fissato per sempre (ricaricando la pagina
   l'ordine non cambia). Le carte extra pubblicate dagli sposi durante l'evento
   si aggiungono in fondo al mazzo di ciascuno, senza toccare l'ordine già visto.
-- Restano due domande placeholder (risposte "Da completare") nella categoria
-  "Mara & Stefano": una su cosa Mara non rinuncerebbe mai a portarsi in
-  viaggio, una su una mania di Stefano — cercate `Da completare` in `app.js`
-  e completatele prima del matrimonio.
 - Se un invitato ricarica la pagina a metà di una domanda, torna al mazzo — il
   cronometro di quella domanda continua comunque a correre in background (uscire
   non è un modo per "congelare" il tempo).
