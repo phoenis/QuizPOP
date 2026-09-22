@@ -536,6 +536,28 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .dialog-actions{ display:flex; align-items:center; justify-content:flex-end; gap:16px; margin-top:18px; }
 .dialog-actions .button{ padding:0.55em 1.3em; font-size:1em; }
 
+/* ===== MEDAL MODAL (risposte di una categoria, dal profilo) — stessa
+   struttura di .admin-modal ma sui toni chiari del resto dell'app, non del
+   pannello sposi ===== */
+.medal-modal{
+  position:fixed; inset:0; z-index:95; background:rgba(36,29,21,.55);
+  display:flex; padding:1rem; animation:v3rise .15s both; overflow-y:auto;
+  flex-direction:column;
+}
+.medal-modal-sheet{
+  width:100%; max-width:480px; margin-top:auto; margin-bottom:auto;
+  background:#fffdf6; border-radius:var(--r-md); border:1px solid var(--neutral-300);
+  box-shadow:var(--shadow-md); padding:20px 16px calc(20px + env(safe-area-inset-bottom));
+}
+.medal-modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.medal-modal-head .section-title{ margin:0; }
+.medal-modal-close{
+  flex:none; width:32px; height:32px; border-radius:50%; border:0;
+  background:var(--neutral-200); color:var(--ink); font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+}
+.medal-modal-body .answer-row:first-child{ border-top:0; }
+
 /* ===== animations ===== */
 @keyframes v3pop{ 0%{ opacity:0; transform:scale(.86);} 60%{ transform:scale(1.04);} 100%{ opacity:1; transform:scale(1);} }
 @keyframes v3rise{ from{ opacity:0; transform:translateY(12px);} to{ opacity:1; transform:none; } }
