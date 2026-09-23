@@ -353,7 +353,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .button.is-outline:hover{ background:var(--accent-100); }
 .button.is-outline.is-esci{ border-color: var(--ink); color: var(--ink); font-size: 0.9rem; margin-top: 24px;}
 .button.is-outline:disabled{ opacity:.45; cursor:default; }
-.button.is-outline.block{ width:100%; margin-bottom:12px; }
+.button.block{ width:100%; margin-bottom:12px; }
 .button.is-outline.small{ font-family:var(--font-primary); font-size:13.5px; padding:14px 16px; border-color:var(--neutral-400); color:var(--ink); }
 .screen-medal .button.is-outline{ border-color:#fffdf6; background:#fffdf6; color:var(--ink); box-shadow:var(--shadow-md); }
 .screen-medal .button.is-outline:hover{ background:rgba(255,253,246,.85); }
