@@ -78,6 +78,18 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   sbaglio) e non entrano mai in classifica, né singola né a squadre — possono
   comunque rispondere alle domande e fare le missioni fotografiche come
   chiunque altro, semplicemente il loro punteggio non conta per la gara.
+- **Punti doppi con i testimoni**: due domande valgono il doppio se anche il
+  testimone giusto l'ha indovinata — `doubleWith` in `app.js`, cerca `QS`:
+  - "Qual è il piatto preferito di Mara?" raddoppia se anche Giulia
+    l'ha indovinata.
+  - "Quale tra queste è una piccola mania di Stefano?" raddoppia se anche
+    Elisa l'ha indovinata.
+
+  ⚠️ Conta l'ordine con cui arrivano le risposte: se un invitato risponde
+  prima che il testimone abbia risposto a sua volta (correttamente) a quella
+  stessa domanda, quell'invitato non prende il raddoppio — i punti già
+  assegnati non vengono ricalcolati in un secondo momento. Conviene quindi
+  che Elisa e Giulia rispondano alle loro domande il prima possibile.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
