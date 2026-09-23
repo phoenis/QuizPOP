@@ -36,14 +36,17 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   previsto, c'è comunque il link "Scaricala" sotto che manda direttamente allo
   store giusto (Android/iOS rilevato automaticamente,
   `WEDSHOOTS_ANDROID_URL`/`WEDSHOOTS_IOS_URL` in `app.js`).
-- **Missione speciale**: ogni invitato scopre una missione fotografica a
-  sorpresa (tipo "Fai un selfie con la sposa"), diversa da quella di chiunque
-  altro stia già giocando finché ce ne sono di libere — con più invitati che
-  missioni, da lì in poi qualche doppione può capitare. L'elenco è in `app.js`,
-  cerca `MISSIONS`. Per completarla si carica una **foto** (compressa nel
-  telefono prima di salvarla, come la foto di copertina); si può anche
-  "cambiarla" se non piace, o farne un'altra dopo aver completato la prima —
-  a piacere.
+- **Missione speciale**: ogni invitato scopre una missione a sorpresa (tipo
+  "Fai un selfie con la sposa"), diversa da quella di chiunque altro stia già
+  giocando finché ce ne sono di libere — con più invitati che missioni, da lì
+  in poi qualche doppione può capitare. L'elenco è in `app.js`, cerca
+  `MISSIONS`: non devono per forza prestarsi a una foto (es. "Fai un
+  brindisi"), perché la foto è **facoltativa**. Per completarla si può
+  caricare una foto (compressa nel telefono prima di salvarla, come la foto
+  di copertina) oppure toccare "L'ho fatta, senza foto" per segnarla fatta
+  senza allegare nulla — anche per una missione "da foto" come il selfie, se
+  non ne ha voglia. Si può anche "cambiarla" se non piace, o farne un'altra
+  dopo aver completato la prima — a piacere.
   ⚠️ Questa funzione usa una collezione Firestore (`missionPhotos`): se
   attivate online dopo aver già seguito questa guida una volta, ricordatevi
   di rifare anche il punto 3 con `firestore.rules` aggiornato, altrimenti il
