@@ -221,7 +221,6 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .mission-icon-circle{
   display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:28px;
 }
-.margin-top-none{margin-top: 0;}
 /* .mission-text{ font-size:26px; line-height:1.2; margin-top:8px; text-wrap:pretty; text-align: center;} */
 .mission-history{ display:flex; flex-direction:column; gap:10px; }
 .mission-history-row{ display:flex; align-items:center; gap:12px; border:1px solid var(--neutral-300); border-radius:var(--r-md); padding:10px; font-size:13.5px; }
@@ -415,16 +414,9 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
   background:#fffdf6; border:1px solid var(--neutral-300); text-align:left; width:100%; gap: 8px;
 }
 .medal-title{text-align: center; font-size:1.3em}
-/* var(--tile-a/b) e' impostato solo dalle 4 categorie (cat-tile--N); i due
-   traguardi extra (Fulmine, Calendario completo) non hanno una variante e
-   ricadono sul gradiente accent di base. */
 .medal-card.earned{ background:linear-gradient(135deg, var(--tile-a, var(--accent-500)), var(--tile-b, var(--accent-700))); border:0; color:#fffdf6; box-shadow:var(--shadow-md); }
 .medal-card img{ width:100%; height:58px; object-fit:contain; }
-.medal-card .glyph-mark{ height:58px; display:flex; align-items:center; justify-content:center; font-size:30px; }
-.medal-card.locked img, .medal-card.locked .glyph-mark{ filter:grayscale(1); opacity:.7; }
-.medal-card .name{ font-size:17px; line-height:1.1; margin-top:8px; }
-.medal-card .note{ font-size:11px; margin-top:3px; opacity:.9; }
-.medal-card.locked .note{ color:var(--neutral-700); opacity:1; }
+.medal-card.locked img{ filter:grayscale(1); opacity:.7; }
 .answer-row{ display:flex; align-items:center; gap:var(--sp-2); padding:10px 0; border-top:1px solid var(--neutral-300); text-align:left; font-size:13px; }
 .answer-row .title{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .answer-row .line{ margin-left:auto; white-space:nowrap; }

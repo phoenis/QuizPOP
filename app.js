@@ -1135,7 +1135,6 @@ function renderProfile(){
   const total = allQuestions().length;
   const times = Object.values(state.res).map(x => x.used);
   const avg = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
-  const best = Object.values(state.res).filter(x => x.correct).sort((a, b) => a.used - b.used)[0];
   const name = state.name || 'Zia Franca';
   const earnedCount = CATS.filter(c => catState(state.res, c).earned).length;
   const medalCards = CATS.map((c, idx) => {
@@ -1146,15 +1145,6 @@ function renderProfile(){
       <div class="medal-title">${esc(c.name)}</div>
     </button>`;
   }).join('');
-  const extraBadges = [
-    { mark: '✦', name: 'Fulmine', note: best ? 'Più veloce: ' + numIt(best.used) + 's' : 'Rispondi sotto i 4 secondi', locked: !best || best.used > 4 },
-    { mark: '✷', name: 'Calendario completo', note: 'Tutte le carte del mazzo', locked: done < total },
-  ];
-  const badgeCards = extraBadges.map(b => `<div class="medal-card ${b.locked ? 'locked' : 'earned'}">
-    <div class="glyph-mark">${b.mark}</div>
-    <div class="name serif">${esc(b.name)}</div>
-    <div class="note">${esc(b.note)}</div>
-  </div>`).join('');
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar">${avatarButton()}</div>
@@ -1173,8 +1163,6 @@ function renderProfile(){
     </div>
     <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
     <div class="medal-grid">${medalCards}</div>
-    <div class="section-title">Altri traguardi</div>
-    <div class="medal-grid">${badgeCards}</div>
     ${state.mode === 'online' && state.transferCode ? `
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
