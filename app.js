@@ -14,7 +14,7 @@ const QS = [
   {k:'Su Mara', h:'Un pomeriggio perfetto.', t:'Quale attività potrebbe convincere Mara a passare un intero pomeriggio senza guardare l’orologio?', o:['Una maratona di serie tv','Lavoretti con il fai da te','Fare shopping','Una lunga corsa'], c:1, s:'Lavoretti con il fai da te: il tempo vola, sempre.'},
   {k:'Su Stefano', h:'Non è proprio il suo forte.', t:'Quale delle seguenti cose Stefano non farebbe mai spontaneamente?', o:['Cucinare','Ballare','Guardare una partita','Fare un pisolino'], c:1, s:'Ballare: solo se strettamente necessario (tipo al matrimonio).'},
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte.'},
-  {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Il giallo'], c:3, s:'Il giallo, senza dubbi.'},
+  {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Giallo'], c:3, s:'Il giallo, senza dubbi.'},
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, doubleWith:'TESTIMONESPOSO', s:'Polpette al sugo, come le fa la mamma.'},
 
@@ -1001,7 +1001,7 @@ function renderOptions(q){
 // contare alla rovescia: e' solo un riferimento, non toglie mai punti.
 function quizCounterText(){
   const secs = Math.floor((Date.now() - state.startedAt) / 1000);
-  return `Carta ${posOf(state.qi) + 1} / ${allQuestions().length} · ${secs}s`;
+  return `${secs}s`;
 }
 
 function renderQuiz(){
@@ -1030,7 +1030,7 @@ function renderResult(){
   const kicker = r.correct ? 'Risposta giusta' : 'Risposta sbagliata';
   const title = r.correct ? `Giusta in ${numIt(r.used)}s` : 'Non era questa';
   const rankLine = locked
-    ? 'La classifica resta chiusa fino ai discorsi: nessuno sa come sta andando, nemmeno tu.'
+    ? ''
     : (mine ? `Sei ${mine.rank}º su ${board.length} in questo momento.` : '');
   const cta = nextOpen(state.res, posOf(state.qi) + 1) !== null ? 'Prossima domanda' : 'Vedi il finale';
   const catIdx = catOf(state.qi);
@@ -1038,7 +1038,6 @@ function renderResult(){
   return `<div class="screen screen-result cat-tile--${variant}">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      <span class="quiz-counter">Carta ${posOf(state.qi) + 1} / ${allQuestions().length}</span>
     </div>
     <div class="result-icon">${r.correct ? '✓' : '✕'}</div>
     <div class="kicker result-kicker">${kicker}</div>
@@ -1115,7 +1114,7 @@ function renderBoard(){
       <div class="you-box">
         <div class="micro">Quello che puoi vedere</div>
         <div class="big serif tabular">${state.score} punti tuoi</div>
-        <div class="board-detail">${done ? 'Media ' + numIt(avg) + 's su ' + done + ' carte' : 'Nessuna carta girata'}</div>
+        <div class="board-detail">${done ? 'Media ' + numIt(avg) + 's su ' + done + ' domande' : 'Ancora nessuna risposta'}</div>
       </div>
       ${tabs}
       ${tab === 'ospiti'
