@@ -71,48 +71,57 @@ const ALBUM_CODE = 'ITc68bf3c0';
 const WEDSHOOTS_ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.matrimonio.launcher&referrer=af_tranid%3DODMwNjM5OTQ2MDgzMDg3OTc3NA%3D%3D%26c%3DWP-IT-LANDINGS%26pid%3DWP-Android-IT';
 const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 
-// Missione fotografica personale: a ogni invitato ne viene assegnata una a
-// caso, evitando (finché ce ne sono di libere) quelle già capitate ad altri.
+// Missione personale: a ogni invitato ne viene assegnata una a caso,
+// evitando (finché ce ne sono di libere) quelle già capitate ad altri.
+// photo:false = missione non necessariamente fotografica (es. un brindisi,
+// un abbraccio): per quelle compare anche "L'ho fatta, senza foto" oltre a
+// Scatta/Galleria (che restano comunque disponibili, se la foto la si vuole
+// fare lo stesso). Le altre, non segnate, restano com'erano: pensate per
+// una foto, e vanno completate con una foto.
 const MISSIONS = [
-  'Qualcuno che balla con un bicchiere in mano',
-  'La pista da ballo',
-  'Il tavolo più "scatenato" della serata',
-  'Una foto al fotografo ufficiale mentre lavora',
-  'Una foto al deejay',
-  'Una foto ad un cameriere',
-  'Una persona che canta',
-  'Gli sposi che ridono',
-  'Le mani intrecciate degli sposi',
-  'Una persona commossa',
-  'Il primo ballo',
-  'Un abbraccio tra due generazioni diverse',
-  'Un bacio',
-  'Una piccola mano',
-  'Qualcuno che scrive',
-  'Qualcuno che si fa una foto',
-  'Qualcuno che tiene in braccio un bambino',
-  'Ricrea una foto di una nostra escursione',
-  'Un piatto del menù, come fosse una cartolina',
-  'Il centrotavola più bello',
-  'La consegna delle bomboniere',
-  'Un dettaglio autunnale (foglia, zucca, colore rust) nella location',
-  'Un giardino',
-  'La persona che ti piace com’è vestita',
-  'Un selfie con lo sposo',
-  'Un selfie con la sposa',
-  'Un selfie con le testimoni',
-  'Un selfie con un genitore degli sposi',
-  'Un selfie di gruppo',
-  'Un selfie con la persona a cui vuoi più bene',
-  'Una foto buffa',
-  'Qualcuno che fa un brindisi',
-  'Un selfie con tutto il tuo tavolo',
-  'Un abbraccio',
-  'Un applauso',
-  'Un selfie con qualcuno vestito del tuo stesso colore',
+  { t: 'Qualcuno che balla con un bicchiere in mano' },
+  { t: 'La pista da ballo' },
+  { t: 'Il tavolo più "scatenato" della serata' },
+  { t: 'Una foto al fotografo ufficiale mentre lavora' },
+  { t: 'Una foto al deejay' },
+  { t: 'Una foto ad un cameriere' },
+  { t: 'Una persona che canta' },
+  { t: 'Gli sposi che ridono' },
+  { t: 'Le mani intrecciate degli sposi' },
+  { t: 'Una persona commossa' },
+  { t: 'Il primo ballo' },
+  { t: 'Un abbraccio tra due generazioni diverse' },
+  { t: 'Un bacio' },
+  { t: 'Una piccola mano' },
+  { t: 'Qualcuno che scrive' },
+  { t: 'Qualcuno che si fa una foto' },
+  { t: 'Qualcuno che tiene in braccio un bambino' },
+  { t: 'Ricrea una foto di una nostra escursione' },
+  { t: 'Un piatto del menù, come fosse una cartolina' },
+  { t: 'Il centrotavola più bello' },
+  { t: 'La consegna delle bomboniere' },
+  { t: 'Un dettaglio autunnale (foglia, zucca, colore rust) nella location' },
+  { t: 'Un giardino' },
+  { t: 'La persona che ti piace com’è vestita' },
+  { t: 'Un selfie con lo sposo' },
+  { t: 'Un selfie con la sposa' },
+  { t: 'Un selfie con le testimoni' },
+  { t: 'Un selfie con un genitore degli sposi' },
+  { t: 'Un selfie di gruppo' },
+  { t: 'Un selfie con la persona a cui vuoi più bene' },
+  { t: 'Una foto buffa' },
+  { t: 'Qualcuno che fa un brindisi', photo: false },
+  { t: 'Un selfie con tutto il tuo tavolo' },
+  { t: 'Un abbraccio', photo: false },
+  { t: 'Un applauso', photo: false },
+  { t: 'Un selfie con qualcuno vestito del tuo stesso colore' },
 ];
 
 /* ============ Utilità ============ */
+// testo di una missione dato il suo indice, con un fallback per indici non
+// (piu') validi (es. una vecchia foto rimasta in missionPhotos dopo una
+// modifica manuale di MISSIONS).
+const missionText = i => (MISSIONS[i] && MISSIONS[i].t) || 'missione';
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
 // emoji al posto di una foto profilo vera: niente caricamenti, si sceglie da
 // una rosa fissa. Chi non ne sceglie una resta con le iniziali, come prima.
@@ -752,7 +761,7 @@ function renderHub(){
           <span class="kicker">Missione</span>
           <span class="title serif">${(() => {
             const last = state.missions[state.missions.length - 1];
-            return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : esc(MISSIONS[last.index]));
+            return !last ? 'Scopri la tua missione' : (last.done ? 'Fatta! Ne vuoi un\'altra?' : esc(missionText(last.index)));
           })()}</span>
           <span class="foot">Scatta la foto</span>
         </button>
@@ -774,19 +783,23 @@ function renderMissione(){
 
   let body;
   if (inProgress){
+    // photo:false su MISSIONS = non necessariamente fotografica (es. un
+    // brindisi, un abbraccio): solo per quelle compare anche "L'ho fatta,
+    // senza foto", oltre a Scatta/Galleria che restano comunque disponibili
+    // se la foto la si vuole fare lo stesso.
+    const optionalPhoto = MISSIONS[cur.index] && MISSIONS[cur.index].photo === false;
     body = `
-      
+
     <div class="card is-centered">
         <div class="kicker">La tua missione</div>
-      <h1 class="mission-text pretty">${esc(MISSIONS[cur.index])}</h1>
+      <h1 class="mission-text pretty">${esc(missionText(cur.index))}</h1>
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
       <p class="fine-print">
-        <button data-action="complete-mission-nophoto">✓ L'ho fatta, senza foto</button>
-        <span> · </span>
+        ${optionalPhoto ? `<button data-action="complete-mission-nophoto">✓ L'ho fatta, senza foto</button><span> · </span>` : ''}
         <button data-action="skip-mission">Non mi piace, cambia</button>
       </p>
       </div>
@@ -817,12 +830,12 @@ function renderMissione(){
     const entry = state.missionPhotos[m.index];
     let mediaHtml = '', rowAttr = '';
     if (entry && entry.src){
-      missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: MISSIONS[m.index] });
+      missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: missionText(m.index) });
       const idx = missionGallery.length - 1;
       mediaHtml = renderMissionMedia(entry, 'mission-history-thumb');
       rowAttr = ` data-action="open-lightbox" data-index="${idx}"`;
     }
-    return `<div class="mission-history-row"${rowAttr}>${mediaHtml}<span>${esc(MISSIONS[m.index])}</span></div>`;
+    return `<div class="mission-history-row"${rowAttr}>${mediaHtml}<span>${esc(missionText(m.index))}</span></div>`;
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
@@ -1399,7 +1412,7 @@ function renderAdmin(){
     .map(m => {
       let mediaHtml = '', rowAttr = '';
       if (m.src){
-        adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: MISSIONS[m.missionIndex] });
+        adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: missionText(m.missionIndex) });
         const idx = adminMissionGallery.length - 1;
         mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb');
         rowAttr = ` data-action="open-lightbox" data-index="${idx}"`;
@@ -1408,7 +1421,7 @@ function renderAdmin(){
       ${mediaHtml}
       <div>
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
-        <div class="kk">${esc(MISSIONS[m.missionIndex] || '')}</div>
+        <div class="kk">${esc(missionText(m.missionIndex))}</div>
       </div>
     </div>`;
     });
@@ -1862,7 +1875,7 @@ async function downloadAllMissionPhotos(){
     const usedNames = new Set();
     photos.forEach(m => {
       const guest = (m.name || 'Senza nome').replace(/[\\/:*?"<>|]/g, '').trim() || 'Senza nome';
-      const mission = (MISSIONS[m.missionIndex] || 'missione').slice(0, 50).replace(/[\\/:*?"<>|]/g, '').trim();
+      const mission = missionText(m.missionIndex).slice(0, 50).replace(/[\\/:*?"<>|]/g, '').trim();
       const base = `${guest} - ${mission}`.trim();
       let filename = `${base}.jpg`, n = 2;
       while (usedNames.has(filename)){ filename = `${base} (${n}).jpg`; n++; }
