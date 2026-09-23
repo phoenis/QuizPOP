@@ -21,7 +21,9 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   scegliere un'emoji da una rosa fissa (facoltativo, in iscrizione o dopo dal
   profilo, tasto "Cambia avatar"). Chi non ne sceglie una resta con le
   iniziali del nome, come prima. Compare ovunque prima c'erano le iniziali:
-  angolo in alto a destra, profilo, classifica, podio finale.
+  angolo in alto a destra, profilo, classifica, podio finale. Aprendo il
+  cambio avatar dal profilo si può anche cambiare tavolo, senza dover
+  riscrivere nome o uscire dal profilo.
 - **Foto di copertina**: metti il file in `assets/photos/hub-hero.jpg`, oppure
   caricala direttamente dal pannello `#sposi` (vedi sotto). Finché non c'è
   nessuna delle due, l'app mostra lo sfondo neutro.
