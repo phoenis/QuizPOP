@@ -40,13 +40,15 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   "Fai un selfie con la sposa"), diversa da quella di chiunque altro stia già
   giocando finché ce ne sono di libere — con più invitati che missioni, da lì
   in poi qualche doppione può capitare. L'elenco è in `app.js`, cerca
-  `MISSIONS`: non devono per forza prestarsi a una foto (es. "Fai un
-  brindisi"), perché la foto è **facoltativa**. Per completarla si può
-  caricare una foto (compressa nel telefono prima di salvarla, come la foto
-  di copertina) oppure toccare "L'ho fatta, senza foto" per segnarla fatta
-  senza allegare nulla — anche per una missione "da foto" come il selfie, se
-  non ne ha voglia. Si può anche "cambiarla" se non piace, o farne un'altra
-  dopo aver completato la prima — a piacere.
+  `MISSIONS`. Per completarla si carica una **foto** (compressa nel telefono
+  prima di salvarla, come la foto di copertina). Alcune missioni non si
+  prestano bene a una foto (es. "Fai un brindisi", "Un abbraccio"): quelle
+  hanno `photo: false` accanto al testo in `MISSIONS`, e solo per quelle
+  compare anche il tasto "L'ho fatta, senza foto" per segnarle fatte senza
+  allegare nulla (la foto resta comunque possibile, se la si vuole fare lo
+  stesso). Per aggiungerne altre, basta mettere `photo: false` sulla voce
+  giusta in `MISSIONS`. Si può anche "cambiarla" se non piace, o farne
+  un'altra dopo aver completato la prima — a piacere.
   ⚠️ Questa funzione usa una collezione Firestore (`missionPhotos`): se
   attivate online dopo aver già seguito questa guida una volta, ricordatevi
   di rifare anche il punto 3 con `firestore.rules` aggiornato, altrimenti il
