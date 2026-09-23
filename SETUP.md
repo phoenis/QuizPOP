@@ -51,18 +51,24 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
 
 - **Cambiare telefono**: ogni telefono ha un'identità propria (nessun login),
   quindi normalmente aprendo il gioco su un secondo telefono si parte da zero.
-  Nel profilo (solo in modalità online) c'è un codice breve — "il tuo profilo
-  su un altro telefono" — da inserire sul nuovo telefono all'indirizzo
-  `.../#code` (niente link visibile nella schermata iniziale: come `#sposi`,
-  lo conosce solo chi ha l'indirizzo): sposta lì nome, punti e risposte (il
-  telefono di prima smette di essere quell'invitato nella classifica e nel
-  pannello sposi, così non compare due volte). Non è una sincronizzazione in
-  tempo reale: si può ripetere quando serve per riprendere i progressi più
-  recenti da un telefono diverso.
-- **Uscire da un profilo**: nel profilo, in fondo, "Esci da questo profilo"
-  libera il telefono per iscrivere qualcun altro (o voi stessi con un altro
-  nome, per fare una prova). Il profilo lasciato non si cancella: resta
-  recuperabile con il suo codice (vedi sopra).
+  Nel profilo (solo per chi ha accesso admin, vedi "Pannello sposi" più sotto,
+  e solo in modalità online) c'è un codice breve — "il tuo profilo su un
+  altro telefono" — da inserire sul nuovo telefono all'indirizzo `.../#code`
+  (niente link visibile nella schermata iniziale: come `#sposi`, lo conosce
+  solo chi ha l'indirizzo): sposta lì nome, punti e risposte (il telefono di
+  prima smette di essere quell'invitato nella classifica e nel pannello
+  sposi, così non compare due volte). Non è una sincronizzazione in tempo
+  reale: si può ripetere quando serve per riprendere i progressi più recenti
+  da un telefono diverso. Un invitato normale non vede questo codice né può
+  cambiare telefono da solo — se serve aiutarlo, potete recuperare il suo
+  profilo voi dal pannello sposi.
+- **Uscire da un profilo**: solo voi due (Mara e Stefano) vedete, in fondo al
+  profilo, "Esci da questo profilo" — libera il telefono per iscrivere
+  qualcun altro (o voi stessi con un altro nome, per fare una prova). Il
+  profilo lasciato non si cancella: resta recuperabile con il suo codice
+  (vedi sopra). Non è visibile a un invitato normale né ai due testimoni,
+  pur essendo anche loro admin: senza un codice visibile per rientrare, uscire
+  per sbaglio lo lascerebbe fuori dal proprio profilo.
 - **I vostri profili riservati** (solo in modalità online): oltre ai codici
   normali generati per ogni invitato, ce ne sono quattro riservati e sempre
   validi, per voi due e i due testimoni — `SPECIAL_PROFILES` in `app.js`:

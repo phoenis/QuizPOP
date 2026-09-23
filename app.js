@@ -262,12 +262,17 @@ async function persistProgress(){
 // Questi 4 profili non compaiono mai in classifica (vedi allPlayersWithMe()),
 // ma possono comunque fare le missioni fotografiche come chiunque altro.
 const SPECIAL_PROFILES = {
-  'POPSPOSA123!': { name: 'Mara', avatarEmoji: '👰🏻‍♀️' },
-  'POPSPOSO123!': { name: 'Stefano', avatarEmoji: '🤵🏻' },
-  'TESTIMONESPOSA': { name: 'Elisa', avatarEmoji: '🎤' },
-  'TESTIMONESPOSO': { name: 'Giulia', avatarEmoji: '🐶' },
+  'POPSPOSA123!': { name: 'Mara', avatarEmoji: '👰🏻‍♀️', role: 'sposo' },
+  'POPSPOSO123!': { name: 'Stefano', avatarEmoji: '🤵🏻', role: 'sposo' },
+  'TESTIMONESPOSA': { name: 'Elisa', avatarEmoji: '🎤', role: 'testimone' },
+  'TESTIMONESPOSO': { name: 'Giulia', avatarEmoji: '🐶', role: 'testimone' },
 };
 const isSpecialProfile = p => !!(p && SPECIAL_PROFILES[(p.transferCode || '').toUpperCase()]);
+// solo Mara e Stefano (non i testimoni, pur essendo anche loro admin): usato
+// per nascondere "Esci da questo profilo" a chiunque altro — un invitato
+// normale senza codice visibile non avrebbe modo di rientrare nel proprio
+// profilo dopo essere uscito.
+const isSpouseProfile = p => (SPECIAL_PROFILES[((p && p.transferCode) || '').toUpperCase()] || {}).role === 'sposo';
 
 // recupera lo stesso profilo su un altro telefono cercandolo per transferCode
 // (mostrato nel proprio profilo) e lo clona sul dispositivo corrente: non è
@@ -1153,6 +1158,7 @@ function renderProfile(){
   }).join('');
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
   const teamChips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
+  const isAdmin = state.adminUids.includes(state.guestId);
   return `<div class="screen screen-profile">
     <div class="topbar">${avatarButton()}</div>
     <button class="avatar lg" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
@@ -1164,7 +1170,7 @@ function renderProfile(){
     <div class="chips">${teamChips}</div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
-    ${state.adminUids.includes(state.guestId) ? `<div class="margin-top-small"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
+    ${isAdmin ? `<div class="margin-top-small"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
     <div class="stat-strip">
       <div class="stat-cell"><div class="v serif tabular">${state.score}</div><div class="c">Punti</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Carte</div></div>
@@ -1172,13 +1178,13 @@ function renderProfile(){
     </div>
     <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
     <div class="medal-grid">${medalCards}</div>
-    ${state.mode === 'online' && state.transferCode ? `
+    ${isAdmin && state.mode === 'online' && state.transferCode ? `
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
         <span class="album-code tabular">${esc(state.transferCode)}</span>
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia'}</button>
       </div>` : ''}
-    <div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>
+    ${isAdmin && isSpouseProfile({ transferCode: state.transferCode }) ? `<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>` : ''}
   </div>`;
 }
 
