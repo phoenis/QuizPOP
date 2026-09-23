@@ -426,8 +426,6 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .medal-card .note{ font-size:11px; margin-top:3px; opacity:.9; }
 .medal-card.locked .note{ color:var(--neutral-700); opacity:1; }
 .answer-row{ display:flex; align-items:center; gap:var(--sp-2); padding:10px 0; border-top:1px solid var(--neutral-300); text-align:left; font-size:13px; }
-.answer-row .num{ min-width:20px; color:var(--neutral-500); }
-.answer-row .num.is-correct{ color:var(--accent-600); }
 .answer-row .title{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .answer-row .line{ margin-left:auto; white-space:nowrap; }
 
