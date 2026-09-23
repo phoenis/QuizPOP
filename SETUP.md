@@ -114,11 +114,29 @@ e apri l'indirizzo che stampa (es. http://localhost:3000).
    una **app Web** (icona `</>`). Dagli un nome qualsiasi e registra.
 6. Firebase mostra un oggetto `firebaseConfig`: copia i valori dentro
    [firebase-config.js](firebase-config.js), sostituendo le stringhe vuote.
-7. Ricarica la pagina: se le chiavi sono corrette l'app è già in modalità online.
+7. ⚠️ **Passo facile da dimenticare, e che blocca tutto in silenzio se saltato**:
+   in **Authentication → Impostazioni → Domini autorizzati**, aggiungi il
+   dominio (o sottodominio) dove metterai online il quiz, es. `maraestefano.it`
+   — senza questo, il sito caricato lì non riesce ad autenticarsi e l'app
+   ripiega da sola in "modalità locale" senza dirlo chiaramente: sembra
+   funzionare (si può comunque creare un profilo, ma resta solo su quel
+   telefono), finché non si prova qualcosa che richiede davvero il collegamento
+   — per esempio recuperare un profilo con un codice, che a quel punto non fa
+   nulla.
+8. Ricarica la pagina: se le chiavi sono corrette e il dominio è autorizzato,
+   l'app è già in modalità online.
 
 Non serve nessun server da mantenere: Firestore è un servizio gestito da
 Google, e le chiavi in `firebase-config.js` sono pensate per stare in chiaro in
 un sito pubblico (la sicurezza vera è nelle regole del punto 3).
+
+**Come capire se sei davvero in modalità online** (utile per un test veloce
+dopo aver caricato il sito): entra con uno dei codici riservati (es. il tuo,
+`POPSposa123!`) e apri il profilo — se in fondo vedi la sezione "Il tuo
+profilo su un altro telefono" con un codice, sei online; se non la vedi
+affatto, quasi certamente sei ancora in modalità locale e va ricontrollato
+il punto 7 qui sopra. (Quella sezione è visibile solo a chi ha accesso admin,
+come i profili riservati — un invitato normale non la vede mai, online o no.)
 
 ## Pannello sposi
 Si raggiunge visitando l'indirizzo del sito con `#sposi` in fondo, ad esempio:

@@ -282,7 +282,18 @@ const isSpouseProfile = p => (SPECIAL_PROFILES[((p && p.transferCode) || '').toU
 // riprendere i progressi più recenti.
 async function recoverProfile(){
   const code = state.recoverCode.trim().toUpperCase();
-  if (!code || state.mode !== 'online' || !fb) return;
+  if (!code){
+    openAlert('Scrivi il codice prima di continuare.');
+    return;
+  }
+  // in modalita' locale (Firebase non configurato, o non raggiungibile da
+  // questo indirizzo — vedi SETUP.md, "Attivare la classifica condivisa")
+  // non esiste nessun profilo da recuperare: prima non si vedeva nulla
+  // toccando "Entra", ora almeno lo si dice chiaramente.
+  if (state.mode !== 'online' || !fb){
+    openAlert('Il gioco non è connesso a Firebase in questo momento: il recupero del profilo funziona solo online.');
+    return;
+  }
   const qs = await fb.getDocs(fb.query(fb.collection(fb.db, 'players'), fb.where('transferCode', '==', code)));
   if (qs.empty){
     const special = SPECIAL_PROFILES[code];
@@ -1179,7 +1190,7 @@ function renderProfile(){
         <span class="album-code tabular">${esc(state.transferCode)}</span>
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia'}</button>
       </div>` : ''}
-    ${isAdmin && isSpouseProfile({ transferCode: state.transferCode }) ? `<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>` : '<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>'}
+    ${isAdmin && isSpouseProfile({ transferCode: state.transferCode }) ? `<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>` : ''}
   </div>`;
 }
 
