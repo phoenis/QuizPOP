@@ -669,7 +669,7 @@ function renderJoin(){
         ${state.joinError ? `<div class="field-error">Scrivi il tuo nome per continuare</div>` : ''}
       </div>
       <div class="field-block">
-        <div class="field-label">Scegli un avatar (facoltativo)</div>
+        <div class="field-label">Scegli un avatar</div>
         <div class="chips">${emojiChips}</div>
       </div>
              <div class="field-block">
@@ -1204,7 +1204,9 @@ function renderProfileEditModal(){
         </div>
         <div class="field-label margin-top-small">Tavolo</div>
         <div class="chips">${teamChips}</div>
-        <button class="button is-fill block margin-top-small" data-action="save-profile-edit">Salva</button>
+        <div class="result-cta">
+          <button class="button is-fill margin-top-small" data-action="save-profile-edit">Salva</button>
+        </div>
       </div>
     </div>
   </div>`;
