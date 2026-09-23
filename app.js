@@ -1166,7 +1166,7 @@ function renderProfile(){
     ${state.avatarPickerOpen ? `<div class="chips">${emojiChips}
       ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
     </div>
-    <div class="field-label margin-top-small">Tavolo</div>
+    <div class="field-label margin-top-large">Tavolo</div>
     <div class="chips">${teamChips}</div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
@@ -1184,7 +1184,7 @@ function renderProfile(){
         <span class="album-code tabular">${esc(state.transferCode)}</span>
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia'}</button>
       </div>` : ''}
-    ${isAdmin && isSpouseProfile({ transferCode: state.transferCode }) ? `<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>` : ''}
+    ${isAdmin && isSpouseProfile({ transferCode: state.transferCode }) ? `<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>` : '<div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>'}
   </div>`;
 }
 

@@ -434,6 +434,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
   box-shadow:var(--shadow-sm); border-bottom: none;
 }
 .margin-top-small{margin-top: 8px;}
+.margin-top-large{margin-top: 24px;}
 .podium-block.top{ background:linear-gradient(135deg, var(--accent-500), var(--accent-700)); color:#fffdf6; border:0; box-shadow:var(--shadow-md); }
 .podium-block.rank-1{ height:140px; }
 .podium-block.rank-2{ height:96px; }
