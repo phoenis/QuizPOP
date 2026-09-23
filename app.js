@@ -1,14 +1,9 @@
 import { firebaseConfig } from './firebase-config.js?v=1';
 
 /* ============ Dati del gioco (copia dal design di riferimento) ============ */
-// doubleWith: codice di un profilo riservato (vedi SPECIAL_PROFILES) — se chi
-// risponde la indovina E quel profilo l'ha gia' indovinata a sua volta,
-// raddoppia i punti di questa domanda (vedi finish()). Va per come sono
-// arrivate le risposte finora: se il profilo riservato risponde dopo, non
-// raddoppia retroattivamente i punti gia' assegnati.
 const QS = [
   {k:'Su Mara', h:'Non parte mai senza.', t:'Qual è una cosa che Mara non rinuncerebbe mai a portarsi in viaggio?', o:['Un libro','La macchina fotografica','Tappi per le orecchie','Il power bank'], c:2, s:'Tappi per le orecchie: non si sa mai chi russa nella stanza accanto.'},
-  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Tenere in ordine i vestiti','Andare dal fruttivendolo','Pulire il pavimento','Aprire le finestre'], c:1, doubleWith:'TESTIMONESPOSA', s:'Andare dal fruttivendolo: un appuntamento fisso.'},
+  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Tenere in ordine i vestiti','Andare dal fruttivendolo','Pulire il pavimento','Aprire le finestre'], c:1, s:'Andare dal fruttivendolo: un appuntamento fisso.'},
   {k:'Su di loro', h:'Chi si butta, chi pianifica.', t:'Chi dei due è più probabile che inizi un nuovo progetto senza sapere ancora esattamente come finirà?', o:['Mara','Stefano','Nessuno dei due, pianificano sempre tutto'], c:0, s:'Mara: si lancia e poi si organizza strada facendo.'},
   {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il cibo preferito di Stefano?', o:['Pizza','Formaggio','Risotto ai funghi','Zucca'], c:1, s:'Il formaggio, sempre e comunque.'},
   {k:'Su Mara', h:'Un pomeriggio perfetto.', t:'Quale attività potrebbe convincere Mara a passare un intero pomeriggio senza guardare l’orologio?', o:['Una maratona di serie tv','Lavoretti con il fai da te','Fare shopping','Una lunga corsa'], c:1, s:'Lavoretti con il fai da te: il tempo vola, sempre.'},
@@ -16,7 +11,7 @@ const QS = [
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte.'},
   {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Giallo'], c:3, s:'Il giallo, senza dubbi.'},
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
-  {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, doubleWith:'TESTIMONESPOSO', s:'Polpette al sugo, come le fa la mamma.'},
+  {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le fa la mamma.'},
 
   {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Come ha fatto Ste a conquistare il cuore di Mara?', o:['Con la battuta su POP fa il criceto','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto: e 1000 altri da fare con il microonde.'},
   {k:'La loro vita insieme', h:'Chi tarda di più.', t:'Chi dei due ci mette più tempo a prepararsi prima di uscire?', o:['Mara','Ste','Nessuno dei due, sono velocissimi','Dipende dall’occasione'], c:1, s:'Ste: qualche minuto in più, ogni volta.'},
@@ -365,14 +360,6 @@ function nextOpen(res, fromPos){
 // entro quei secondi vale di piu', oltre resta comunque il punteggio base).
 function dur(){ return TIMER_S; }
 
-// vero se il profilo riservato di q.doubleWith ha gia' risposto correttamente
-// a questa stessa domanda (vedi il commento su doubleWith sopra QS).
-function doubledByPartner(q){
-  if (!q.doubleWith) return false;
-  const partner = state.players.find(p => (p.transferCode || '').toUpperCase() === q.doubleWith);
-  return !!(partner && partner.res && partner.res[state.qi] && partner.res[state.qi].correct);
-}
-
 function finish(idx){
   const q = Q(state.qi);
   const correct = q.order
@@ -380,9 +367,8 @@ function finish(idx){
     : (idx === q.c);
   const used = Math.max(0.1, (Date.now() - state.startedAt) / 1000);
   const bonus = correct ? Math.round(BONUS_PTS * Math.max(0, 1 - used / dur())) : 0;
-  const doubled = correct && doubledByPartner(q);
-  const pts = (correct ? BASE_PTS + bonus : 0) * (doubled ? 2 : 1);
-  state.res[state.qi] = { pts, bonus, correct, used, doubled };
+  const pts = correct ? BASE_PTS + bonus : 0;
+  state.res[state.qi] = { pts, bonus, correct, used };
   state.score += pts;
   state.locked = true;
   state.screen = 'result';
@@ -1047,7 +1033,6 @@ function renderResult(){
       <div class="breakdown">
         <div class="breakdown-row"><span>${r.correct ? 'Risposta giusta' : 'Risposta'}</span><span class="val tabular">${r.correct ? '+' + BASE_PTS : '0'}</span></div>
         <div class="breakdown-row"><span>Velocità${r.used ? ' · ' + numIt(r.used) + 's' : ''}</span><span class="val tabular">${r.correct ? '+' + r.bonus : '—'}</span></div>
-        ${r.doubled ? `<div class="breakdown-row"><span>Raddoppio · anche ${esc((SPECIAL_PROFILES[q.doubleWith] || {}).name || '')} l’ha indovinata</span><span class="val tabular">+${BASE_PTS + r.bonus}</span></div>` : ''}
         <div class="breakdown-row total"><span>Totale</span><span class="val tabular">${r.pts || 0}</span></div>
       </div>
     </div>
