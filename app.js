@@ -254,14 +254,18 @@ async function persistProgress(){
   }
 }
 
-// codici riservati per Mara e Stefano: al primo utilizzo creano il loro
+// codici riservati per sposi e testimoni: al primo utilizzo creano il loro
 // profilo speciale (nome e icona fissi, protetto da "Elimina" nel pannello
 // sposi — vedi isSpecialProfile() — e gia' admin, vedi addAdmin() qui sotto);
 // da li' in poi si comportano come un transferCode normale, recuperando
 // quello stesso profilo (con lo stesso accesso admin) su ogni telefono.
+// Questi 4 profili non compaiono mai in classifica (vedi allPlayersWithMe()),
+// ma possono comunque fare le missioni fotografiche come chiunque altro.
 const SPECIAL_PROFILES = {
   'POPSPOSA123!': { name: 'Mara', avatarEmoji: '👰🏻‍♀️' },
   'POPSPOSO123!': { name: 'Stefano', avatarEmoji: '🤵🏻' },
+  'TESTIMONESPOSA': { name: 'Elisa', avatarEmoji: '🎤' },
+  'TESTIMONESPOSO': { name: 'Giulia', avatarEmoji: '🐶' },
 };
 const isSpecialProfile = p => !!(p && SPECIAL_PROFILES[(p.transferCode || '').toUpperCase()]);
 
@@ -491,8 +495,13 @@ function afterMedal(){
   else { replaceScreen('home'); render(); }
 }
 
+// sposi e testimoni (vedi SPECIAL_PROFILES) non contano mai come partecipanti
+// alla classifica, ne' quando compaiono nella lista di tutti gli altri ne'
+// quando sono loro stessi a giocare: possono comunque rispondere alle
+// domande e fare le missioni, solo non finiscono mai in classifica.
 function allPlayersWithMe(){
-  const board = state.players.length ? state.players.slice() : RIVALS_DEMO.slice();
+  const board = (state.players.length ? state.players.slice() : RIVALS_DEMO.slice()).filter(p => !isSpecialProfile(p));
+  if (isSpecialProfile({ transferCode: state.transferCode })) return board;
   const mine = { id: state.guestId, name: state.name || 'Tu', team: state.team, avatarEmoji: state.avatarEmoji, score: state.score, me: true,
     detail: Object.keys(state.res).length + ' carte su ' + allQuestions().length };
   const already = board.some(p => p.id === state.guestId);
@@ -1220,7 +1229,6 @@ function renderClassificaFinale(backButton){
       </div>
     </div>`;
   }).join('');
-  const note = mine && mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Mannaggia, è andata male!';
   const teams = computeTeams();
   const winningTeam = teams.length ? teams.slice().sort((a, b) => b.avg - a.avg)[0] : null;
   return `
@@ -1232,9 +1240,11 @@ function renderClassificaFinale(backButton){
       <span class="winner-team-name serif">${esc(winningTeam.label)}</span>
     </div>` : ''}
     <div class="card is-dashed">
-      <div class="kicker">Tu</div>
-      <h2>${mine ? mine.rank + 'º con ' + mine.score + ' punti' : ''}</h2>
-      <div class="sub-text pretty">${note}</div>
+      ${mine ? `<div class="kicker">Tu</div>
+      <h2>${mine.rank}º con ${mine.score} punti</h2>
+      <div class="sub-text pretty">${mine.rank <= 3 ? 'Premio in arrivo insieme alla torta.' : 'Mannaggia, è andata male!'}</div>`
+      : `<div class="kicker">Classifica</div>
+      <div class="sub-text pretty">Guarda chi si e' rivelato il più preparato.</div>`}
           <button class="button is-outline" data-action="open-board-full">Classifica completa</button>
     </div>
   `;
