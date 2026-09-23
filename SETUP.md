@@ -160,10 +160,11 @@ sottocartella del tuo spazio Aruba, es. `/quiz/` così sarà raggiungibile su
 tutto il gioco parla direttamente con Firebase dal browser dell'invitato.
 
 ## Note tecniche
-- Nessuna scadenza sulle domande: si può rispondere con tutta calma. Rispondere
-  entro 20 secondi (mai mostrati a schermo) dà comunque un piccolo bonus di
-  punti in più, che si riduce con il passare del tempo ma non toglie mai il
-  punteggio base della domanda.
+- Nessuna scadenza sulle domande: si può rispondere con tutta calma. In alto,
+  accanto al numero della carta, i secondi trascorsi corrono solo come
+  riferimento (non è un conto alla rovescia): rispondere entro 20 secondi dà
+  comunque un piccolo bonus di punti in più, che si riduce con il passare del
+  tempo ma non toglie mai il punteggio base della domanda.
 - Le 25 domande sono divise in 4 categorie ("Mara & Stefano" da 10, "La loro
   vita insieme", "Il giorno di festa" e "Andiamo in viaggio" da 5 ciascuna),
   mostrate come 4 card nella schermata "Le domande" (una per categoria, con
