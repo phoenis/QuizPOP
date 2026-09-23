@@ -115,16 +115,30 @@ e apri l'indirizzo che stampa (es. http://localhost:3000).
 6. Firebase mostra un oggetto `firebaseConfig`: copia i valori dentro
    [firebase-config.js](firebase-config.js), sostituendo le stringhe vuote.
 7. ⚠️ **Passo facile da dimenticare, e che blocca tutto in silenzio se saltato**:
-   in **Authentication → Impostazioni → Domini autorizzati**, aggiungi il
-   dominio (o sottodominio) dove metterai online il quiz, es. `maraestefano.it`
-   — senza questo, il sito caricato lì non riesce ad autenticarsi e l'app
+   la chiave API creata da Firebase ha di default una restrizione sui referrer
+   HTTP (il dominio da cui arriva la richiesta) — finché il tuo dominio non è
+   nella lista, il sito caricato lì non riesce ad autenticarsi e l'app
    ripiega da sola in "modalità locale" senza dirlo chiaramente: sembra
    funzionare (si può comunque creare un profilo, ma resta solo su quel
    telefono), finché non si prova qualcosa che richiede davvero il collegamento
    — per esempio recuperare un profilo con un codice, che a quel punto non fa
-   nulla.
-8. Ricarica la pagina: se le chiavi sono corrette e il dominio è autorizzato,
-   l'app è già in modalità online.
+   nulla. Se apri la console del browser (F12) su quella pagina e vedi un
+   errore tipo `auth/requests-from-referer-https://tuodominio.it-are-blocked`,
+   è esattamente questo. Per sistemarlo:
+   1. Vai su https://console.cloud.google.com/apis/credentials (stesso
+      progetto Firebase, verifica in alto).
+   2. Apri la chiave "Browser key (auto created by Firebase)" (quella che
+      inizia uguale al valore `apiKey` in `firebase-config.js`).
+   3. Sotto "Restrizioni applicazione" → "Referrer HTTP (siti web)", aggiungi
+      il tuo dominio, sia con sia senza `www`, con l'asterisco finale:
+      `https://tuodominio.it/*` e `https://www.tuodominio.it/*`.
+   4. Salva — puoi impiegare qualche minuto prima che valga davvero.
+
+   (Nota: questa è una impostazione diversa dai "Domini autorizzati" dentro
+   Firebase Authentication, che invece riguarda altri tipi di accesso, non
+   quello anonimo usato qui — non serve toccarla per questo problema.)
+8. Ricarica la pagina: se le chiavi sono corrette e il dominio è tra i
+   referrer consentiti, l'app è già in modalità online.
 
 Non serve nessun server da mantenere: Firestore è un servizio gestito da
 Google, e le chiavi in `firebase-config.js` sono pensate per stare in chiaro in
