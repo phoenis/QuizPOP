@@ -1186,7 +1186,6 @@ function renderMedalModal(){
   const rows = state.order.filter(qi => catOf(qi) === idx && state.res[qi]).map(qi => {
     const r = state.res[qi];
     return `<div class="answer-row">
-      <span class="num${r.correct?' is-correct':''}">${posOf(qi)+1}</span>
       <span class="title">${esc(Q(qi).t)}</span>
       <span class="line tabular">${r.pts?'+'+r.pts:'0'} · ${numIt(r.used)}s</span>
     </div>`;
