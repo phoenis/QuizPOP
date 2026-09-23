@@ -1133,8 +1133,7 @@ function renderProfile(){
     const note = st.right + ' su ' + st.n + ' giuste';
     return `<button class="medal-card ${st.earned ? 'earned cat-tile--' + (idx + 1) : 'locked'}" data-action="open-medal-modal" data-cat="${idx}">
       ${c.mark}
-      <div class="name serif">${esc(c.name)}</div>
-      <div class="note">${note}</div>
+      <div class="medal-title">${esc(c.name)}</div>
     </button>`;
   }).join('');
   const extraBadges = [
@@ -1195,6 +1194,8 @@ function renderMedalModal(){
   return `<div class="medal-modal" data-action="close-medal-modal">
     <div class="medal-modal-sheet" data-action="lightbox-noop">
       <div class="medal-modal-head">
+      <div class="name serif">${esc(c.name)}</div>
+      <div class="note">${esc(c.note)}</div>
         <div class="section-title">${esc(c.name)}</div>
         <button class="medal-modal-close" data-action="close-medal-modal">✕</button>
       </div>
