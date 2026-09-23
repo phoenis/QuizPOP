@@ -50,7 +50,7 @@ function catState(res, c){
   const n = c.to - c.from + 1;
   return { done, right, n, earned: done === n };
 }
-const TEAMS = ['Machu Picchu','Palcoyo','Étretat','Tirino','Etna','Parco della Majella','Tuckett','XII Apostoli','Le Mont-Saint-Michel','Calanchi'];
+const TEAMS = ['Calanchi','Etna','Étretat','Le Mont-Saint-Michel','Machu Picchu','Palcoyo','Parco della Majella','Tirino','Tuckett','XII Apostoli'];
 const RIVALS_DEMO = [
   {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1, avatarEmoji:'🌻'},
   {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2, avatarEmoji:'🦄'},
@@ -669,10 +669,9 @@ function renderJoin(){
         <div class="field-label">Che escursione hai intrapreso?</div>
         <div class="chips">${chips}</div>
       </div>
-    </div>
-    <div class="join-spacer"></div>
     <div class="result-cta">
-      <button class="button is-outline" data-action="join">Comincia</button>
+      <button class="button is-fill" data-action="join">Comincia</button>
+    </div>
     </div>
     <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
   </div>`;
@@ -685,16 +684,15 @@ function renderJoin(){
 function renderRecoverCode(){
   return `<div class="screen screen-join">
     <h1 class="join-title couple-title">Mara<span class="amp-line amp">&amp;</span>Stefano</h1>
-    <div class="kicker neutral join-sub">Recupera il tuo profilo</div>
+    <div class="kicker neutral join-sub">Entra con il tuo profilo</div>
     <div class="card join-card">
       <div class="field-block">
         <div class="field-label">Codice del tuo profilo</div>
         <input id="recover-code" class="name-input" type="text" placeholder="Codice" maxlength="20" value="${esc(state.recoverCode)}">
       </div>
-    </div>
-    <div class="join-spacer"></div>
     <div class="result-cta">
-      <button class="button is-outline" data-action="recover-profile">Recupera profilo</button>
+      <button class="button is-fill" data-action="recover-profile">Entra</button>
+    </div>
     </div>
     <img src="assets/mascotte/criceti.png" alt="" class="join-mascot">
   </div>`;
