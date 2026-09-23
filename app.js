@@ -784,7 +784,11 @@ function renderMissione(){
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
-      <p class="fine-print"><button data-action="skip-mission">Non mi piace, cambia</button></p>
+      <p class="fine-print">
+        <button data-action="complete-mission-nophoto">✓ L'ho fatta, senza foto</button>
+        <span> · </span>
+        <button data-action="skip-mission">Non mi piace, cambia</button>
+      </p>
       </div>
     </div>`;
   } else if (!list.length){
@@ -1642,6 +1646,10 @@ root.addEventListener('click', e => {
       openConfirm('Cambiare missione? Non potrai più tornare a questa.', skipMission);
       break;
     }
+    case 'complete-mission-nophoto': {
+      openConfirm('Segnare questa missione come fatta, senza foto?', () => completeMission(null));
+      break;
+    }
     case 'admin-hero-pick': document.getElementById('admin-hero-file').click(); break;
     case 'admin-hero-remove': {
       openConfirm('Togliere la foto di copertina? Torna il placeholder.', removeHeroPhoto);
@@ -1771,20 +1779,26 @@ async function skipMission(){
   await assignMission(cur.index);
 }
 
+// file e' facoltativo: una missione si puo' segnare fatta anche senza foto
+// (non tutte si prestano, es. un brindisi), ma chi vuole puo' comunque
+// allegarne una passando un file, come prima.
 async function completeMission(file){
   const cur = state.missions[state.missions.length - 1];
-  if (!cur || cur.done || !file) return;
-  const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
-  let dataUrl = '';
-  for (const [maxDim, quality] of steps){
-    dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
-    if (dataUrl.length < 500000) break;
+  if (!cur || cur.done) return;
+  let kind = 'none', src = '';
+  if (file){
+    const steps = [[1000, 0.7], [800, 0.55], [600, 0.4]];
+    let dataUrl = '';
+    for (const [maxDim, quality] of steps){
+      dataUrl = await fileToCompressedDataUrl(file, maxDim, quality);
+      if (dataUrl.length < 500000) break;
+    }
+    if (dataUrl.length >= 500000){
+      openAlert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
+      return;
+    }
+    kind = 'photo'; src = dataUrl;
   }
-  if (dataUrl.length >= 500000){
-    openAlert('La foto è troppo pesante anche dopo la compressione: provane una più semplice.');
-    return;
-  }
-  const kind = 'photo', src = dataUrl;
   cur.done = true;
   state.missionPhotos = { ...state.missionPhotos, [cur.index]: { kind, src } };
   render();
