@@ -1194,9 +1194,10 @@ function renderMedalModal(){
   return `<div class="medal-modal" data-action="close-medal-modal">
     <div class="medal-modal-sheet" data-action="lightbox-noop">
       <div class="medal-modal-head">
-      <div class="name serif">${esc(c.name)}</div>
-      <div class="note">${esc(c.note)}</div>
-        <div class="section-title">${esc(c.name)}</div>
+      <div class="medal-modal-head-text">
+      <h2 class="mission-text pretty">${esc(c.name)}</h2>
+      <div class="sub-text pretty margin-top-none">${esc(c.note)}</div>
+        </div>
         <button class="medal-modal-close" data-action="close-medal-modal">✕</button>
       </div>
       <div class="medal-modal-body">${rows || `<p class="fine-print">Ancora niente. Gira la prima carta di questa categoria.</p>`}</div>
