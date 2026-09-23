@@ -1044,7 +1044,9 @@ function renderMedal(){
       <h1 class="medal-celebrate-title pretty">Congratulazioni, hai vinto la medaglia "${esc(c.name)}"!</h1>
       <p class="medal-celebrate-note pretty">${esc(c.note)}</p>
     </div>
-    <button class="button is-outline block" data-action="after-medal">Continua</button>
+    <div class="result-cta">
+      <button class="button is-outline block" data-action="after-medal">Continua</button>
+    </div>
   </div>`;
 }
 
@@ -1195,11 +1197,10 @@ function renderMedalModal(){
       <div class="medal-modal-head">
       <div class="medal-modal-head-text">
       <h2 class="mission-text pretty">${esc(c.name)}</h2>
-      <div class="sub-text pretty margin-top-none">${esc(c.note)}</div>
         </div>
         <button class="medal-modal-close" data-action="close-medal-modal">✕</button>
       </div>
-      <div class="medal-modal-body">${rows || `<p class="fine-print">Ancora niente. Gira la prima carta di questa categoria.</p>`}</div>
+      <div class="medal-modal-body">${rows || `<p class="fine-print">Per ottenere la medaglia devi rispondere alle domande di questa categoria!</p>`}</div>
     </div>
   </div>`;
 }
