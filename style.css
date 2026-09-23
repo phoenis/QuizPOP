@@ -468,14 +468,15 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .admin-card-content{ display:flex; flex-direction: row; align-items: center; gap:var(--sp-3);}
 .admin-card-row .avatar{ border-color:rgba(247,236,214,.3); color:var(--admin-ink); }
 .admin-card-row .num{ color:var(--accent-400); font-family:var(--font-primary); font-size:16px; min-width:22px; }
-.admin-card-row .kk{ font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; opacity:.55; }
-.admin-card-row .tt{ font-size:13.5px; }
+.admin-card-row .kk{ font-size:11px; text-transform:uppercase; letter-spacing:.18em; opacity:.55; line-height: 1.6;}
+.admin-card-row .tt{ font-size:14px; margin-bottom: 4px; display: flex; align-items: flex-end }
 .admin-card-row .cnt{ margin-left:auto; font-size:11px; opacity:.6; white-space:nowrap; }
 .avatar-icon{position: absolute; bottom: 0; right: 0; width: 1.6rem; padding: 0.35rem; color: white; background-color: var(--accent-600); border-radius: var(--r-full);}
 .avatar-icon svg{width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;}
 .reset-btn{ background:none; border:1px solid rgba(247,236,214,.28); border-radius:var(--r-full); color:rgba(247,236,214,.7); font-size:11px; padding:7px 12px; white-space:nowrap; }
+.admin-label{ background:var(--neutral-700); border-radius:var(--r-full); color:var(--neutral-300); font-size:11px; padding:3px 6px; white-space:nowrap;  margin-left: 8px;}
 .reset-btn:hover{ border-color:var(--accent-400); color:var(--accent-400); }
-.admin-card-row-actions{ display:flex; flex-direction:row; gap:6px; }
+.admin-card-row-actions{ display:flex; flex-direction:row; justify-content: flex-end; gap:6px; }
 .mission-admin-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid rgba(247,236,214,.16); }
 .mission-admin-thumb{ flex:none; width:52px; height:52px; object-fit:cover; border-radius:var(--r-md); cursor:pointer; }
 .mission-admin-row .tt{ font-size:13.5px; }

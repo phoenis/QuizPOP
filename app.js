@@ -1364,14 +1364,14 @@ function renderAdmin(){
       <div class="admin-card-content">
         <div class="avatar">${esc(avatarGlyph(p))}</div>
         <div>
-          <div class="tt">${esc(name)}${nameTag}</div>
-          <div class="kk">${esc(TEAMS[p.team] || '')} · ${done}/${totalCards} carte · ${p.score || 0} punti</div>
+          <div class="tt">${esc(name)}${nameTag} ${isAdmin
+          ? `<span class="admin-label">Admin</span>`
+          : ``}</div>
+          <div class="kk">${esc(TEAMS[p.team] || '')}</div>
+          <div class="kk">${done}/${totalCards} risposte · ${p.score || 0} punti</div>
         </div>
       </div>
       <div class="admin-card-row-actions">
-        ${isAdmin
-          ? `<button class="reset-btn" data-action="remove-admin" data-id="${esc(p.id)}">Admin ✓</button>`
-          : `<button class="reset-btn" data-action="add-admin" data-id="${esc(p.id)}">Rendi admin</button>`}
         <button class="reset-btn" data-action="reset-player-answers" data-id="${esc(p.id)}">Azzera</button>
         ${isSpecialProfile(p) ? '' : `<button class="reset-btn" data-action="delete-player" data-id="${esc(p.id)}">Elimina</button>`}
       </div>
