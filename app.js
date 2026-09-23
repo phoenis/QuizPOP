@@ -11,7 +11,7 @@ const QS = [
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte.'},
   {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Giallo'], c:3, s:'Il giallo, senza dubbi.'},
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
-  {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le fa la mamma.'},
+  {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le faceva nonna Pina.'},
 
   {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Come ha fatto Ste a conquistare il cuore di Mara?', o:['Con la battuta su POP fa il criceto','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto: e 1000 altri da fare con il microonde.'},
   {k:'La loro vita insieme', h:'Chi tarda di più.', t:'Chi dei due ci mette più tempo a prepararsi prima di uscire?', o:['Mara','Ste','Nessuno dei due, sono velocissimi','Dipende dall’occasione'], c:1, s:'Ste: qualche minuto in più, ogni volta.'},
@@ -1039,7 +1039,7 @@ function renderResult(){
     <p class="rank-line">${esc(rankLine)}</p>
     <div class="result-cta">
       <button class="button is-fill is-negative" data-action="after-result">${cta}</button>
-      <div class="button-alone"><button class="btn-text" data-action="nav-back">Basta per ora, torno dopo</button></div>
+      <div class="button-alone"><button class="btn-text margin-top-small" data-action="nav-back">Basta per ora, torno dopo</button></div>
     </div>
   </div>`;
 }
