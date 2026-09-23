@@ -226,7 +226,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .mission-history-row{ display:flex; align-items:center; gap:12px; border:1px solid var(--neutral-300); border-radius:var(--r-md); padding:10px; font-size:13.5px; }
 .mission-history-thumb{ flex:none; width:48px; height:48px; object-fit:cover; border-radius:var(--r-md); cursor:pointer; }
 .mission-mascot{ width:90px; height:auto; opacity:.9; }
-.album-code-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px; background:var(--accent-100); border-radius:var(--r-md); padding:14px 16px; }
+.album-code-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--accent-100); border-radius:var(--r-md); padding:14px 16px; flex-wrap: wrap;}
 .album-code{ font-size:21px; letter-spacing:.06em; color:var(--accent-700); }
 
 /* ===== HOME / DOMANDE (card per categoria) ===== */
@@ -349,7 +349,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .btn-text{ border:0; background:none; color:var(--neutral-700); font-size:13px; text-decoration:underline; text-underline-offset:3px; }
 .button-alone{width: 100%; display: flex; justify-content: center; margin-top: auto; margin-bottom: 8px;}
 .button.is-fill.is-negative{color: #241d15; background-color: white; border-color: white;}
-.button.is-copied, .button.small.is-copied{ background:#4a7c43; border-color:#4a7c43; color:#fff; }
+.button.is-copied, .button.small.is-copied{ background:var(--accent-700); border-color:var(--accent-700); color:#fff; }
 .button.is-outline:hover{ background:var(--accent-100); }
 .button.is-outline.is-esci{ border-color: var(--ink); color: var(--ink); font-size: 0.9rem; margin-top: 24px;}
 .button.is-outline:disabled{ opacity:.45; cursor:default; }

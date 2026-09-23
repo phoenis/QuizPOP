@@ -1175,7 +1175,7 @@ function renderProfile(){
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
         <span class="album-code tabular">${esc(state.transferCode)}</span>
-        <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia codice'}</button>
+        <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia'}</button>
       </div>` : ''}
     <div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>
   </div>`;
