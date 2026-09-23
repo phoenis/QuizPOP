@@ -156,7 +156,7 @@ function renderMissionMedia(entry, cls){
 /* ============ Stato ============ */
 const state = {
   screen: 'boot',
-  name: '', team: 0, avatarEmoji: '', joinError: false,
+  name: '', team: null, avatarEmoji: '', joinError: false, teamError: false,
   profileEditOpen: false, // true mentre e' aperta la modale "modifica profilo" (avatar + tavolo)
   draftAvatarEmoji: '', draftTeam: 0, // valori scelti dentro la modale, applicati solo al tocco di "Salva"
   sel: null,
@@ -695,6 +695,7 @@ function renderJoin(){
              <div class="field-block">
         <div class="field-label">Che escursione hai intrapreso?</div>
         <div class="chips">${chips}</div>
+        ${state.teamError ? `<div class="field-error">Scegli il tuo tavolo per continuare</div>` : ''}
       </div>
     <div class="result-cta">
       <button class="button is-fill" data-action="join">Comincia</button>
@@ -1528,7 +1529,7 @@ root.addEventListener('click', e => {
     // tutto insieme al submit del form. Dal profilo si passa invece dalla
     // modale "Modifica profilo" qui sotto (pick-draft-*/save-profile-edit),
     // che non tocca il profilo vero finche' non si tocca "Salva".
-    case 'pick-team': state.team = +el.dataset.team; render(); break;
+    case 'pick-team': state.team = +el.dataset.team; state.teamError = false; render(); break;
     case 'pick-avatar': state.avatarEmoji = el.dataset.emoji || ''; render(); break;
     case 'open-profile-edit': {
       state.draftAvatarEmoji = state.avatarEmoji;
@@ -1576,13 +1577,13 @@ root.addEventListener('click', e => {
     case 'join': {
       const input = document.getElementById('name-input');
       const name = (input && input.value.trim()) || '';
-      if (!name){
-        state.joinError = true;
+      state.joinError = !name;
+      state.teamError = state.team == null;
+      if (state.joinError || state.teamError){
         render();
-        document.getElementById('name-input')?.focus();
+        if (state.joinError) document.getElementById('name-input')?.focus();
         break;
       }
-      state.joinError = false;
       state.name = name;
       persistProgress();
       go('hub');
