@@ -784,7 +784,7 @@ function renderMissione(){
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
         <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
-      <p class="fine-print"><a href="" data-action="skip-mission">Non mi piace, cambia</a></p>
+      <p class="fine-print"><button data-action="skip-mission">Non mi piace, cambia</button></p>
       </div>
     </div>`;
   } else if (!list.length){
@@ -855,7 +855,7 @@ function renderAlbum(){
         <div class="result-cta">
           <button class="button is-outline" data-action="open-album">Apri WedShoots ↗</button>
         </div>
-          <p class="fine-print">Non hai l'app? <a href="" data-action="open-album-store">Scaricala</a></p>
+          <p class="fine-print">Non hai l'app? <button data-action="open-album-store">Scaricala</button></p>
       </div>
       <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
     </div>

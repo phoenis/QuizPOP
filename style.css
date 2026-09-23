@@ -153,7 +153,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .chip.on{ background:var(--accent-200); border-color:var(--accent-600); color:var(--accent-700); }
 .chip.emoji{ font-size:19px; padding:7px 11px; line-height:1; }
 .fine-print{ font-size:11.5px; color:var(--neutral-700); margin-top:12px; }
-.fine-print a{color: inherit; text-decoration: underline; font-weight: 400; color: var(--neutral-800);}
+.fine-print a, .fine-print button{color: inherit; text-decoration: underline; font-weight: 400; color: var(--neutral-800); font-size: inherit;}
 
 /* ===== HUB (home con foto) ===== */
 .hub-hero{ position:relative; height:250px; background:var(--neutral-300); overflow:hidden; flex:1; display:flex; align-items:flex-end; margin: -16px -16px 0 -16px; z-index: 1;}
