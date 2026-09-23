@@ -1154,13 +1154,16 @@ function renderProfile(){
     </button>`;
   }).join('');
   const emojiChips = AVATAR_EMOJIS.map(e => `<button class="chip emoji ${state.avatarEmoji===e?'on':''}" data-action="pick-avatar" data-emoji="${e}">${e}</button>`).join('');
+  const teamChips = TEAMS.map((t, i) => `<button class="chip ${state.team===i?'on':''}" data-action="pick-team" data-team="${i}">${esc(t)}</button>`).join('');
   return `<div class="screen screen-profile">
     <div class="topbar">${avatarButton()}</div>
     <button class="avatar lg" data-action="toggle-avatar-picker">${esc(avatarGlyph(state))}<span class="avatar-icon" data-action="toggle-avatar-picker">${state.avatarPickerOpen ? '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="m227.31 73.37l-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M192 108.68L147.31 64l24-24L216 84.68Z"></path></svg>'}</span></button>
 
     ${state.avatarPickerOpen ? `<div class="chips">${emojiChips}
       ${state.avatarEmoji ? `<button class="chip" data-action="pick-avatar" data-emoji="">Nessuna</button>` : ''}
-    </div>` : ''}
+    </div>
+    <div class="field-label margin-top-small">Tavolo</div>
+    <div class="chips">${teamChips}</div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
     ${state.adminUids.includes(state.guestId) ? `<div class="margin-top-small"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
@@ -1465,7 +1468,15 @@ root.addEventListener('click', e => {
   if (!el) return;
   const action = el.dataset.action;
   switch (action){
-    case 'pick-team': state.team = +el.dataset.team; render(); break;
+    case 'pick-team': {
+      state.team = +el.dataset.team;
+      // al momento dell'iscrizione state.name e' ancora vuoto: si salva tutto
+      // insieme al submit del form. Dal profilo invece va salvato subito,
+      // come gia' succede per pick-avatar qui sotto.
+      if (state.name) persistProgress();
+      render();
+      break;
+    }
     case 'pick-avatar': {
       state.avatarEmoji = el.dataset.emoji || '';
       state.avatarPickerOpen = false;
