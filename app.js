@@ -1155,7 +1155,7 @@ function renderProfile(){
     </div>` : ''}
     <h1 class="profile-name">${esc(name)}</h1>
     <div class="profile-team">Tavolo ${esc(TEAMS[state.team])}</div>
-    ${state.adminUids.includes(state.guestId) ? `<div class="result-cta"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
+    ${state.adminUids.includes(state.guestId) ? `<div class="margin-top-small"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
     <div class="stat-strip">
       <div class="stat-cell"><div class="v serif tabular">${state.score}</div><div class="c">Punti</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Carte</div></div>
@@ -1168,8 +1168,7 @@ function renderProfile(){
       <div class="album-code-box">
         <span class="album-code tabular">${esc(state.transferCode)}</span>
         <button class="button is-outline small${state.copiedFlash==='transfer'?' is-copied':''}" data-action="copy-transfer-code">${state.copiedFlash==='transfer'?'Copiato!':'Copia codice'}</button>
-      </div>
-      <p class="fine-print">Aprendo il gioco su un altro telefono, tocca "Hai già un profilo?" e inserisci questo codice per ritrovare nome, punti e risposte.</p>` : ''}
+      </div>` : ''}
     <div class="button-alone"><button class="button is-outline is-esci" data-action="logout">Esci da questo profilo</button></div>
   </div>`;
 }
@@ -1430,8 +1429,9 @@ function renderAdminModal(){
         <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
       </div>
       ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
-      <div class="button-alone"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>` : ''}
+      ` : ''}
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
+      <div class="button-alone"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>
     </div>
   </div>`;
 }
