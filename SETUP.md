@@ -61,18 +61,23 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   libera il telefono per iscrivere qualcun altro (o voi stessi con un altro
   nome, per fare una prova). Il profilo lasciato non si cancella: resta
   recuperabile con il suo codice (vedi sopra).
-- **I vostri due profili** (solo in modalità online): oltre ai codici normali
-  generati per ogni invitato, ce ne sono due riservati e sempre validi, per
-  voi due — `SPECIAL_PROFILES` in `app.js`:
+- **I vostri profili riservati** (solo in modalità online): oltre ai codici
+  normali generati per ogni invitato, ce ne sono quattro riservati e sempre
+  validi, per voi due e i due testimoni — `SPECIAL_PROFILES` in `app.js`:
   - Mara: `POPSposa123!` (icona 👰🏻‍♀️)
   - Stefano: `POPSposo123!` (icona 🤵🏻)
+  - Elisa: `TestimoneSposa` (icona 🎤)
+  - Giulia: `TestimoneSposo` (icona 🐶)
 
-  Andando su `.../#code` e inserendo uno di questi due codici (anche su un
+  Andando su `.../#code` e inserendo uno di questi codici (anche su un
   telefono nuovo) si crea — la prima volta — o si ritrova — le volte dopo —
   sempre lo stesso profilo, con nome e icona già impostati e già con la
   scorciatoia al pannello sposi nel proprio profilo (non serve più
-  ricordarsi l'indirizzo `#sposi`). Questi due profili non compaiono con il
-  tasto "Elimina" nel pannello sposi: non si possono cancellare per sbaglio.
+  ricordarsi l'indirizzo `#sposi`). Questi quattro profili non compaiono con
+  il tasto "Elimina" nel pannello sposi (non si possono cancellare per
+  sbaglio) e non entrano mai in classifica, né singola né a squadre — possono
+  comunque rispondere alle domande e fare le missioni fotografiche come
+  chiunque altro, semplicemente il loro punteggio non conta per la gara.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
