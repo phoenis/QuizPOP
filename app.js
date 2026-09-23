@@ -19,11 +19,11 @@ const QS = [
   {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:["Ad un'associazione ludica",'Online','Al compleanno di Elisa','In montagna'], c:2, s:'Al compleanno di Elisa: una serata che ha cambiato tutto.'},
   {k:'La loro vita insieme', h:'Prima di tutti gli altri viaggi.', t:'Quale di questi è stato il primo viaggio fatto da soli?', o:['Toscana','Abruzzo','Francia','Perù'], c:0, s:'Toscana: il primo di tanti.'},
 
-  {k:'Il giorno di festa', h:'Un ricordo blu che resterà per sempre.', t:'A cosa servirà la cianotipia fatta durante il rito?', o:['Da appendere in salotto','Copertina per l’album di nozze','Da regalare ai testimoni','Segnalibro per gli invitati'], c:1, s:'Copertina per l’album di nozze: un ricordo del giorno del sì.'},
-  {k:'Il giorno di festa', h:'Parole scelte con cura.', t:'Chi ha letto la dedica d’amore?', o:['Il papà dello sposo','La mamma della sposa','La testimone dello sposo','La cugina della sposa'], c:1, s:'La mamma della sposa.'},
-  {k:'Il giorno di festa', h:'Amore è anche questo.', t:'Ste ama Mara nonostante?', o:['Non sappia cucinare','Metta a soqquadro casa per ogni nuova passione','Sia sempre in ritardo','Non guardi mai le partite con lui'], c:1, s:'Metta a soqquadro casa per ogni nuova passione: e ne ha sempre una nuova.'},
-  {k:'Il giorno di festa', h:'Un colpo d’occhio sulla sala.', t:'Quanti tavoli ci sono?', o:['7','8','9','10'], c:2, s:'9 tavoli, ognuno con un nome di viaggio.'},
-  {k:'Il giorno di festa', h:'Il posto giusto per dirsi sì.', t:'Come si chiama la villa in cui siamo?', o:['Villa Calini','Villa Fiorita','Villa degli Ulivi','Villa Serena'], c:0, s:'Villa Calini.'},
+  {k:'Il matrimonio', h:'Un ricordo blu che resterà per sempre.', t:'A cosa servirà la cianotipia fatta durante il rito?', o:['Da appendere in salotto','Copertina per l’album di nozze','Da regalare ai testimoni','Segnalibro per gli invitati'], c:1, s:'Copertina per l’album di nozze: un ricordo del giorno del sì.'},
+  {k:'Il matrimonio', h:'Parole scelte con cura.', t:'Chi ha letto la dedica d’amore?', o:['Il papà dello sposo','La mamma della sposa','La testimone dello sposo','La cugina della sposa'], c:1, s:'La mamma della sposa.'},
+  {k:'Il matrimonio', h:'Amore è anche questo.', t:'Ste ama Mara nonostante?', o:['Non sappia cucinare','Metta a soqquadro casa per ogni nuova passione','Sia sempre in ritardo','Non guardi mai le partite con lui'], c:1, s:'Metta a soqquadro casa per ogni nuova passione: e ne ha sempre una nuova.'},
+  {k:'Il matrimonio', h:'Un viaggio da ricordare.', t:'Dove siamo andati in luna di miele?', o:['Francia','Italia','Perù','Portogallo'], c:2, s:"Perù, prima volta insieme fuori dall'Europa."},
+  {k:'Il matrimonio', h:'Il posto giusto per dirsi sì.', t:'Come si chiama la villa in cui siamo?', o:['Villa Calini','Villa Fiorita','Villa degli Ulivi','Villa Serena'], c:0, s:'Villa Calini.'},
 
   // "Andiamo in viaggio": nei libretti-segnaposto ogni tavolo racconta una sua escursione e un
   // aneddoto sul luogo — l'idea è che per rispondere si deve andare a chiedere in giro,
@@ -40,7 +40,7 @@ const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 const CATS = [
   {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Hai risposto a tutte le domande sugli sposi'},
   {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Hai risposto a tutte le domande sulla nostra vita'},
-  {name:'Il giorno di festa', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte le domande su oggi'},
+  {name:'Il matrimonio', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte le domande sul nostro matrimonio'},
   {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Hai risposto a tutte le domande sui viaggi'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
@@ -1076,9 +1076,9 @@ function renderMedal(){
     </div>
     <div class="medal-celebrate">
       <div class="medal-badge-ring">${c.mark}</div>
-      <div class="kicker">Nuova medaglia</div>
-      <h1 class="medal-celebrate-title pretty">Congratulazioni, hai vinto la medaglia "${esc(c.name)}"!</h1>
-      <p class="medal-celebrate-note pretty">${esc(c.note)}</p>
+      <div class="kicker">${esc(c.name)}</div>
+      <h1 class="medal-celebrate-title pretty">Congratulazioni!</h1>
+      <p class="medal-celebrate-note pretty">${esc(c.note)}.</p>
     </div>
     <div class="result-cta">
       <button class="button is-outline block" data-action="after-medal">Continua</button>
