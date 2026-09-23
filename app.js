@@ -973,6 +973,14 @@ function renderOptions(q){
   return `<div class="option-group">${rows}</div>`;
 }
 
+// "Carta N/25 · Ns": i secondi trascorsi dall'apertura della domanda corrente,
+// aggiornati ogni secondo (vedi l'intervallo piu' in basso nel file) senza
+// contare alla rovescia: e' solo un riferimento, non toglie mai punti.
+function quizCounterText(){
+  const secs = Math.floor((Date.now() - state.startedAt) / 1000);
+  return `Carta ${posOf(state.qi) + 1} / ${allQuestions().length} · ${secs}s`;
+}
+
 function renderQuiz(){
   const q = Q(state.qi);
   const catIdx = catOf(state.qi);
@@ -981,7 +989,7 @@ function renderQuiz(){
   return `<div class="screen screen-quiz cat-tile--${variant}">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      <span class="quiz-counter">Carta ${posOf(state.qi) + 1} / ${allQuestions().length}</span>
+      <span class="quiz-counter">${quizCounterText()}</span>
     </div>
     <div class="kicker">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
@@ -1943,5 +1951,14 @@ window.addEventListener('popstate', e => {
   state.screen = (e.state && e.state.screen) || (state.name ? 'hub' : 'join');
   render();
 });
+
+// fa avanzare i secondi nel contatore della domanda aperta: tocca solo il
+// testo del contatore gia' in pagina, senza un render() completo (che
+// farebbe ripartire ogni animazione della schermata una volta al secondo).
+setInterval(() => {
+  if (state.screen !== 'quiz' || state.locked) return;
+  const el = root.querySelector('.quiz-counter');
+  if (el) el.textContent = quizCounterText();
+}, 1000);
 
 boot();
