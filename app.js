@@ -294,17 +294,32 @@ async function persistProgress(){
 // Questi 4 profili non compaiono mai in classifica (vedi allPlayersWithMe()),
 // ma possono comunque fare le missioni fotografiche come chiunque altro.
 const SPECIAL_PROFILES = {
-  'POPSPOSA123!': { name: 'Mara', avatarEmoji: '👰🏻‍♀️', role: 'sposo' },
-  'POPSPOSO123!': { name: 'Stefano', avatarEmoji: '🤵🏻', role: 'sposo' },
+  'SPOSA!': { name: 'Mara', avatarEmoji: '👰🏻‍♀️', role: 'sposo' },
+  'SPOSO!': { name: 'Stefano', avatarEmoji: '🤵🏻', role: 'sposo' },
   'TESTIMONESPOSA': { name: 'Elisa', avatarEmoji: '🎤', role: 'testimone' },
   'TESTIMONESPOSO': { name: 'Giulia', avatarEmoji: '🐶', role: 'testimone' },
 };
-const isSpecialProfile = p => !!(p && SPECIAL_PROFILES[(p.transferCode || '').toUpperCase()]);
+// codici usati da Mara e Stefano prima del cambio (settembre 2026): non
+// vengono piu' proposti a chi crea un profilo nuovo (vedi recoverProfile()),
+// ma chi aveva gia' attivato il proprio profilo con uno di questi resta
+// riconosciuto come profilo riservato — altrimenti perderebbe di colpo
+// l'accesso admin e ricomparirebbe in classifica.
+const LEGACY_SPECIAL_CODES = {
+  'POPSPOSA123!': SPECIAL_PROFILES['SPOSA!'],
+  'POPSPOSO123!': SPECIAL_PROFILES['SPOSO!'],
+};
+const isSpecialProfile = p => {
+  const code = ((p && p.transferCode) || '').toUpperCase();
+  return !!(SPECIAL_PROFILES[code] || LEGACY_SPECIAL_CODES[code]);
+};
 // solo Mara e Stefano (non i testimoni, pur essendo anche loro admin): usato
 // per nascondere "Esci da questo profilo" a chiunque altro — un invitato
 // normale senza codice visibile non avrebbe modo di rientrare nel proprio
 // profilo dopo essere uscito.
-const isSpouseProfile = p => (SPECIAL_PROFILES[((p && p.transferCode) || '').toUpperCase()] || {}).role === 'sposo';
+const isSpouseProfile = p => {
+  const code = ((p && p.transferCode) || '').toUpperCase();
+  return ((SPECIAL_PROFILES[code] || LEGACY_SPECIAL_CODES[code]) || {}).role === 'sposo';
+};
 
 // recupera lo stesso profilo su un altro telefono cercandolo per transferCode
 // (mostrato nel proprio profilo) e lo clona sul dispositivo corrente: non è

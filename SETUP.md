@@ -77,8 +77,8 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
 - **I vostri profili riservati** (solo in modalità online): oltre ai codici
   normali generati per ogni invitato, ce ne sono quattro riservati e sempre
   validi, per voi due e i due testimoni — `SPECIAL_PROFILES` in `app.js`:
-  - Mara: `POPSposa123!` (icona 👰🏻‍♀️)
-  - Stefano: `POPSposo123!` (icona 🤵🏻)
+  - Mara: `Sposa!` (icona 👰🏻‍♀️)
+  - Stefano: `Sposo!` (icona 🤵🏻)
   - Elisa: `TestimoneSposa` (icona 🎤)
   - Giulia: `TestimoneSposo` (icona 🐶)
 
@@ -91,6 +91,21 @@ e dentro "Le domande" c'è una freccia in alto a sinistra per tornare alla home.
   sbaglio) e non entrano mai in classifica, né singola né a squadre — possono
   comunque rispondere alle domande e fare le missioni fotografiche come
   chiunque altro, semplicemente il loro punteggio non conta per la gara.
+
+  I codici di Mara e Stefano erano in origine `POPSposa123!` e
+  `POPSposo123!`: sono stati cambiati (settembre 2026) in `Sposa!` e
+  `Sposo!`. Chi aveva già attivato il proprio profilo con il codice vecchio
+  resta riconosciuto come profilo riservato senza bisogno di fare nulla
+  (vedi `LEGACY_SPECIAL_CODES` in `app.js`) — ma il codice vecchio resta
+  legato a quel profilo per il recupero su un altro telefono: per far
+  funzionare anche lì il nuovo codice `Sposa!`/`Sposo!`, bisogna aprire
+  Firebase Console → Firestore Database → collezione `players`, trovare il
+  documento con `name` uguale a "Mara" (o "Stefano") e modificare a mano il
+  campo `transferCode` sostituendo il valore vecchio con quello nuovo, in
+  maiuscolo (`SPOSA!` o `SPOSO!` — l'app confronta i codici sempre in
+  maiuscolo). Se preferite non farlo, il profilo vecchio continua a
+  funzionare perfettamente con il codice vecchio; il nuovo codice, finché
+  non modificate quel campo, creerebbe invece un profilo nuovo e vuoto.
 
 Finché `firebase-config.js` resta vuoto, l'app gira in **modalità locale**: ottima per
 provarla, ma i punteggi restano solo sul telefono di chi gioca e non sono condivisi.
@@ -151,7 +166,7 @@ un sito pubblico (la sicurezza vera è nelle regole del punto 3).
 
 **Come capire se sei davvero in modalità online** (utile per un test veloce
 dopo aver caricato il sito): entra con uno dei codici riservati (es. il tuo,
-`POPSposa123!`) e apri il profilo — se in fondo vedi la sezione "Il tuo
+`Sposa!`) e apri il profilo — se in fondo vedi la sezione "Il tuo
 profilo su un altro telefono" con un codice, sei online; se non la vedi
 affatto, quasi certamente sei ancora in modalità locale e va ricontrollato
 il punto 7 qui sopra. (Quella sezione è visibile solo a chi ha accesso admin,
