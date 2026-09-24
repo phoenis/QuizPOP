@@ -79,42 +79,63 @@ const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 // fare lo stesso). Le altre, non segnate, restano com'erano: pensate per
 // una foto, e vanno completate con una foto.
 const MISSIONS = [
-  { t: 'Qualcuno che balla con un bicchiere in mano' },
-  { t: 'La pista da ballo' },
-  { t: 'Il tavolo più "scatenato" della serata' },
-  { t: 'Una foto al fotografo ufficiale mentre lavora' },
-  { t: 'Una foto al deejay' },
-  { t: 'Una foto ad un cameriere' },
-  { t: 'Una persona che canta' },
-  { t: 'Gli sposi che ridono' },
-  { t: 'Le mani intrecciate degli sposi' },
-  { t: 'Una persona commossa' },
-  { t: 'Il primo ballo' },
-  { t: 'Un abbraccio tra due generazioni diverse' },
-  { t: 'Un bacio' },
-  { t: 'Una piccola mano' },
-  { t: 'Qualcuno che scrive' },
-  { t: 'Qualcuno che si fa una foto' },
-  { t: 'Qualcuno che tiene in braccio un bambino' },
+  { t: 'Scatta una foto di qualcuno che balla con un bicchiere in mano' },
+  { t: 'Scatta una foto della pista da ballo' },
+  { t: 'Scatta una foto del tavolo più "scatenato"' },
+  { t: 'Scatta una foto al fotografo ufficiale mentre lavora' },
+  { t: 'Scatta una foto al deejay' },
+  { t: 'Scatta una foto ad un cameriere' },
+  { t: 'Scatta una foto ad una persona che canta' },
+  { t: 'Scatta una foto agli sposi che ridono' },
+  { t: 'Scatta una foto di una persona commossa' },
+  { t: 'Scatta una foto del primo ballo' },
+  { t: 'Scatta una foto di un abbraccio tra due generazioni diverse' },
+  { t: 'Scatta una foto di un bacio' },
+  { t: 'Scatta una foto di una piccola mano' },
+  { t: 'Scatta una foto a qualcuno che scrive' },
+  { t: 'Scatta una foto a qualcuno che si fa una foto' },
+  { t: 'Scatta una foto a qualcuno che tiene in braccio un bambino' },
   { t: 'Ricrea una foto di una nostra escursione' },
-  { t: 'Un piatto del menù, come fosse una cartolina' },
-  { t: 'Il centrotavola più bello' },
-  { t: 'La consegna delle bomboniere' },
-  { t: 'Un dettaglio autunnale (foglia, zucca, colore rust) nella location' },
-  { t: 'Un giardino' },
-  { t: 'La persona che ti piace com’è vestita' },
-  { t: 'Un selfie con lo sposo' },
-  { t: 'Un selfie con la sposa' },
-  { t: 'Un selfie con le testimoni' },
-  { t: 'Un selfie con un genitore degli sposi' },
-  { t: 'Un selfie di gruppo' },
-  { t: 'Un selfie con la persona a cui vuoi più bene' },
-  { t: 'Una foto buffa' },
-  { t: 'Qualcuno che fa un brindisi', photo: false },
-  { t: 'Un selfie con tutto il tuo tavolo' },
-  { t: 'Un abbraccio', photo: false },
-  { t: 'Un applauso', photo: false },
-  { t: 'Un selfie con qualcuno vestito del tuo stesso colore' },
+  { t: 'Scatta una foto di un piatto, come fosse una cartolina' },
+  { t: 'Scatta una foto del centrotavola più bello' },
+  { t: 'Scatta una foto della consegna delle bomboniere' },
+  { t: 'Scatta una foto di un dettaglio autunnale' },
+  { t: 'Scatta una foto di un giardino' },
+  { t: 'Scatta una foto di una persona che ti piace com’è vestita' },
+  { t: 'Fai un selfie con lo sposo' },
+  { t: 'Fai un selfie con la sposa' },
+  { t: 'Fai un selfie con le testimoni' },
+  { t: 'Fai un selfie con un genitore degli sposi' },
+  { t: 'Fai un selfie di gruppo' },
+  { t: 'Fai un selfie con la persona a cui vuoi più bene' },
+  { t: 'Fai una foto buffa' },
+  { t: 'Scatta una foto a qualcuno che fa un brindisi' },
+  { t: 'Fai un selfie con tutto il tuo tavolo' },
+  { t: 'Scatta una foto di un abbraccio' },
+  { t: 'Scatta una foto di un applauso' },
+  { t: 'Fai un selfie con qualcuno vestito del tuo stesso colore' },
+  { t: 'Dai un abbraccio allo sposo', photo: false },
+  { t: 'Dai un abbraccio alla sposa', photo: false },
+  { t: 'Fai un brindisi con qualcuno che hai appena conosciuto', photo: false },
+  { t: 'Presentati a una persona che non conosci', photo: false },
+  { t: 'Scopri come conoscono gli sposi due persone che non avevi mai visto insieme', photo: false },
+  { t: 'Chiedi a qualcuno di raccontarti un aneddoto sugli sposi', photo: false },
+  { t: 'Scopri qual è il ricordo più vecchio che qualcuno ha con gli sposi', photo: false },
+  { t: 'Trova chi ha viaggiato da più lontano per essere qui', photo: false },
+  { t: 'Trova qualcuno con cui condividi un hobby', photo: false },
+  { t: 'Fai un brindisi dedicato agli sposi', photo: false },
+  { t: 'Proponi un brindisi al tuo tavolo', photo: false },
+  { t: 'Convince qualcuno che non sta ballando a venire in pista con te', photo: false },
+  { t: "Fai ballare qualcuno di un'altra generazione", photo: false },
+  { t: 'Insegna a qualcuno un passo di danza', photo: false },
+  { t: 'Improvvisa un trenino con almeno 5 persone', photo: false },
+  { t: 'Canta una canzone a squarciagola insieme a tutto il tuo tavolo', photo: false },
+  { t: 'Racconta agli sposi un ricordo che hai di loro', photo: false },
+  { t: 'Dì agli sposi una cosa che ammiri di loro come coppia', photo: false },
+  { t: 'Dai agli sposi un consiglio per i prossimi 50 anni insieme', photo: false },
+  { t: 'Chiedi allo sposo qual è la sua cosa preferita della sposa', photo: false },
+  { t: 'Chiedi alla sposa qual è la sua cosa preferita dello sposo', photo: false },
+  { t: 'Augura agli sposi qualcosa che non sia il classico “tanti auguri”', photo: false },  
 ];
 
 /* ============ Utilità ============ */
@@ -613,8 +634,8 @@ function renderDialog(){
     <div class="dialog-card" data-action="dialog-noop">
       <p class="dialog-message pretty">${esc(d.message)}</p>
       <div class="dialog-actions">
-        ${isConfirm ? `<div class="button-alone"><button class="btn-text" data-action="dialog-cancel">Annulla</button></div>` : ''}
         <button class="button is-fill" data-action="dialog-confirm">${isConfirm ? 'Conferma' : 'OK'}</button>
+        ${isConfirm ? `<div class="button-alone"><button class="btn-text" data-action="dialog-cancel">Annulla</button></div>` : ''}
       </div>
     </div>
   </div>`;
@@ -793,24 +814,26 @@ function renderMissione(){
 
     <div class="card is-centered">
         <div class="kicker">La tua missione</div>
-      <h1 class="mission-text pretty">${esc(missionText(cur.index))}</h1>
+      <h2 class="mission-text pretty">${esc(missionText(cur.index))}</h2>
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
+      <div class="dialog-actions">
       <div class="result-cta">
-        <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Carica</button>
-      <p class="fine-print">
-        ${optionalPhoto ? `<button data-action="complete-mission-nophoto">✓ L'ho fatta, senza foto</button><span> · </span>` : ''}
-        <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
-      </p>
+        <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-gallery">Carica <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M228 144v64a12 12 0 0 1-12 12H40a12 12 0 0 1-12-12v-64a12 12 0 0 1 24 0v52h152v-52a12 12 0 0 1 24 0M96.49 80.49L116 61v83a12 12 0 0 0 24 0V61l19.51 19.52a12 12 0 1 0 17-17l-40-40a12 12 0 0 0-17 0l-40 40a12 12 0 1 0 17 17Z"></path></svg></button>
+          ${optionalPhoto ? `<button class="button is-outline" data-action="complete-mission-nophoto">L'ho fatta, senza foto ✓</button>` : ''}
+          </div>
+        <p class="button-alone">
+          <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
+        </p>
       </div>
     </div>`;
   } else if (!list.length){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">📷</div>
-      <h1>Hai una missione fotografica ad aspettarti</h1>
-      <p class="sub-text pretty">Ne esce una a sorpresa, diversa da quella di chiunque altro stia giocando.</p>
+      <h1>Hai una missione che ti aspetta!</h1>
+      <p class="sub-text pretty">Ne esce una a sorpresa, scopri qual è la tua.</p>
       <div class="result-cta">
-        <button class="button is-outline" data-action="reveal-mission">Scopri la tua missione</button>
+        <button class="button is-outline" data-action="reveal-mission">Scopri la missione</button>
       </div>
     </div>
     <img src="assets/mascotte/criceto-missione.png" alt="" class="mission-mascot">`;
@@ -864,15 +887,17 @@ function renderAlbum(){
       <div class="card is-centered">
         <div class="kicker">Album condiviso</div>
         <h1>Le tue foto nel nostro album</h1>
-        <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
+        <p class="sub-text pretty"><br>Apri WedShoots e inserisci questo codice per entrare:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
-          <button class="button is-fill${state.copiedFlash==='album'?' is-copied':''}" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
+          <button class="button is-outline${state.copiedFlash==='album'?' is-copied':''}" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
         </div>
-        <div class="result-cta">
-          <button class="button is-outline" data-action="open-album">Apri WedShoots ↗</button>
+        <div class="dialog-actions">
+          <button class="button is-fill" data-action="open-album">Apri WedShoots ↗</button>
+          <div class="button-alone">
+            <p class="fine-print">Non hai l'app? <button data-action="open-album-store">Scaricala</button></p>
+          </div>
         </div>
-          <p class="fine-print">Non hai l'app? <button data-action="open-album-store">Scaricala</button></p>
       </div>
       <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
     </div>

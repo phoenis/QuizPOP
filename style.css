@@ -55,6 +55,7 @@ body{
   min-height:100dvh;
 }
 h1,h2,h3,.serif{font-family:var(--font-primary); font-weight:400; margin:0;}
+h1{font-size: 1.5rem;}
 /* Solo per il titolo "Mara & Stefano" */
 .couple-title{font-family:var(--font-secondary); font-weight:400; font-size: 2em;}
 .couple-title .letter-span{position: relative;}
@@ -152,8 +153,8 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 }
 .chip.on{ background:var(--accent-200); border-color:var(--accent-600); color:var(--accent-700); }
 .chip.emoji{ font-size:19px; padding:7px 11px; line-height:1; }
-.fine-print{ font-size:11.5px; color:var(--neutral-700); margin-top:12px; }
-.fine-print a, .fine-print button{color: inherit; text-decoration: underline; font-weight: 400; color: var(--neutral-800); font-size: inherit;}
+.fine-print{ font-size:11.5px; color:var(--neutral-700); }
+.fine-print a, .fine-print button, .btn-text button{color: inherit; text-decoration: underline; font-weight: 400; color: var(--neutral-800); font-size: inherit; border: 0; padding: 0;}
 
 /* ===== HUB (home con foto) ===== */
 .hub-hero{ position:relative; height:250px; background:var(--neutral-300); overflow:hidden; flex:1; display:flex; align-items:flex-end; margin: -16px -16px 0 -16px; z-index: 1;}
@@ -226,7 +227,8 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .mission-history-row{ display:flex; align-items:center; gap:12px; border:1px solid var(--neutral-300); border-radius:var(--r-md); padding:10px; font-size:13.5px; }
 .mission-history-thumb{ flex:none; width:48px; height:48px; object-fit:cover; border-radius:var(--r-md); cursor:pointer; }
 .mission-mascot{ width:90px; height:auto; opacity:.9; }
-.album-code-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--accent-100); border-radius:var(--r-md); padding:14px 16px; flex-wrap: wrap;}
+.album-code-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--accent-100); border-radius:var(--r-full); padding:8px 8px 8px 24px; flex-wrap: wrap; margin-top: 4px; margin-bottom: 40px}
+.album-code-box button{font-size: 0.95em;}
 .album-code{ font-size:21px; letter-spacing:.06em; color:var(--accent-700); }
 
 /* ===== HOME / DOMANDE (card per categoria) ===== */
@@ -329,6 +331,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .rank-line{ font-size:11.5px; color:var(--neutral-700); margin-top:16px; line-height:1.5; }
 .screen-result .rank-line{ color:rgba(255,253,246,.85); }
 .result-cta{ margin-top:auto; padding-top:14px; display:flex; flex-direction:row; flex-wrap: wrap; gap:8px; align-items:stretch; justify-content: center;  padding-top: 16px;}
+.dialog-actions{flex-direction: column; align-content: center; margin-top: 12px;}
 .screen-result .btn-text{ color:rgba(255,253,246,.85); }
 /* .button-alone si stira in altezza dentro .result-cta (align-items:stretch
    del genitore): questo ricentra il bottone di testo al suo interno. */
@@ -340,6 +343,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
   color:var(--accent-700); background:transparent;
   font-family:var(--font-primary); font-size: 1.2em;
   padding:0.5em 1.5em; transition:background .15s ease;
+  gap: 6px;
 }
 /* bottone pieno, per l'azione principale su sfondo crema (es. "Scatta") */
 .button.is-fill{
@@ -524,7 +528,7 @@ border:0 solid var(--neutral-200); background:var(--cream); color:var(--ink);
 .dialog-card{
   width:100%; max-width:340px; background:#fffdf6; border-radius:var(--r-md);
   box-shadow:var(--shadow-md); padding:22px;
-  animation:v3fade .22s ease-out both;
+  animation:v3fade .22s ease-out both; text-align: center;
 }
 .dialog-message{ font-size:14.5px; line-height:1.5; color:var(--ink); }
 .dialog-actions{ display:flex; align-items:center; justify-content:flex-end; gap:16px; margin-top:18px; }
