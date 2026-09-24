@@ -797,11 +797,10 @@ function renderMissione(){
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
       <div class="result-cta">
-        <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-camera">📷 Scatta</button>
-        <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Galleria</button>
+        <button class="button is-outline" data-action="mission-photo-pick" data-target="mission-file-gallery">🖼️ Carica</button>
       <p class="fine-print">
         ${optionalPhoto ? `<button data-action="complete-mission-nophoto">✓ L'ho fatta, senza foto</button><span> · </span>` : ''}
-        <button data-action="skip-mission">Non mi piace, cambia</button>
+        <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
       </p>
       </div>
     </div>`;
