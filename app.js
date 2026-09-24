@@ -714,7 +714,7 @@ function renderJoin(){
         <div class="chips">${emojiChips}</div>
       </div>
              <div class="field-block">
-        <div class="field-label">Che escursione hai intrapreso?</div>
+        <div class="field-label">A quale tavolo ti trovi?</div>
         <div class="chips">${chips}</div>
         ${state.teamError ? `<div class="field-error">Scegli il tuo tavolo per continuare</div>` : ''}
       </div>
