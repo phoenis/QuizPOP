@@ -13,7 +13,7 @@ const QS = [
   {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le faceva nonna Pina.'},
 
-  {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Come ha fatto Ste a conquistare il cuore di Mara?', o:['Con la battuta su POP fa il criceto','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto: e 1000 altri da fare con il microonde.'},
+  {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Come ha fatto Ste a conquistare il cuore di Mara?', o:['Con la battuta su POP fa il criceto','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto: e 1000 altri giochi da fare con il microonde.'},
   {k:'La loro vita insieme', h:'Chi tarda di più.', t:'Chi dei due ci mette più tempo a prepararsi prima di uscire?', o:['Mara','Ste','Nessuno dei due, sono velocissimi','Dipende dall’occasione'], c:1, s:'Ste: qualche minuto in più, ogni volta.'},
   {k:'La loro vita insieme', h:'Al ristorante succede sempre così.', t:'Chi dei due è più facile che dica «non lo voglio» e poi finisce per mangiare metà di quello dell’altro?', o:['Mara','Ste','Entrambi, a turno','Nessuno dei due'], c:1, s:'Ste: lo dice convinto, poi cambia idea a metà pasto.'},
   {k:'Come è iniziata', h:'Si parte dall’inizio: quella sera, quegli amici.', t:'Come si sono conosciuti Mara e Stefano?', o:["Ad un'associazione ludica",'Online','Al compleanno di Elisa','In montagna'], c:2, s:'Al compleanno di Elisa: una serata che ha cambiato tutto.'},
@@ -224,7 +224,7 @@ function shuffle(arr){
 
 // l'ordine di visualizzazione delle domande e' casuale ma fisso per invitato:
 // le domande gia' assegnate a una posizione non si spostano piu', anche ricaricando;
-// le carte extra pubblicate dopo, essendo nuove, vengono solo aggiunte in coda.
+// le domande extra pubblicate dopo, essendo nuove, vengono solo aggiunte in coda.
 // Se una carta extra viene cancellata dal pannello sposi, il suo indice sparisce
 // da allQuestions(): lo togliamo anche dall'ordine salvato, altrimenti resterebbe
 // una casella "fantasma" nella griglia di chi l'aveva gia' vista.
@@ -551,7 +551,7 @@ function allPlayersWithMe(){
   const board = (state.players.length ? state.players.slice() : RIVALS_DEMO.slice()).filter(p => !isSpecialProfile(p));
   if (isSpecialProfile({ transferCode: state.transferCode })) return board;
   const mine = { id: state.guestId, name: state.name || 'Tu', team: state.team, avatarEmoji: state.avatarEmoji, score: state.score, me: true,
-    detail: Object.keys(state.res).length + ' carte su ' + allQuestions().length };
+    detail: Object.keys(state.res).length + ' domande su ' + allQuestions().length };
   const already = board.some(p => p.id === state.guestId);
   return already
     ? board.map(p => p.id === state.guestId ? { ...p, ...mine } : p)
@@ -1188,7 +1188,7 @@ function renderBoard(){
     ${tabs}
     ${tab === 'ospiti'
       ? `<div class="board-list">${rows}</div>
-      <div class="sub-text pretty">A parità di punti vince chi ha risposto più in fretta.</div>
+      <div class="sub-text pretty">A parità di punti vince chi ha risposto più velocemente.</div>
          `
       : `<div class="board-list">${teamRows}</div>
       <p class="sub-text pretty">Media punti a persona: ogni squadra pesa allo stesso modo, indipendentemente dal numero di partecipanti!</p>
@@ -1221,7 +1221,7 @@ function renderProfile(){
     ${isAdmin ? `<div class="margin-top-small"><button class="button is-outline" data-action="go" data-screen="admin">Pannello sposi</button></div>` : ''}
     <div class="stat-strip">
       <div class="stat-cell"><div class="v serif tabular">${state.score}</div><div class="c">Punti</div></div>
-      <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Carte</div></div>
+      <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done?numIt(avg)+'s':'—'}</div><div class="c">Media</div></div>
     </div>
     <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
@@ -1855,7 +1855,7 @@ async function completeMission(file){
 }
 
 // azzera le risposte di un invitato (utile in fase di test, per rigiocare senza
-// doversi iscrivere con un nome nuovo). L'ordine delle carte resta lo stesso.
+// doversi iscrivere con un nome nuovo). L'ordine delle domande resta lo stesso.
 async function resetPlayerAnswers(playerId){
   if (state.mode !== 'online' || !fb) return;
   await fb.setDoc(fb.doc(fb.db, 'players', playerId), { res: {}, score: 0 }, { merge: true });
