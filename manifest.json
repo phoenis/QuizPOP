@@ -1,0 +1,16 @@
+{
+  "name": "Mara & Stefano — Il gioco degli invitati",
+  "short_name": "M&S Quiz",
+  "description": "Il gioco per gli invitati al matrimonio di Mara e Stefano",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdf6e4",
+  "theme_color": "#fdf6e4",
+  "lang": "it",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/webclip.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
