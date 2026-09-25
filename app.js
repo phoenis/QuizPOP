@@ -2085,3 +2085,12 @@ setInterval(() => {
 }, 1000);
 
 boot();
+
+// registra il service worker "vuoto" (vedi sw.js) solo per far comparire il
+// tasto "Installa app" su Chrome/Android — su iOS/Safari "Aggiungi a Home"
+// funziona già senza, grazie ai meta tag apple-* in index.html.
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
