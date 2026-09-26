@@ -54,6 +54,7 @@ body{
   min-height:100vh;
   min-height:100dvh;
 }
+a{color: inherit;}
 h1,h2,h3,.serif{font-family:var(--font-primary); font-weight:400; margin:0;}
 h1{font-size: 1.5rem;}
 /* Solo per il titolo "Mara & Stefano" */
