@@ -656,7 +656,33 @@ function renderDialog(){
   </div>`;
 }
 
+// se una schermata rimane con un riferimento non più valido dopo giorni (es.
+// una domanda/missione modificata nel frattempo), un errore qui non deve
+// lasciare la pagina bianca per sempre — nemmeno ricaricando, visto che lo
+// stato salvato che causa il crash è sempre lo stesso. Un primo tentativo
+// riparte dall'hub (spesso basta, l'errore è quasi sempre specifico di una
+// schermata); se fallisce anche quello, mostra un messaggio con un tasto per
+// ricaricare invece di restare bloccati in silenzio.
 function render(){
+  try {
+    renderScreen();
+  } catch (err) {
+    console.error('Errore nel render, torno all\'hub.', err);
+    try {
+      state.screen = state.name ? 'hub' : 'join';
+      state.dialog = null; state.lightbox = null; state.adminModal = null;
+      state.medalModal = null; state.profileEditOpen = false;
+      renderScreen();
+    } catch (err2) {
+      console.error('Errore anche tornando all\'hub, mostro la schermata di recupero.', err2);
+      root.innerHTML = `<div class="screen" style="padding:40px 20px;text-align:center;">
+        <p class="pretty" style="font-size:1.1rem;margin-bottom:20px;">Qualcosa non ha funzionato caricando questa pagina.</p>
+        <button class="button is-fill" onclick="location.reload()">Ricarica</button>
+      </div>`;
+    }
+  }
+}
+function renderScreen(){
   let html = '';
   switch (state.screen){
     case 'boot': html = renderBoot(); break;
@@ -2084,7 +2110,15 @@ setInterval(() => {
   if (el) el.textContent = quizCounterText();
 }, 1000);
 
-boot();
+boot().catch(err => {
+  // non dovrebbe mai succedere (boot() ha già i suoi try/catch interni), ma
+  // se capita comunque meglio un messaggio che una pagina bianca silenziosa.
+  console.error('Errore fatale in boot().', err);
+  root.innerHTML = `<div class="screen" style="padding:40px 20px;text-align:center;">
+    <p class="pretty" style="font-size:1.1rem;margin-bottom:20px;">Qualcosa non ha funzionato caricando questa pagina.</p>
+    <button class="button is-fill" onclick="location.reload()">Ricarica</button>
+  </div>`;
+});
 
 // registra il service worker "vuoto" (vedi sw.js) solo per far comparire il
 // tasto "Installa app" su Chrome/Android — su iOS/Safari "Aggiungi a Home"
