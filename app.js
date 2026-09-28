@@ -871,7 +871,7 @@ function renderMissione(){
     </div>`;
   } else if (!list.length){
     body = `<div class="card is-centered">
-      <div class="mission-icon-circle">📷</div>
+      <div class="mission-icon-circle">🔍</div>
       <h1>Hai una missione che ti aspetta!</h1>
       <p class="sub-text pretty">Ne esce una a sorpresa, scopri qual è la tua.</p>
       <div class="result-cta">
@@ -1566,7 +1566,7 @@ function renderAdminModal(){
       ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
       ` : ''}
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
-      <div class="button-alone"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>
+      <div class="button-alone margin-top-medium"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>
     </div>
   </div>`;
 }
