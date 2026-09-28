@@ -117,6 +117,7 @@ const MISSIONS = [
   { t: 'Dai un abbraccio allo sposo', photo: false },
   { t: 'Dai un abbraccio alla sposa', photo: false },
   { t: 'Fai un brindisi con qualcuno che hai appena conosciuto', photo: false },
+  { t: 'Grida "Viva gli sposi!"', photo: false },
   { t: 'Presentati a una persona che non conosci', photo: false },
   { t: 'Scopri come conoscono gli sposi due persone che non avevi mai visto insieme', photo: false },
   { t: 'Chiedi a qualcuno di raccontarti un aneddoto sugli sposi', photo: false },
