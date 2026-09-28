@@ -1566,7 +1566,7 @@ function renderAdminModal(){
       ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
       ` : ''}
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
-      <div class="button-alone margin-top-medium"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>
+      ${key === 'missioni' ? `<div class="button-alone margin-top-medium"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>` : ''}
     </div>
   </div>`;
 }
