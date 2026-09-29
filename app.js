@@ -1962,6 +1962,10 @@ async function completeMission(file){
 async function resetPlayerAnswers(playerId){
   if (state.mode !== 'online' || !fb) return;
   await fb.setDoc(fb.doc(fb.db, 'players', playerId), { res: {}, score: 0 }, { merge: true });
+  // senza un ascolto live su players (vedi piu' sopra), il pannello non
+  // vedrebbe l'effetto di "Azzera" finche' non si tocca "Aggiorna" a mano —
+  // facile pensare che non abbia funzionato.
+  await refreshPlayersOnce();
 }
 
 // svuota le missioni fatte da tutti: cancella ogni foto missione caricata
@@ -1976,6 +1980,10 @@ async function resetAllMissions(){
     state.missions = []; state.missionPhotos = {};
     await persistProgress();
   }
+  // stesso motivo di resetPlayerAnswers(): senza questo il pannello
+  // continuerebbe a mostrare le missioni appena svuotate.
+  await refreshPlayersOnce();
+  await refreshAdminMissionsOnce();
 }
 
 // toglie un invitato dalla classifica/dal gioco (utenze di prova, doppioni
@@ -1987,6 +1995,9 @@ async function deletePlayer(playerId){
   if (isSpecialProfile(state.players.find(p => p.id === playerId))) return;
   if (state.adminUids.includes(playerId)) await removeAdmin(playerId);
   await fb.deleteDoc(fb.doc(fb.db, 'players', playerId));
+  // stesso motivo di resetPlayerAnswers(): senza questo l'invitato eliminato
+  // resterebbe visibile nel pannello finche' non si tocca "Aggiorna" a mano.
+  await refreshPlayersOnce();
 }
 
 // impacchetta in uno zip tutte le foto missione di tutti gli invitati e lo
