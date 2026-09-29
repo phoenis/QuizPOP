@@ -1212,7 +1212,7 @@ function renderBoard(){
     <div class="board-rank serif tabular">${p.rank}</div>
     <div class="avatar">${esc(p.avatar)}</div>
     <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc(p.detail||'')}${p.me?' · tu':''}</div></div>
-    <div class="board-score serif tabular">${p.score}</div>
+    <div class="board-score serif tabular">${p.score || 0}</div>
   </div>`).join('');
   const teamsRanked = teams.slice().sort((a, b) => b.avg - a.avg).map((g, i) => ({ ...g, rank: i + 1 }));
   const teamRows = teamsRanked.map(g => `<div class="board-row ${g.rank===1?'top':''}">
@@ -1349,7 +1349,7 @@ function renderClassificaFinale(backButton){
       <div class="avatar">${esc(p.avatar)}</div>
       <div class="podium-pname">${esc(p.name)}</div>
       <div class="podium-block serif rank-${p.rank} ${p.rank===1?'top':''}">
-        <div class="score tabular">${p.score}</div>
+        <div class="score tabular">${p.score || 0}</div>
         <div class="rk">${p.rank}º</div>
       </div>
     </div>`;
@@ -1399,6 +1399,20 @@ function renderFinale(){
   </div>`;
 }
 
+// dati di tutti gli invitati: nessuno ne ha bisogno finche' la classifica e'
+// chiusa, tranne il pannello sposi (per le sue statistiche) — vedi il commento
+// in boot() su dove parte l'ascolto vero e proprio di players. Attivata da
+// renderAdmin() e, per tutti, non appena la classifica si apre davvero.
+let playersSubStarted = false;
+function ensurePlayersSub(){
+  if (playersSubStarted || state.mode !== 'online' || !fb) return;
+  playersSubStarted = true;
+  fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
+    state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    render();
+  });
+}
+
 // tutte le foto missione (non solo le proprie), solo per il pannello
 // sposi: si attiva la prima volta che si entra davvero in questa schermata,
 // che sia con l'indirizzo #sposi o con la scorciatoia dal profilo — invece
@@ -1424,6 +1438,7 @@ function storeAdminList(key, rowsArr, emptyLabel){
 }
 
 function renderAdmin(){
+  ensurePlayersSub();
   ensureAdminMissionsSub();
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
@@ -2014,10 +2029,14 @@ async function boot(){
             }
             if (!state.transferCode && state.name){ state.transferCode = genTransferCode(); persistProgress(); }
             if (ensureOrder() && state.name) persistProgress();
-            fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
-              state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-              render();
-            });
+            // niente ascolto della collezione players qui: finche' la classifica
+            // e' chiusa nessuna schermata di un invitato normale mostra i dati
+            // degli altri, quindi non serve che il telefono di ciascuno riceva
+            // in tempo reale ogni risposta di tutti gli altri — con molti
+            // invitati connessi e' lo spreco di letture piu' grosso. Parte solo
+            // per il pannello sposi (vedi ensurePlayersSub(), richiamata da
+            // renderAdmin()) e per tutti non appena la classifica si apre
+            // davvero (vedi piu' sotto, nell'ascolto di meta/state).
             // solo le proprie foto missione (query filtrata sul server): con
             // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
             // un inutile spreco di dati sul telefono di ciascuno.
@@ -2032,6 +2051,11 @@ async function boot(){
               state.revealed = !!d.revealed;
               state.heroPhoto = d.heroPhoto || '';
               state.adminUids = d.admins || [];
+              // da qui in poi tutti vedono la classifica, quindi da qui in poi
+              // tutti ne ricevono anche gli aggiornamenti in tempo reale
+              // (ensurePlayersSub() parte una volta sola, richiamate successive
+              // non fanno nulla).
+              if (state.revealed) ensurePlayersSub();
               render();
             });
             fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
