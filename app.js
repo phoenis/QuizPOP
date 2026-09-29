@@ -1421,19 +1421,22 @@ function ensurePlayersLoaded(){
   refreshPlayersOnce();
 }
 
-// tutte le foto missione (non solo le proprie), solo per il pannello
-// sposi: si attiva la prima volta che si entra davvero in questa schermata,
-// che sia con l'indirizzo #sposi o con la scorciatoia dal profilo — invece
-// di dipendere da un controllo fatto una volta sola all'avvio dell'app, che
-// mancava proprio nel secondo caso.
-let adminMissionsSubStarted = false;
-function ensureAdminMissionsSub(){
-  if (adminMissionsSubStarted || state.mode !== 'online' || !fb) return;
-  adminMissionsSubStarted = true;
-  fb.onSnapshot(fb.collection(fb.db, 'missionPhotos'), qs => {
-    state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
-    render();
-  });
+// tutte le foto missione (non solo le proprie), solo per il pannello sposi:
+// stesso discorso di players — niente ascolto live (se il pannello resta
+// aperto per ore genererebbe una lettura per ogni foto caricata da chiunque),
+// solo un'istantanea alla prima apertura e poi solo quando si tocca apposta
+// "Aggiorna" (vedi 'refresh-admin-data').
+let adminMissionsLoadedOnce = false;
+async function refreshAdminMissionsOnce(){
+  if (state.mode !== 'online' || !fb) return;
+  const qs = await fb.getDocs(fb.collection(fb.db, 'missionPhotos'));
+  state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
+  render();
+}
+function ensureAdminMissionsLoaded(){
+  if (adminMissionsLoadedOnce || state.mode !== 'online' || !fb) return;
+  adminMissionsLoadedOnce = true;
+  refreshAdminMissionsOnce();
 }
 
 const ADMIN_MODAL_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande' };
@@ -1447,7 +1450,7 @@ function storeAdminList(key, rowsArr, emptyLabel){
 
 function renderAdmin(){
   ensurePlayersLoaded();
-  ensureAdminMissionsSub();
+  ensureAdminMissionsLoaded();
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
   const totalPossible = totalPlayers * totalCards;
@@ -1530,7 +1533,7 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
-    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-players">Aggiorna i dati degli invitati</button></div>` : ''}
+    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-admin-data">Aggiorna i dati</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -1760,7 +1763,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
-    case 'refresh-players': refreshPlayersOnce(); break;
+    case 'refresh-admin-data': refreshPlayersOnce(); refreshAdminMissionsOnce(); break;
     case 'reset-all-missions': {
       openConfirm('Svuotare tutte le missioni fatte? Cancella le foto caricate da ogni invitato e li fa ripartire da capo con una nuova missione. Non si può annullare.', () => resetAllMissions());
       break;
@@ -2080,11 +2083,12 @@ async function boot(){
             });
             // le foto missione di TUTTI gli invitati, solo per il pannello sposi
             // (per gli invitati normali resta la query filtrata sulla propria,
-            // molto più leggera — vedi sopra). Non parte qui: si attiva al volo
-            // la prima volta che si entra davvero nel pannello sposi (vedi
-            // ensureAdminMissionsSub(), richiamata da renderAdmin()), cosi'
-            // funziona sia arrivandoci con l'indirizzo #sposi sia con la
-            // scorciatoia dal profilo — che imposta l'indirizzo solo dopo.
+            // molto più leggera — vedi sopra). Non le carica qui: la prima
+            // istantanea parte al volo la prima volta che si entra davvero nel
+            // pannello sposi (vedi ensureAdminMissionsLoaded(), richiamata da
+            // renderAdmin()), cosi' funziona sia arrivandoci con l'indirizzo
+            // #sposi sia con la scorciatoia dal profilo — che imposta
+            // l'indirizzo solo dopo.
             resolve();
           } catch (err) {
             reject(err);
