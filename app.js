@@ -1400,9 +1400,8 @@ function renderFinale(){
 }
 
 // dati di tutti gli invitati: nessuno ne ha bisogno finche' la classifica e'
-// chiusa, tranne il pannello sposi (per le sue statistiche) — vedi il commento
-// in boot() su dove parte l'ascolto vero e proprio di players. Attivata da
-// renderAdmin() e, per tutti, non appena la classifica si apre davvero.
+// chiusa — vedi il commento in boot() su dove parte l'ascolto vero e proprio
+// di players, attivato per tutti non appena la classifica si apre davvero.
 let playersSubStarted = false;
 function ensurePlayersSub(){
   if (playersSubStarted || state.mode !== 'online' || !fb) return;
@@ -1411,6 +1410,26 @@ function ensurePlayersSub(){
     state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     render();
   });
+}
+
+// pannello sposi, prima del reveal: niente ascolto live nemmeno qui, per non
+// generare una lettura ad ogni singola risposta di ogni invitato per tutto il
+// tempo in cui il pannello resta aperto (puo' essere ore, durante la festa).
+// Un'istantanea alla prima apertura basta a far vedere qualcosa, poi si
+// aggiorna solo quando si tocca apposta "Aggiorna" (vedi 'refresh-players').
+// Dopo il reveal il pannello passa da solo all'ascolto live vero e proprio,
+// gia' attivo per tutti (vedi ensurePlayersSub() qui sopra).
+let adminPlayersLoaded = false;
+async function refreshPlayersOnce(){
+  if (state.mode !== 'online' || !fb) return;
+  const qs = await fb.getDocs(fb.collection(fb.db, 'players'));
+  state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  render();
+}
+function ensureAdminPlayersLoaded(){
+  if (adminPlayersLoaded || state.revealed) return;
+  adminPlayersLoaded = true;
+  refreshPlayersOnce();
 }
 
 // tutte le foto missione (non solo le proprie), solo per il pannello
@@ -1438,7 +1457,7 @@ function storeAdminList(key, rowsArr, emptyLabel){
 }
 
 function renderAdmin(){
-  ensurePlayersSub();
+  if (state.revealed) ensurePlayersSub(); else ensureAdminPlayersLoaded();
   ensureAdminMissionsSub();
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
@@ -1522,6 +1541,7 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
+    ${!state.revealed && state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-players">Aggiorna i dati degli invitati</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -1751,6 +1771,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
+    case 'refresh-players': refreshPlayersOnce(); break;
     case 'reset-all-missions': {
       openConfirm('Svuotare tutte le missioni fatte? Cancella le foto caricate da ogni invitato e li fa ripartire da capo con una nuova missione. Non si può annullare.', () => resetAllMissions());
       break;
@@ -2033,10 +2054,13 @@ async function boot(){
             // e' chiusa nessuna schermata di un invitato normale mostra i dati
             // degli altri, quindi non serve che il telefono di ciascuno riceva
             // in tempo reale ogni risposta di tutti gli altri — con molti
-            // invitati connessi e' lo spreco di letture piu' grosso. Parte solo
-            // per il pannello sposi (vedi ensurePlayersSub(), richiamata da
-            // renderAdmin()) e per tutti non appena la classifica si apre
-            // davvero (vedi piu' sotto, nell'ascolto di meta/state).
+            // invitati connessi e' lo spreco di letture piu' grosso. Il pannello
+            // sposi, prima del reveal, si accontenta di un'istantanea presa
+            // all'apertura + un tasto "Aggiorna" (vedi ensureAdminPlayersLoaded()/
+            // refreshPlayersOnce(), richiamate da renderAdmin()); l'ascolto vero
+            // e proprio (ensurePlayersSub()) parte per tutti solo non appena la
+            // classifica si apre davvero (vedi piu' sotto, nell'ascolto di
+            // meta/state).
             // solo le proprie foto missione (query filtrata sul server): con
             // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
             // un inutile spreco di dati sul telefono di ciascuno.
