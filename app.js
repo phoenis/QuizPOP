@@ -1399,36 +1399,25 @@ function renderFinale(){
   </div>`;
 }
 
-// dati di tutti gli invitati: nessuno ne ha bisogno finche' la classifica e'
-// chiusa — vedi il commento in boot() su dove parte l'ascolto vero e proprio
-// di players, attivato per tutti non appena la classifica si apre davvero.
-let playersSubStarted = false;
-function ensurePlayersSub(){
-  if (playersSubStarted || state.mode !== 'online' || !fb) return;
-  playersSubStarted = true;
-  fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
-    state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    render();
-  });
-}
-
-// pannello sposi, prima del reveal: niente ascolto live nemmeno qui, per non
-// generare una lettura ad ogni singola risposta di ogni invitato per tutto il
-// tempo in cui il pannello resta aperto (puo' essere ore, durante la festa).
-// Un'istantanea alla prima apertura basta a far vedere qualcosa, poi si
-// aggiorna solo quando si tocca apposta "Aggiorna" (vedi 'refresh-players').
-// Dopo il reveal il pannello passa da solo all'ascolto live vero e proprio,
-// gia' attivo per tutti (vedi ensurePlayersSub() qui sopra).
-let adminPlayersLoaded = false;
+// dati di tutti gli invitati: non serve mai un ascolto live, nemmeno dopo il
+// reveal — rispondere alle domande si blocca appena la classifica si apre
+// (vedi flip()) e le missioni non danno punti, quindi da quel momento in poi
+// il punteggio di nessuno cambia più (a parte un eventuale "Azzera" da
+// pannello sposi, caso raro e comunque coperto dal tasto "Aggiorna" qui
+// sotto). Basta un'istantanea: una sola volta a testa finché la classifica è
+// chiusa (pannello sposi, per le sue statistiche — un invitato normale non
+// vede mai i dati degli altri prima di allora), una sola volta per tutti nel
+// momento del reveal.
+let playersLoadedOnce = false;
 async function refreshPlayersOnce(){
   if (state.mode !== 'online' || !fb) return;
   const qs = await fb.getDocs(fb.collection(fb.db, 'players'));
   state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   render();
 }
-function ensureAdminPlayersLoaded(){
-  if (adminPlayersLoaded || state.revealed) return;
-  adminPlayersLoaded = true;
+function ensurePlayersLoaded(){
+  if (playersLoadedOnce || state.mode !== 'online' || !fb) return;
+  playersLoadedOnce = true;
   refreshPlayersOnce();
 }
 
@@ -1457,7 +1446,7 @@ function storeAdminList(key, rowsArr, emptyLabel){
 }
 
 function renderAdmin(){
-  if (state.revealed) ensurePlayersSub(); else ensureAdminPlayersLoaded();
+  ensurePlayersLoaded();
   ensureAdminMissionsSub();
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
@@ -1541,7 +1530,7 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
-    ${!state.revealed && state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-players">Aggiorna i dati degli invitati</button></div>` : ''}
+    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-players">Aggiorna i dati degli invitati</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -2052,15 +2041,13 @@ async function boot(){
             if (ensureOrder() && state.name) persistProgress();
             // niente ascolto della collezione players qui: finche' la classifica
             // e' chiusa nessuna schermata di un invitato normale mostra i dati
-            // degli altri, quindi non serve che il telefono di ciascuno riceva
-            // in tempo reale ogni risposta di tutti gli altri — con molti
-            // invitati connessi e' lo spreco di letture piu' grosso. Il pannello
-            // sposi, prima del reveal, si accontenta di un'istantanea presa
-            // all'apertura + un tasto "Aggiorna" (vedi ensureAdminPlayersLoaded()/
-            // refreshPlayersOnce(), richiamate da renderAdmin()); l'ascolto vero
-            // e proprio (ensurePlayersSub()) parte per tutti solo non appena la
-            // classifica si apre davvero (vedi piu' sotto, nell'ascolto di
-            // meta/state).
+            // degli altri, e dopo il reveal il punteggio di nessuno cambia piu'
+            // (rispondere si blocca appena si apre, le missioni non danno
+            // punti) — quindi non serve mai un ascolto in tempo reale, solo
+            // un'istantanea presa una volta sola (vedi ensurePlayersLoaded()/
+            // refreshPlayersOnce()): dal pannello sposi mentre e' chiusa (con
+            // in piu' un tasto "Aggiorna" per i casi rari, es. dopo un
+            // "Azzera"), per tutti nel momento del reveal (qui sotto).
             // solo le proprie foto missione (query filtrata sul server): con
             // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
             // un inutile spreco di dati sul telefono di ciascuno.
@@ -2075,11 +2062,10 @@ async function boot(){
               state.revealed = !!d.revealed;
               state.heroPhoto = d.heroPhoto || '';
               state.adminUids = d.admins || [];
-              // da qui in poi tutti vedono la classifica, quindi da qui in poi
-              // tutti ne ricevono anche gli aggiornamenti in tempo reale
-              // (ensurePlayersSub() parte una volta sola, richiamate successive
-              // non fanno nulla).
-              if (state.revealed) ensurePlayersSub();
+              // da qui in poi tutti vedono la classifica: un'istantanea basta,
+              // il punteggio di nessuno cambiera' piu' (ensurePlayersLoaded()
+              // parte una volta sola, richiamate successive non fanno nulla).
+              if (state.revealed) ensurePlayersLoaded();
               render();
             });
             fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
