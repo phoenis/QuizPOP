@@ -1411,9 +1411,16 @@ function renderFinale(){
 let playersLoadedOnce = false;
 async function refreshPlayersOnce(){
   if (state.mode !== 'online' || !fb) return;
-  const qs = await fb.getDocs(fb.collection(fb.db, 'players'));
-  state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  render();
+  // non lascia mai un errore di rete (facile con la wifi di un locale per
+  // matrimoni) risalire a chi chiama: chi assegna una missione, per esempio,
+  // deve poter procedere comunque invece di vedere il tasto non fare niente.
+  try {
+    const qs = await fb.getDocs(fb.collection(fb.db, 'players'));
+    state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    render();
+  } catch (err) {
+    console.error('Non sono riuscito ad aggiornare la lista invitati.', err);
+  }
 }
 function ensurePlayersLoaded(){
   if (playersLoadedOnce || state.mode !== 'online' || !fb) return;
@@ -1429,9 +1436,13 @@ function ensurePlayersLoaded(){
 let adminMissionsLoadedOnce = false;
 async function refreshAdminMissionsOnce(){
   if (state.mode !== 'online' || !fb) return;
-  const qs = await fb.getDocs(fb.collection(fb.db, 'missionPhotos'));
-  state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
-  render();
+  try {
+    const qs = await fb.getDocs(fb.collection(fb.db, 'missionPhotos'));
+    state.allMissionPhotos = qs.docs.map(doc => { const d = doc.data(); return { ...d, ...normalizeMissionMedia(d) }; });
+    render();
+  } catch (err) {
+    console.error('Non sono riuscito ad aggiornare le foto missione.', err);
+  }
 }
 function ensureAdminMissionsLoaded(){
   if (adminMissionsLoadedOnce || state.mode !== 'online' || !fb) return;
@@ -1870,7 +1881,10 @@ async function assignMission(excludeIndex){
   // prima del reveal state.players non e' tenuto aggiornato in tempo reale
   // (vedi boot()): una lettura fresca qui, solo nel momento in cui serve
   // davvero sapere chi ha gia' cosa, costa molto meno che un ascolto live
-  // per tutta la festa.
+  // per tutta la festa. refreshPlayersOnce() non lancia mai (vedi sopra):
+  // se la rete non risponde si procede comunque con quello che si ha già —
+  // un eventuale doppione occasionale (già tollerato più sotto) è meglio di
+  // un tasto che sembra non fare niente.
   await refreshPlayersOnce();
   const taken = takenMissionIndexes();
   if (excludeIndex != null) taken.add(excludeIndex);
