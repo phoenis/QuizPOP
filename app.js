@@ -276,12 +276,22 @@ async function initFirebase(){
 async function persistProgress(){
   if (!state.transferCode) state.transferCode = genTransferCode();
   if (state.mode === 'online' && fb && state.guestId) {
-    const ref = fb.doc(fb.db, 'players', state.guestId);
-    await fb.setDoc(ref, {
-      name: state.name, team: state.team, avatarEmoji: state.avatarEmoji, sel: state.sel,
-      res: state.res, score: state.score, order: state.order,
-      missions: state.missions, transferCode: state.transferCode, updatedAt: fb.serverTimestamp(),
-    }, { merge: true });
+    // un errore di rete qui (facile con la wifi scarsa di un locale per
+    // matrimoni) non deve mai risalire a chi chiama: diversi punti fanno
+    // "await persistProgress()" prima di aggiornare la schermata, e senza
+    // questo un salvataggio fallito lascerebbe quell'azione bloccata a
+    // meta' — es. una missione assegnata ma mai mostrata. Il salvataggio
+    // vero e proprio riparte comunque al prossimo cambiamento di stato.
+    try {
+      const ref = fb.doc(fb.db, 'players', state.guestId);
+      await fb.setDoc(ref, {
+        name: state.name, team: state.team, avatarEmoji: state.avatarEmoji, sel: state.sel,
+        res: state.res, score: state.score, order: state.order,
+        missions: state.missions, transferCode: state.transferCode, updatedAt: fb.serverTimestamp(),
+      }, { merge: true });
+    } catch (err) {
+      console.error('Non sono riuscito a salvare i progressi.', err);
+    }
   } else {
     saveLocalProfile();
   }
@@ -1895,8 +1905,12 @@ async function assignMission(excludeIndex){
   const pool = free.length ? free : MISSIONS.map((_, i) => i);
   const index = pool[Math.floor(Math.random() * pool.length)];
   state.missions = [...state.missions, { index, done: false }];
-  await persistProgress();
+  // mostra subito la missione (persistProgress() ormai non lancia mai, ma
+  // può comunque metterci qualche secondo con una rete lenta): stesso
+  // schema già usato in completeMission(), non si aspetta il salvataggio
+  // per aggiornare la schermata.
   render();
+  await persistProgress();
 }
 
 async function skipMission(){
