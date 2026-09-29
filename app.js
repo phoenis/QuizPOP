@@ -2184,6 +2184,20 @@ window.addEventListener('popstate', e => {
   render();
 });
 
+// cambiare solo la parte dopo # di un URL gia' caricato non ricarica la
+// pagina (comportamento standard del browser): senza questo, toccare un
+// link/segnalibro diretto a #sposi o #code mentre l'app e' gia' aperta nella
+// stessa scheda (con qualunque altra schermata) non farebbe assolutamente
+// nulla, perche' boot() legge l'hash una volta sola all'avvio e qui non
+// scatta popstate (quello e' solo per indietro/avanti). Stessa logica di
+// boot(): ignora ogni altro valore di hash, che e' solo l'app stessa che
+// tiene l'indirizzo sincronizzato con la schermata corrente (vedi
+// pushScreen/replaceScreen).
+window.addEventListener('hashchange', () => {
+  if (location.hash === '#sposi' && state.screen !== 'admin'){ state.screen = 'admin'; render(); }
+  else if (location.hash === '#code' && state.screen !== 'code'){ state.screen = 'code'; render(); }
+});
+
 // fa avanzare i secondi nel contatore della domanda aperta: tocca solo il
 // testo del contatore gia' in pagina, senza un render() completo (che
 // farebbe ripartire ogni animazione della schermata una volta al secondo).
