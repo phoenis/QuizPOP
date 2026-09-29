@@ -1212,7 +1212,7 @@ function renderBoard(){
     <div class="board-rank serif tabular">${p.rank}</div>
     <div class="avatar">${esc(p.avatar)}</div>
     <div><div class="board-name">${esc(p.name)}</div><div class="board-detail">${esc(p.detail||'')}${p.me?' · tu':''}</div></div>
-    <div class="board-score serif tabular">${p.score}</div>
+    <div class="board-score serif tabular">${p.score || 0}</div>
   </div>`).join('');
   const teamsRanked = teams.slice().sort((a, b) => b.avg - a.avg).map((g, i) => ({ ...g, rank: i + 1 }));
   const teamRows = teamsRanked.map(g => `<div class="board-row ${g.rank===1?'top':''}">
@@ -1349,7 +1349,7 @@ function renderClassificaFinale(backButton){
       <div class="avatar">${esc(p.avatar)}</div>
       <div class="podium-pname">${esc(p.name)}</div>
       <div class="podium-block serif rank-${p.rank} ${p.rank===1?'top':''}">
-        <div class="score tabular">${p.score}</div>
+        <div class="score tabular">${p.score || 0}</div>
         <div class="rk">${p.rank}º</div>
       </div>
     </div>`;
@@ -1399,6 +1399,28 @@ function renderFinale(){
   </div>`;
 }
 
+// dati di tutti gli invitati: non serve mai un ascolto live, nemmeno dopo il
+// reveal — rispondere alle domande si blocca appena la classifica si apre
+// (vedi flip()) e le missioni non danno punti, quindi da quel momento in poi
+// il punteggio di nessuno cambia più (a parte un eventuale "Azzera" da
+// pannello sposi, caso raro e comunque coperto dal tasto "Aggiorna" qui
+// sotto). Basta un'istantanea: una sola volta a testa finché la classifica è
+// chiusa (pannello sposi, per le sue statistiche — un invitato normale non
+// vede mai i dati degli altri prima di allora), una sola volta per tutti nel
+// momento del reveal.
+let playersLoadedOnce = false;
+async function refreshPlayersOnce(){
+  if (state.mode !== 'online' || !fb) return;
+  const qs = await fb.getDocs(fb.collection(fb.db, 'players'));
+  state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  render();
+}
+function ensurePlayersLoaded(){
+  if (playersLoadedOnce || state.mode !== 'online' || !fb) return;
+  playersLoadedOnce = true;
+  refreshPlayersOnce();
+}
+
 // tutte le foto missione (non solo le proprie), solo per il pannello
 // sposi: si attiva la prima volta che si entra davvero in questa schermata,
 // che sia con l'indirizzo #sposi o con la scorciatoia dal profilo — invece
@@ -1424,6 +1446,7 @@ function storeAdminList(key, rowsArr, emptyLabel){
 }
 
 function renderAdmin(){
+  ensurePlayersLoaded();
   ensureAdminMissionsSub();
   const totalPlayers = state.players.length;
   const totalCards = allQuestions().length;
@@ -1507,6 +1530,7 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
+    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-players">Aggiorna i dati degli invitati</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -1736,6 +1760,7 @@ root.addEventListener('click', e => {
       break;
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
+    case 'refresh-players': refreshPlayersOnce(); break;
     case 'reset-all-missions': {
       openConfirm('Svuotare tutte le missioni fatte? Cancella le foto caricate da ogni invitato e li fa ripartire da capo con una nuova missione. Non si può annullare.', () => resetAllMissions());
       break;
@@ -2014,10 +2039,15 @@ async function boot(){
             }
             if (!state.transferCode && state.name){ state.transferCode = genTransferCode(); persistProgress(); }
             if (ensureOrder() && state.name) persistProgress();
-            fb.onSnapshot(fb.collection(fb.db, 'players'), qs => {
-              state.players = qs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-              render();
-            });
+            // niente ascolto della collezione players qui: finche' la classifica
+            // e' chiusa nessuna schermata di un invitato normale mostra i dati
+            // degli altri, e dopo il reveal il punteggio di nessuno cambia piu'
+            // (rispondere si blocca appena si apre, le missioni non danno
+            // punti) — quindi non serve mai un ascolto in tempo reale, solo
+            // un'istantanea presa una volta sola (vedi ensurePlayersLoaded()/
+            // refreshPlayersOnce()): dal pannello sposi mentre e' chiusa (con
+            // in piu' un tasto "Aggiorna" per i casi rari, es. dopo un
+            // "Azzera"), per tutti nel momento del reveal (qui sotto).
             // solo le proprie foto missione (query filtrata sul server): con
             // molti invitati, sincronizzare le foto di tutti a tutti sarebbe
             // un inutile spreco di dati sul telefono di ciascuno.
@@ -2032,6 +2062,10 @@ async function boot(){
               state.revealed = !!d.revealed;
               state.heroPhoto = d.heroPhoto || '';
               state.adminUids = d.admins || [];
+              // da qui in poi tutti vedono la classifica: un'istantanea basta,
+              // il punteggio di nessuno cambiera' piu' (ensurePlayersLoaded()
+              // parte una volta sola, richiamate successive non fanno nulla).
+              if (state.revealed) ensurePlayersLoaded();
               render();
             });
             fb.onSnapshot(fb.collection(fb.db, 'extraCards'), qs => {
