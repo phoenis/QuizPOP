@@ -1845,9 +1845,9 @@ async function removeHeroPhoto(){
 }
 
 // evita (finche' ce ne sono di libere) le missioni gia' in mano a qualcun
-// altro (via state.players, in tempo reale) o già fatte/in corso per se
-// stessi. In locale (senza Firebase) non c'e' nessun altro con cui
-// confrontarsi, quindi conta solo la propria lista.
+// altro (via state.players) o già fatte/in corso per se stessi. In locale
+// (senza Firebase) non c'e' nessun altro con cui confrontarsi, quindi conta
+// solo la propria lista.
 function takenMissionIndexes(){
   const taken = new Set();
   for (const p of state.players){
@@ -1864,6 +1864,11 @@ function takenMissionIndexes(){
 async function assignMission(excludeIndex){
   const cur = state.missions[state.missions.length - 1];
   if (cur && !cur.done) return; // ce n'e' gia' una in corso
+  // prima del reveal state.players non e' tenuto aggiornato in tempo reale
+  // (vedi boot()): una lettura fresca qui, solo nel momento in cui serve
+  // davvero sapere chi ha gia' cosa, costa molto meno che un ascolto live
+  // per tutta la festa.
+  await refreshPlayersOnce();
   const taken = takenMissionIndexes();
   if (excludeIndex != null) taken.add(excludeIndex);
   const free = MISSIONS.map((_, i) => i).filter(i => !taken.has(i));
