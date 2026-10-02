@@ -2,15 +2,10 @@ import { firebaseConfig } from './firebase-config.js?v=1';
 
 /* ============ Dati del gioco (copia dal design di riferimento) ============ */
 const QS = [
-  {k:'Su Mara', h:'Non parte mai senza.', t:'Qual è una cosa che Mara non rinuncerebbe mai a portarsi in viaggio?', o:['Un libro','La macchina fotografica','Tappi per le orecchie','Il power bank'], c:2, s:'Tappi per le orecchie: non si sa mai chi russa nella stanza accanto.'},
-  {k:'Su Stefano', h:'Una piccola stranezza, presa con affetto.', t:'Quale tra queste è una piccola mania di Stefano?', o:['Tenere in ordine i vestiti','Andare dal fruttivendolo','Pulire il pavimento','Aprire le finestre'], c:1, s:'Andare dal fruttivendolo: un appuntamento fisso.'},
-  {k:'Su di loro', h:'Chi si butta, chi pianifica.', t:'Chi dei due è più probabile che inizi un nuovo progetto senza sapere ancora esattamente come finirà?', o:['Mara','Stefano','Nessuno dei due, pianificano sempre tutto'], c:0, s:'Mara: si lancia e poi si organizza strada facendo.'},
-  {k:'Su Stefano', h:'Una questione di gusto.', t:'Qual è il cibo preferito di Stefano?', o:['Pizza','Formaggio','Risotto ai funghi','Zucca'], c:1, s:'Il formaggio, sempre e comunque.'},
+  {k:'Su di loro', h:'Cornamuse e chitarre elettriche, sempre in prima fila.', t:'A quale concerto non perdono mai occasione di andare?', o:['Max Pezzali','Folkstone','Furor Gallico','Zucchero'], c:1, s:'Folkstone: biglietto comprato ad ogni tour, senza se e senza ma.'},
   {k:'Su Mara', h:'Un pomeriggio perfetto.', t:'Quale attività potrebbe convincere Mara a passare un intero pomeriggio senza guardare l’orologio?', o:['Una maratona di serie tv','Lavoretti con il fai da te','Fare shopping','Una lunga corsa'], c:1, s:'Lavoretti con il fai da te: il tempo vola, sempre.'},
-  {k:'Su Stefano', h:'Non è proprio il suo forte.', t:'Quale delle seguenti cose Stefano non farebbe mai spontaneamente?', o:['Cucinare','Ballare','Guardare una partita','Fare un pisolino'], c:1, s:'Ballare: solo se strettamente necessario (tipo al matrimonio).'},
   {k:'Su Stefano', h:'Chi lo conosce bene, lo sa.', t:'Qual è la cosa che Stefano ama di più di Mara?', o:['Quando ride socchiudendo gli occhi e alzando le guanciotte','Quando si emoziona per le piccole cose e diventa incontenibile','Quando si concentra su qualcosa e fa una faccia serissima senza accorgersi','Quando racconta qualcosa che la appassiona e inizia a parlare velocissimo'], c:0, s:'Quando ride socchiudendo gli occhi e alzando le guanciotte.'},
   {k:'Su Mara', h:'Un colore che le somiglia.', t:'Qual è il colore preferito di Mara?', o:['Rosso','Blu','Verde','Giallo'], c:3, s:'Il giallo, senza dubbi.'},
-  {k:'Su Mara', h:'Chi la conosce bene, lo sa.', t:'Qual è la cosa che Mara ama di più di Stefano?', o:['La sua pazienza','La sua risata','Il suo modo di cucinare','Come organizza le vacanze'], c:1, s:'La sua risata: contagiosa, sempre.'},
   {k:'Su Mara', h:'Una questione di gusto.', t:'Qual è il piatto preferito di Mara?', o:['Lasagne','Risotto ai funghi','Polpette al sugo','Parmigiana'], c:2, s:'Polpette al sugo, come le faceva nonna Pina.'},
 
   {k:'La loro vita insieme', h:'La frase che ha rotto il ghiaccio.', t:'Come ha fatto Ste a conquistare il cuore di Mara?', o:['Con la battuta su POP fa il criceto','La barzelletta della banana nell’orecchio','Il trucco di magia con la moneta nel braccio','La spiegazione sul perché si scuote la bustina di zucchero'], c:0, s:'POP fa il criceto: e 1000 altri giochi da fare con il microonde.'},
@@ -38,10 +33,10 @@ const BASE_PTS = 60, BONUS_PTS = 40, TIMER_S = 20;
 // una medaglia per categoria a chi risponde a tutte le sue domande, giuste o
 // sbagliate che siano: cosi' la puo' vincere chiunque, non solo chi indovina.
 const CATS = [
-  {name:'Mara & Stefano', from:0, to:9, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Hai risposto a tutte le domande sugli sposi'},
-  {name:'La loro vita insieme', from:10, to:14, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Hai risposto a tutte le domande sulla nostra vita'},
-  {name:'Il matrimonio', from:15, to:19, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte le domande sul nostro matrimonio'},
-  {name:'Andiamo in viaggio', from:20, to:24, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Hai risposto a tutte le domande sui viaggi'},
+  {name:'Mara & Stefano', from:0, to:4, mark:'<img src="assets/mascotte/criceti-mara-ste.png" alt="">', medal:'Gli sposi', note:'Hai risposto a tutte le domande sugli sposi'},
+  {name:'La loro vita insieme', from:5, to:9, mark:'<img src="assets/mascotte/criceti-love.png" alt="">', medal:'La vita insieme', note:'Hai risposto a tutte le domande sulla nostra vita'},
+  {name:'Il matrimonio', from:10, to:14, mark:'<img src="assets/mascotte/criceti-festa.png" alt="">', medal:'Il giorno del sì', note:'Hai risposto a tutte le domande sul nostro matrimonio'},
+  {name:'Andiamo in viaggio', from:15, to:19, mark:'<img src="assets/mascotte/criceto-viaggio.png" alt="">', medal:'In viaggio', note:'Hai risposto a tutte le domande sui viaggi'},
 ];
 function catOf(i){ return CATS.findIndex(c => i >= c.from && i <= c.to); }
 function catState(res, c){
@@ -976,12 +971,20 @@ function renderHome(){
   // ogni categoria e' una tile colorata cliccabile, con badge di stato
   // (gioca/completato), barra di avanzamento (quante ne hai fatte, non
   // quante giuste: quello resta nelle medaglie) e il criceto della categoria.
-  const catRow = (icon, name, catQs, variant) => {
+  const catRow = (icon, name, catQs, variant, catIdx) => {
     const doneN = catQs.filter(qi => state.res[qi]).length;
     const pct = catQs.length ? Math.round((doneN / catQs.length) * 100) : 0;
     const target = catQs.find(qi => !state.res[qi]) ?? catQs[0];
     const earned = catQs.length > 0 && doneN === catQs.length;
-    return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" data-action="flip-to" data-i="${target}">
+    // una categoria completata non serve piu' riaprirla per rispondere: tocca
+    // la tile e vede subito le proprie risposte di quella categoria, invece
+    // di tornare sull'ultima domanda gia' fatta — stessa modale che prima si
+    // apriva solo dalla griglia medaglie nel profilo, ora tolta da li' (vedi
+    // renderProfile()) perche' poco chiara a chi non e' avvezzo ai giochi.
+    const action = (earned && catIdx != null)
+      ? `data-action="open-medal-modal" data-cat="${catIdx}"`
+      : `data-action="flip-to" data-i="${target}"`;
+    return `<button class="cat-tile cat-tile--${variant} ${earned?'earned':''}" ${action}>
       <span class="cat-tile-text">
         <span class="cat-tile-top">
           <span class="cat-tile-badge">${earned ? '✓' : '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1.2em" height="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.69L9.54 5.98A.998.998 0 0 0 8 6.82"></path></svg>'}</span>
@@ -999,7 +1002,7 @@ function renderHome(){
   };
   const catCards = CATS.map((c, idx) => {
     const catQs = state.order.filter(qi => catOf(qi) === idx);
-    return catRow(c.mark, c.name, catQs, idx + 1);
+    return catRow(c.mark, c.name, catQs, idx + 1, idx);
   }).join('');
   const extraQs = state.order.filter(qi => catOf(qi) < 0);
   const extraCard = extraQs.length ? catRow('✦', 'Domande extra', extraQs, 'extra') : '';
@@ -1092,7 +1095,7 @@ function renderOptions(q){
   return `<div class="option-group">${rows}</div>`;
 }
 
-// "Carta N/25 · Ns": i secondi trascorsi dall'apertura della domanda corrente,
+// "Ns": i secondi trascorsi dall'apertura della domanda corrente,
 // aggiornati ogni secondo (vedi l'intervallo piu' in basso nel file) senza
 // contare alla rovescia: e' solo un riferimento, non toglie mai punti.
 function quizCounterText(){
@@ -1108,12 +1111,14 @@ function renderQuiz(){
   return `<div class="screen screen-quiz cat-tile--${variant}">
     <div class="topbar">
       <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
-      <span class="quiz-counter">${quizCounterText()}</span>
     </div>
     <div class="kicker">${esc(q.k)}</div>
     <h2 class="quiz-q pretty">${esc(q.t)}</h2>
     ${renderQuizBody(q)}
-    <div class="quiz-footer">${cat ? cat.mark : ''}<span>Conta anche quanto ci metti. Te lo diciamo dopo.</span></div>
+    <div class="quiz-timer">
+      <span class="quiz-counter tabular">${quizCounterText()}</span>
+      <span class="quiz-timer-label">Conta anche quanto ci metti: più veloce rispondi, più punti fai.</span>
+    </div>
   </div>`;
 }
 
@@ -1254,15 +1259,6 @@ function renderProfile(){
   const times = Object.values(state.res).map(x => x.used);
   const avg = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
   const name = state.name || 'Zia Franca';
-  const earnedCount = CATS.filter(c => catState(state.res, c).earned).length;
-  const medalCards = CATS.map((c, idx) => {
-    const st = catState(state.res, c);
-    const note = st.right + ' su ' + st.n + ' giuste';
-    return `<button class="medal-card ${st.earned ? 'earned cat-tile--' + (idx + 1) : 'locked'}" data-action="open-medal-modal" data-cat="${idx}">
-      ${c.mark}
-      <div class="medal-title">${esc(c.name)}</div>
-    </button>`;
-  }).join('');
   const isAdmin = state.adminUids.includes(state.guestId);
   return `<div class="screen screen-profile">
     <div class="topbar">${avatarButton()}</div>
@@ -1276,8 +1272,6 @@ function renderProfile(){
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done?numIt(avg)+'s':'—'}</div><div class="c">Media</div></div>
     </div>
-    <div class="section-title">Medaglie · ${earnedCount} su ${CATS.length}</div>
-    <div class="medal-grid">${medalCards}</div>
     ${isAdmin && state.mode === 'online' && state.transferCode ? `
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
