@@ -837,16 +837,14 @@ function renderMissione(){
       <h2 class="mission-text pretty">${esc(missionText(cur.index))}</h2>
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
-      <div class="dialog-actions">
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-gallery">Carica <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M228 144v64a12 12 0 0 1-12 12H40a12 12 0 0 1-12-12v-64a12 12 0 0 1 24 0v52h152v-52a12 12 0 0 1 24 0M96.49 80.49L116 61v83a12 12 0 0 0 24 0V61l19.51 19.52a12 12 0 1 0 17-17l-40-40a12 12 0 0 0-17 0l-40 40a12 12 0 1 0 17 17Z"></path></svg></button>
           ${optionalPhoto ? `<button class="button is-outline" data-action="complete-mission-nophoto">L'ho fatta, senza foto ✓</button>` : ''}
-          </div>
-        <p class="button-alone">
-          <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
-        </p>
       </div>
-    </div>`;
+    </div>
+    <p class="button-alone margin-top-small">
+      <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
+    </p>`;
   } else if (!list.length){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">🔍</div>
@@ -1741,10 +1739,7 @@ root.addEventListener('click', e => {
     case 'logout': logout(); break;
     case 'reveal-mission': assignMission(); break;
     case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
-    case 'skip-mission': {
-      openConfirm('Cambiare missione? Non potrai più tornare a questa.', skipMission);
-      break;
-    }
+    case 'skip-mission': skipMission(); break;
     case 'complete-mission-nophoto': {
       openConfirm('Segnare questa missione come fatta, senza foto?', () => completeMission(null));
       break;
