@@ -1117,7 +1117,7 @@ function renderQuiz(){
     ${renderQuizBody(q)}
     <div class="quiz-timer">
       <span class="quiz-counter tabular">${quizCounterText()}</span>
-      <span class="quiz-timer-label">Conta anche quanto ci metti: più veloce rispondi, più punti fai.</span>
+      <span class="quiz-timer-label">Conta anche quanto ci metti:<br>più sei veloce più punti fai!</span>
     </div>
   </div>`;
 }
