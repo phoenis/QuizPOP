@@ -74,40 +74,13 @@ const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 // fare lo stesso). Le altre, non segnate, restano com'erano: pensate per
 // una foto, e vanno completate con una foto.
 const MISSIONS = [
-  { t: 'Scatta una foto di qualcuno che balla con un bicchiere in mano' },
-  { t: 'Scatta una foto della pista da ballo' },
-  { t: 'Scatta una foto del tavolo più "scatenato"' },
-  { t: 'Scatta una foto al fotografo ufficiale mentre lavora' },
-  { t: 'Scatta una foto al deejay' },
-  { t: 'Scatta una foto ad un cameriere' },
-  { t: 'Scatta una foto ad una persona che canta' },
-  { t: 'Scatta una foto agli sposi che ridono' },
-  { t: 'Scatta una foto di una persona commossa' },
-  { t: 'Scatta una foto del primo ballo' },
-  { t: 'Scatta una foto di un abbraccio tra due generazioni diverse' },
-  { t: 'Scatta una foto di un bacio' },
-  { t: 'Scatta una foto di una piccola mano' },
-  { t: 'Scatta una foto a qualcuno che scrive' },
-  { t: 'Scatta una foto a qualcuno che si fa una foto' },
-  { t: 'Scatta una foto a qualcuno che tiene in braccio un bambino' },
-  { t: 'Ricrea una foto di una nostra escursione' },
-  { t: 'Scatta una foto di un piatto, come fosse una cartolina' },
-  { t: 'Scatta una foto del centrotavola più bello' },
-  { t: 'Scatta una foto della consegna delle bomboniere' },
-  { t: 'Scatta una foto di un dettaglio autunnale' },
-  { t: 'Scatta una foto di un giardino' },
-  { t: 'Scatta una foto di una persona che ti piace com’è vestita' },
   { t: 'Fai un selfie con lo sposo' },
   { t: 'Fai un selfie con la sposa' },
   { t: 'Fai un selfie con le testimoni' },
   { t: 'Fai un selfie con un genitore degli sposi' },
   { t: 'Fai un selfie di gruppo' },
   { t: 'Fai un selfie con la persona a cui vuoi più bene' },
-  { t: 'Fai una foto buffa' },
-  { t: 'Scatta una foto a qualcuno che fa un brindisi' },
   { t: 'Fai un selfie con tutto il tuo tavolo' },
-  { t: 'Scatta una foto di un abbraccio' },
-  { t: 'Scatta una foto di un applauso' },
   { t: 'Fai un selfie con qualcuno vestito del tuo stesso colore' },
   { t: 'Dai un abbraccio allo sposo', photo: false },
   { t: 'Dai un abbraccio alla sposa', photo: false },
@@ -864,16 +837,14 @@ function renderMissione(){
       <h2 class="mission-text pretty">${esc(missionText(cur.index))}</h2>
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
-      <div class="dialog-actions">
       <div class="result-cta">
         <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-gallery">Carica <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M228 144v64a12 12 0 0 1-12 12H40a12 12 0 0 1-12-12v-64a12 12 0 0 1 24 0v52h152v-52a12 12 0 0 1 24 0M96.49 80.49L116 61v83a12 12 0 0 0 24 0V61l19.51 19.52a12 12 0 1 0 17-17l-40-40a12 12 0 0 0-17 0l-40 40a12 12 0 1 0 17 17Z"></path></svg></button>
           ${optionalPhoto ? `<button class="button is-outline" data-action="complete-mission-nophoto">L'ho fatta, senza foto ✓</button>` : ''}
-          </div>
-        <p class="button-alone">
-          <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
-        </p>
       </div>
-    </div>`;
+    </div>
+    <p class="button-alone margin-top-small">
+      <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
+    </p>`;
   } else if (!list.length){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">🔍</div>
@@ -1768,10 +1739,7 @@ root.addEventListener('click', e => {
     case 'logout': logout(); break;
     case 'reveal-mission': assignMission(); break;
     case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
-    case 'skip-mission': {
-      openConfirm('Cambiare missione? Non potrai più tornare a questa.', skipMission);
-      break;
-    }
+    case 'skip-mission': skipMission(); break;
     case 'complete-mission-nophoto': {
       openConfirm('Segnare questa missione come fatta, senza foto?', () => completeMission(null));
       break;
