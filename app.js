@@ -1272,6 +1272,10 @@ function renderProfile(){
       <div class="stat-cell"><div class="v serif tabular">${done}/${total}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${done?numIt(avg)+'s':'—'}</div><div class="c">Media</div></div>
     </div>
+    <div class="section-title">Classifica</div>
+    ${state.revealed
+      ? `<button class="button is-outline" data-action="open-board-full">Vedi la classifica</button>`
+      : `<p class="sub-text pretty">Chiusa — si apre quando Mara e Stefano la annunciano.</p>`}
     ${isAdmin && state.mode === 'online' && state.transferCode ? `
       <div class="section-title">Il tuo profilo su un altro telefono</div>
       <div class="album-code-box">
