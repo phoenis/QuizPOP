@@ -831,7 +831,7 @@ function renderMissione(){
     // se la foto la si vuole fare lo stesso.
     const optionalPhoto = MISSIONS[cur.index] && MISSIONS[cur.index].photo === false;
     body = `
-
+    <div style="margin-top:auto;margin-bottom:auto;">
     <div class="card is-centered">
         <div class="kicker">La tua missione</div>
       <h2 class="mission-text pretty">${esc(missionText(cur.index))}</h2>
@@ -844,7 +844,8 @@ function renderMissione(){
     </div>
     <p class="button-alone margin-top-small">
       <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
-    </p>`;
+    </p>
+    </div>`;
   } else if (!list.length){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">🔍</div>
