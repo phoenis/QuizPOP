@@ -905,8 +905,9 @@ function renderAlbum(){
     <div class="mission-wrap">
       <div class="card is-centered">
         <div class="kicker">Album condiviso</div>
-        <h1>Le tue foto nel nostro album</h1>
-        <p class="sub-text pretty"><br>Apri WedShoots e inserisci questo codice per entrare:</p>
+        <h1>Le foto della festa, tutte in un posto</h1>
+        <p class="sub-text pretty">È l'album di WedShoots: ognuno carica le foto che scatta e rivede quelle di tutti gli altri invitati.<br>Resta attivo anche nei giorni dopo il matrimonio: scarica l'app e tornaci con comodo quando vuoi.</p>
+        <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
           <button class="button is-outline${state.copiedFlash==='album'?' is-copied':''}" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
