@@ -838,11 +838,10 @@ function renderMissione(){
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
       <div class="result-cta">
-        <button class="button is-fill" data-action="mission-photo-pick" data-target="mission-file-gallery">Carica <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M228 144v64a12 12 0 0 1-12 12H40a12 12 0 0 1-12-12v-64a12 12 0 0 1 24 0v52h152v-52a12 12 0 0 1 24 0M96.49 80.49L116 61v83a12 12 0 0 0 24 0V61l19.51 19.52a12 12 0 1 0 17-17l-40-40a12 12 0 0 0-17 0l-40 40a12 12 0 1 0 17 17Z"></path></svg></button>
-          ${optionalPhoto ? `<button class="button is-outline" data-action="complete-mission-nophoto">L'ho fatta, senza foto ✓</button>` : ''}
+        <button class="button is-outline" data-action="complete-mission-nophoto">Fatta ✓</button>  
       </div>
     </div>
-    <p class="button-alone margin-top-small">
+    <p class="button-alone margin-top-medium">
       <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
     </p>
     </div>`;
@@ -905,9 +904,10 @@ function renderAlbum(){
     <div class="mission-wrap">
       <div class="card is-centered">
         <div class="kicker">Album condiviso</div>
-        <h1>Le foto della festa, tutte in un posto</h1>
-        <p class="sub-text pretty">È l'album di WedShoots: ognuno carica le foto che scatta e rivede quelle di tutti gli altri invitati.<br>Resta attivo anche nei giorni dopo il matrimonio: scarica l'app e tornaci con comodo quando vuoi.</p>
-        <p class="sub-text pretty">Apri WedShoots e inserisci questo codice per entrare:</p>
+        <h1>Le foto della festa, <br>tutte in un posto</h1>
+        <p class="sub-text pretty">Nell'album di WedShoots ognuno carica le foto che scatta e rivede quelle di tutti gli altri invitati.</p>
+        <p class="sub-text pretty">Oggi goditi la festa, l'album rimane attivo anche nei prossimi giorni!</p>
+        <p class="sub-text pretty">Per partecipare usa questo codice:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
           <button class="button is-outline${state.copiedFlash==='album'?' is-copied':''}" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
@@ -919,7 +919,7 @@ function renderAlbum(){
           </div>
         </div>
       </div>
-      <img src="assets/mascotte/cricetino-fiore-solo.png" alt="" class="mission-mascot">
+      
     </div>
   </div>`;
 }
