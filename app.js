@@ -56,15 +56,15 @@ const RIVALS_DEMO = [
 ];
 function demoRes(n, avg){ const r={}; for(let i=0;i<n;i++) r[i]={pts:60,bonus:20,correct:true,used:avg||5}; return r; }
 
-// Album condiviso WedShoots: pagina ufficiale "download" di wedshoots.com con
+// Album condiviso Wedshoots: pagina ufficiale "download" di Wedshoots.com con
 // l'ID album già incorporato, pensata apposta per l'invito — dovrebbe aprire
 // l'app se già installata, altrimenti mandare allo store giusto da sola.
 // + codice album da mostrare/copiare a chi entra dalla versione web, + link
 // diretti agli store come riserva se la pagina non reindirizzasse da sola.
-const ALBUM_URL = 'https://www.wedshoots.com/it/download?albumId=ITc68bf3c0';
+const ALBUM_URL = 'https://www.Wedshoots.com/it/download?albumId=ITc68bf3c0';
 const ALBUM_CODE = 'ITc68bf3c0';
-const WEDSHOOTS_ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.matrimonio.launcher&referrer=af_tranid%3DODMwNjM5OTQ2MDgzMDg3OTc3NA%3D%3D%26c%3DWP-IT-LANDINGS%26pid%3DWP-Android-IT';
-const WEDSHOOTS_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
+const Wedshoots_ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.matrimonio.launcher&referrer=af_tranid%3DODMwNjM5OTQ2MDgzMDg3OTc3NA%3D%3D%26c%3DWP-IT-LANDINGS%26pid%3DWP-Android-IT';
+const Wedshoots_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 
 // Missione personale: a ogni invitato ne viene assegnata una a caso,
 // evitando (finché ce ne sono di libere) quelle già capitate ad altri.
@@ -810,7 +810,7 @@ function renderHub(){
         <button class="hub-tile" data-action="go" data-screen="album">
           <span class="kicker">Album</span>
           <span class="title serif">Carica le tue foto</span>
-          <span class="foot">WedShoots ↗</span>
+          <span class="foot">Wedshoots ↗</span>
         </button>
       </div>
     </div>
@@ -841,14 +841,14 @@ function renderMissione(){
         <button class="button is-outline" data-action="complete-mission-nophoto">Fatta ✓</button>  
       </div>
     </div>
-    <p class="button-alone margin-top-medium">
+    <p class="button-alone margin-top-large">
       <button class="btn-text" data-action="skip-mission">Non mi piace, cambia</button>
     </p>
     </div>`;
   } else if (!list.length){
     body = `<div class="card is-centered">
       <div class="mission-icon-circle">🔍</div>
-      <h1>Hai una missione che ti aspetta!</h1>
+      <h1 class="text-wrap-balance">Hai una missione che ti aspetta!</h1>
       <p class="sub-text pretty">Ne esce una a sorpresa, scopri qual è la tua.</p>
       <div class="result-cta">
         <button class="button is-outline" data-action="reveal-mission">Scopri la missione</button>
@@ -904,22 +904,22 @@ function renderAlbum(){
     <div class="mission-wrap">
       <div class="card is-centered">
         <div class="kicker">Album condiviso</div>
-        <h1>Le foto della festa, <br>tutte in un posto</h1>
-        <p class="sub-text pretty">Nell'album di WedShoots ognuno carica le foto che scatta e rivede quelle di tutti gli altri invitati.</p>
-        <p class="sub-text pretty">Oggi goditi la festa, l'album rimane attivo anche nei prossimi giorni!</p>
+        <h1 class="margin-top-medium text-wrap-balance">Oggi goditi la festa, l'album rimane attivo anche nei prossimi giorni!</h1>
+        <p class="sub-text pretty">Nell'album di Wedshoots ognuno carica le foto che scatta e rivede quelle di tutti gli altri invitati.</p>
+        <div class="divider"></div>
         <p class="sub-text pretty">Per partecipare usa questo codice:</p>
         <div class="album-code-box">
           <span class="album-code tabular">${esc(ALBUM_CODE)}</span>
           <button class="button is-outline${state.copiedFlash==='album'?' is-copied':''}" data-action="copy-album-code">${state.copiedFlash==='album'?'Copiato!':'Copia'}</button>
         </div>
         <div class="dialog-actions">
-          <button class="button is-fill" data-action="open-album">Apri WedShoots ↗</button>
+          <button class="button is-fill" data-action="open-album">Apri Wedshoots ↗</button>
           <div class="button-alone">
             <p class="fine-print">Non hai l'app? <button data-action="open-album-store">Scaricala</button></p>
           </div>
         </div>
-      </div>
-      
+      </div>      
+      <img src="assets/mascotte/criceto-foto.png" alt="" class="mission-mascot">
     </div>
   </div>`;
 }
@@ -1724,7 +1724,7 @@ root.addEventListener('click', e => {
     case 'open-album': window.open(ALBUM_URL, '_blank'); break;
     case 'open-album-store': {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      window.open(isIOS ? WEDSHOOTS_IOS_URL : WEDSHOOTS_ANDROID_URL, '_blank');
+      window.open(isIOS ? Wedshoots_IOS_URL : Wedshoots_ANDROID_URL, '_blank');
       break;
     }
     case 'copy-album-code': {
