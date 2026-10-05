@@ -1742,10 +1742,7 @@ root.addEventListener('click', e => {
     case 'reveal-mission': assignMission(); break;
     case 'mission-photo-pick': document.getElementById(el.dataset.target).click(); break;
     case 'skip-mission': skipMission(); break;
-    case 'complete-mission-nophoto': {
-      openConfirm('Segnare questa missione come fatta, senza foto?', () => completeMission(null));
-      break;
-    }
+    case 'complete-mission-nophoto': completeMission(null); break;
     case 'admin-hero-pick': document.getElementById('admin-hero-file').click(); break;
     case 'admin-hero-remove': {
       openConfirm('Togliere la foto di copertina? Torna il placeholder.', removeHeroPhoto);
