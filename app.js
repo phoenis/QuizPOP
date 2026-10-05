@@ -2162,6 +2162,17 @@ window.addEventListener('hashchange', () => {
   else if (location.hash === '#code' && state.screen !== 'code'){ state.screen = 'code'; render(); }
 });
 
+// blocca lo zoom: su iPhone, pizzicando lo schermo, la barra in alto (con la
+// freccia indietro) finisce fuori dall'inquadratura — il viewport meta da
+// solo non basta, Safari ignora maximum-scale/user-scalable sul gesto pinch.
+document.addEventListener('gesturestart', e => e.preventDefault());
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault(); // doppio tap = zoom
+  lastTouchEnd = now;
+}, { passive: false });
+
 // fa avanzare i secondi nel contatore della domanda aperta: tocca solo il
 // testo del contatore gia' in pagina, senza un render() completo (che
 // farebbe ripartire ogni animazione della schermata una volta al secondo).
