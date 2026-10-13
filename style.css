@@ -80,6 +80,10 @@ input{font-family:inherit;}
   display:flex;
   flex-direction:column;
   overflow-x:hidden;
+  /* installata come app (viewport-fit:cover, vedi index.html): il contenuto
+     disegna fin sotto l'indicatore home, che altrimenti lo copre invece di
+     lasciarlo semplicemente scrollabile oltre. */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 @media (min-width:30.0625rem){
   body{ display:flex; justify-content:center; padding:1.5rem 0; }
