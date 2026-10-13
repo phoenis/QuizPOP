@@ -1426,8 +1426,8 @@ function ensurePlayersLoaded(){
 // tutte le foto missione (non solo le proprie), solo per il pannello sposi:
 // stesso discorso di players — niente ascolto live (se il pannello resta
 // aperto per ore genererebbe una lettura per ogni foto caricata da chiunque),
-// solo un'istantanea alla prima apertura e poi solo quando si tocca apposta
-// "Aggiorna" (vedi 'refresh-admin-data').
+// solo un'istantanea alla prima apertura e poi solo quando si apre la
+// classifica (vedi openRevealWithRefresh()).
 let adminMissionsLoadedOnce = false;
 async function refreshAdminMissionsOnce(){
   if (state.mode !== 'online' || !fb) return;
@@ -1525,7 +1525,6 @@ function renderAdmin(){
     </div>`;
     });
   state.lightboxGallery = adminMissionGallery;
-  const activeMissionsCount = state.missionsList.filter(m => m.active !== false).length;
   const missionManageRows = state.missionsList.map(m => {
     const isActive = m.active !== false;
     return `<div class="admin-card-row${isActive ? '' : ' is-inactive'}">
@@ -1567,7 +1566,6 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${totalCards}</div><div class="c">Domande</div></div>
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
-    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-admin-data">Aggiorna i dati</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -1575,7 +1573,7 @@ function renderAdmin(){
       </div>
       ${state.revealed
         ? `<button class="btn-dark" data-action="close-board">Riapri il gioco</button>`
-        : `<button class="btn-dark" data-action="open-board">Chiudi e mostra la classifica</button>`}
+        : `<button class="btn-dark" data-action="open-board">Apri la classifica</button>`}
     </div>
     <div class="section-title">Impostazioni</div>
     ${state.heroPhoto ? `<div class="hero-upload-box has-photo">
@@ -1607,11 +1605,6 @@ function renderAdmin(){
         <span class="admin-link-count tabular">${totalCards}</span>
         <span class="admin-link-label">Domande</span>
       </button>
-      <button class="admin-link-box" data-action="open-admin-modal" data-target="elenco-missioni">
-        <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68"></path></svg></span>
-        <span class="admin-link-count tabular">${activeMissionsCount}</span>
-        <span class="admin-link-label">Elenco missioni</span>
-      </button>
     </div>
   </div>`;
 }
@@ -1629,6 +1622,7 @@ function renderAdminModal(){
         <div class="section-title">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
         <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
       </div>
+      ${key === 'missioni' ? `<div class="button-alone"><button class="btn-text" data-action="switch-admin-modal" data-target="elenco-missioni">Modifica missioni</button></div>` : ''}
       ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
       ` : ''}
       <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
@@ -1750,11 +1744,15 @@ root.addEventListener('click', e => {
       break;
     }
     case 'open-board-full': state.revealed = true; go('board'); break;
-    case 'open-board': openReveal(); break;
+    case 'open-board': openRevealWithRefresh(); break;
     case 'close-board': closeReveal(); break;
     case 'peek-categories': state.peekCategories = !state.peekCategories; render(); break;
     case 'board-tab': state.boardTab = el.dataset.tab; render(); break;
     case 'open-admin-modal': saveScroll(); pushOverlayHistory(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
+    // cambia solo il contenuto di una modale già aperta (es. da "Missioni" a
+    // "Modifica missioni"): niente nuova voce di history, altrimenti un solo
+    // "indietro" non basterebbe più a chiudere davvero la modale.
+    case 'switch-admin-modal': state.adminModal = el.dataset.target; render(); resetScroll(); break;
     case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'open-medal-modal': saveScroll(); pushOverlayHistory(); state.medalModal = +el.dataset.cat; render(); resetScroll(); break;
     case 'close-medal-modal': state.medalModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
@@ -1811,7 +1809,6 @@ root.addEventListener('click', e => {
       break;
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
-    case 'refresh-admin-data': refreshPlayersOnce(); refreshAdminMissionsOnce(); break;
     case 'reset-all-missions': {
       openConfirm('Svuotare tutte le missioni fatte? Cancella le foto caricate da ogni invitato e li fa ripartire da capo con una nuova missione. Non si può annullare.', () => resetAllMissions());
       break;
@@ -1833,6 +1830,14 @@ function openReveal(){
     fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { revealed: true }, { merge: true });
   }
   render();
+}
+
+// "Apri la classifica": prima aggiorna punteggi/missioni (sostituiva il
+// tasto "Aggiorna i dati", tolto perché questo è l'unico momento in cui
+// avere dati freschi conta davvero), poi apre la classifica.
+async function openRevealWithRefresh(){
+  await Promise.all([refreshPlayersOnce(), refreshAdminMissionsOnce()]);
+  openReveal();
 }
 
 function closeReveal(){
