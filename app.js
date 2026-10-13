@@ -47,21 +47,6 @@ function catState(res, c){
 }
 const TEAMS = ['Calanchi','Etna','Étretat','Le Mont-Saint-Michel','Machu Picchu','Palcoyo','Parco della Majella','Tirino','Tuckett','XII Apostoli'];
 
-// risposte date quando il quiz aveva ancora 25 domande (prima categoria da
-// 10 invece di 5): quella riduzione ha spostato la posizione di tutte le
-// domande dalla seconda categoria in poi, quindi le risposte salvate con il
-// vecchio indice (la chiave di res) ora risultano agganciate alla domanda
-// sbagliata se lasciate ferme. Questa mappa dice, per ogni vecchio indice,
-// a quale nuovo indice spostare quella stessa risposta — null se la domanda
-// non esiste più (vedi fixLegacyQuizAnswers()). Chi ha giocato solo con le
-// 20 domande attuali non viene mai toccato: si riconosce chi ha ancora
-// risposte vecchie dal fatto che res contiene un indice 20 o più, impossibile
-// da qui in poi visto che le domande sono 20 (indici 0-19).
-const LEGACY_QUIZ_INDEX_MAP = {
-  0: null, 1: null, 2: 0, 3: 2, 4: null, 5: null, 6: null, 7: 3, 8: null, 9: null,
-  10: 5, 11: 6, 12: 7, 13: 8, 14: 9, 15: 10, 16: 11, 17: 12, 18: 13, 19: 14,
-  20: 15, 21: 16, 22: 17, 23: 18, 24: 19,
-};
 const RIVALS_DEMO = [
   {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1, avatarEmoji:'🌻'},
   {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2, avatarEmoji:'🦄'},
@@ -1583,7 +1568,7 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
     ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-admin-data">Aggiorna i dati</button></div>` : ''}
-    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="fix-legacy-answers">Sistema risposte vecchio quiz (25 domande)</button></div>` : ''}
+    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="restore-massimo-answers">Rimetti le risposte di Massimo</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -1828,8 +1813,8 @@ root.addEventListener('click', e => {
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
     case 'refresh-admin-data': refreshPlayersOnce(); refreshAdminMissionsOnce(); break;
-    case 'fix-legacy-answers': {
-      openConfirm('Sistemare le risposte di chi ha ancora giocato con le 25 domande? Sposta ogni risposta sulla domanda giusta, toglie quelle per domande non più in elenco.', fixLegacyQuizAnswers);
+    case 'restore-massimo-answers': {
+      openConfirm('Rimettere a posto le 18 risposte di Massimo (le altre 7 erano per domande non più in elenco)?', restoreMassimoAnswers);
       break;
     }
     case 'reset-all-missions': {
@@ -2052,28 +2037,44 @@ async function deletePlayer(playerId){
   await refreshPlayersOnce();
 }
 
-// ===== correzione una tantum per chi ha giocato col vecchio quiz da 25
-// domande (vedi LEGACY_QUIZ_INDEX_MAP più sopra) — pensata per un solo
-// invitato (Massimo), da togliere di nuovo dal pannello appena confermato
-// che ha funzionato: individua da solo chi ha ancora risposte vecchie (un
-// indice 20 o più in res, impossibile ora che le domande sono 20) e sposta
-// ciascuna risposta sulla nuova posizione della stessa domanda, scartando
-// quelle per domande non più in elenco.
-async function fixLegacyQuizAnswers(){
+// ===== correzione una tantum per Massimo: il suo campo res era rimasto
+// legato alle vecchie 25 domande del quiz (quando la prima categoria ne
+// aveva 10 invece di 5), poi è stato cancellato del tutto da Firestore per
+// sbaglio mentre si cercava di sistemarlo a mano. Questi sono gli stessi 18
+// valori già ricalcolati rispetto alle 20 domande attuali (le altre 7
+// risposte erano per domande non più in elenco, già scartate) — rimetterli
+// qui invece che a mano in Firestore. Da togliere di nuovo dal
+// pannello una volta confermato che ha funzionato.
+const MASSIMO_RESTORED_RES = {
+  0: { bonus: 22, correct: true, pts: 82, used: 8.817 },
+  2: { bonus: 0, correct: false, pts: 0, used: 17.509 },
+  3: { bonus: 0, correct: false, pts: 0, used: 7.962 },
+  5: { bonus: 0, correct: true, pts: 60, used: 35.442 },
+  6: { bonus: 0, correct: false, pts: 0, used: 20.56 },
+  7: { bonus: 15, correct: true, pts: 75, used: 12.296 },
+  8: { bonus: 0, correct: true, pts: 60, used: 22.588 },
+  9: { bonus: 0, correct: true, pts: 60, used: 21.033 },
+  10: { bonus: 0, correct: true, pts: 60, used: 24.173 },
+  11: { bonus: 0, correct: false, pts: 0, used: 21.317 },
+  12: { bonus: 0, correct: true, pts: 60, used: 22.161 },
+  13: { bonus: 31, correct: true, pts: 91, used: 4.372 },
+  14: { bonus: 31, correct: true, pts: 91, used: 4.491 },
+  15: { bonus: 0, correct: false, pts: 0, used: 12.681 },
+  16: { bonus: 0, correct: false, pts: 0, used: 14.953 },
+  17: { bonus: 4, correct: true, pts: 64, used: 17.774 },
+  18: { bonus: 0, correct: true, pts: 60, used: 21.34 },
+  19: { bonus: 0, correct: false, pts: 0, used: 60.16 },
+};
+async function restoreMassimoAnswers(){
   if (state.mode !== 'online' || !fb) return;
-  const affected = state.players.filter(p => Object.keys(p.res || {}).some(k => +k >= 20));
-  if (!affected.length){ openAlert('Nessun invitato ha ancora risposte della vecchia versione del quiz.'); return; }
-  for (const p of affected){
-    const newRes = {};
-    for (const [oldIdx, entry] of Object.entries(p.res || {})){
-      const newIdx = LEGACY_QUIZ_INDEX_MAP[oldIdx];
-      if (newIdx != null) newRes[newIdx] = entry;
-    }
-    const newScore = Object.values(newRes).reduce((s, r) => s + (r.pts || 0), 0);
-    await fb.setDoc(fb.doc(fb.db, 'players', p.id), { res: newRes, score: newScore }, { merge: true });
-  }
+  const matches = state.players.filter(p => (p.name || '').trim().toLowerCase() === 'massimo');
+  if (!matches.length){ openAlert('Non trovo nessun invitato di nome "Massimo".'); return; }
+  if (matches.length > 1){ openAlert('Ci sono più invitati di nome "Massimo", devo saperlo con certezza: dimmi quale (es. dalle ultime cifre del suo id nel pannello).'); return; }
+  const p = matches[0];
+  const score = Object.values(MASSIMO_RESTORED_RES).reduce((s, r) => s + (r.pts || 0), 0);
+  await fb.setDoc(fb.doc(fb.db, 'players', p.id), { res: MASSIMO_RESTORED_RES, score }, { merge: true });
   await refreshPlayersOnce();
-  openAlert(`Risposte sistemate per: ${affected.map(p => p.name || 'Senza nome').join(', ')}.`);
+  openAlert(`Fatto: 18 risposte rimesse a posto per ${p.name}, punteggio ${score}.`);
 }
 
 // impacchetta in uno zip tutte le foto missione di tutti gli invitati e lo
