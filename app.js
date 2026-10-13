@@ -73,45 +73,55 @@ const Wedshoots_IOS_URL = 'https://apps.apple.com/IT/app/id606939610?mt=8';
 // Scatta/Galleria (che restano comunque disponibili, se la foto la si vuole
 // fare lo stesso). Le altre, non segnate, restano com'erano: pensate per
 // una foto, e vanno completate con una foto.
-const MISSIONS = [
-  { t: 'Fai un selfie con lo sposo' },
-  { t: 'Fai un selfie con la sposa' },
-  { t: 'Fai un selfie con le testimoni' },
-  { t: 'Fai un selfie con un genitore degli sposi' },
-  { t: 'Fai un selfie di gruppo' },
-  { t: 'Fai un selfie con la persona a cui vuoi più bene' },
-  { t: 'Fai un selfie con tutto il tuo tavolo' },
-  { t: 'Fai un selfie con qualcuno vestito del tuo stesso colore' },
-  { t: 'Dai un abbraccio allo sposo', photo: false },
-  { t: 'Dai un abbraccio alla sposa', photo: false },
-  { t: 'Fai un brindisi con qualcuno che hai appena conosciuto', photo: false },
-  { t: 'Grida "Viva gli sposi!"', photo: false },
-  { t: 'Presentati a una persona che non conosci', photo: false },
-  { t: 'Scopri come conoscono gli sposi due persone che non avevi mai visto insieme', photo: false },
-  { t: 'Chiedi a qualcuno di raccontarti un aneddoto sugli sposi', photo: false },
-  { t: 'Scopri qual è il ricordo più vecchio che qualcuno ha con gli sposi', photo: false },
-  { t: 'Trova chi ha viaggiato da più lontano per essere qui', photo: false },
-  { t: 'Trova qualcuno con cui condividi un hobby', photo: false },
-  { t: 'Fai un brindisi dedicato agli sposi', photo: false },
-  { t: 'Proponi un brindisi al tuo tavolo', photo: false },
-  { t: 'Convince qualcuno che non sta ballando a venire in pista con te', photo: false },
-  { t: "Fai ballare qualcuno di un'altra generazione", photo: false },
-  { t: 'Insegna a qualcuno un passo di danza', photo: false },
-  { t: 'Improvvisa un trenino con almeno 5 persone', photo: false },
-  { t: 'Canta una canzone a squarciagola insieme a tutto il tuo tavolo', photo: false },
-  { t: 'Racconta agli sposi un ricordo che hai di loro', photo: false },
-  { t: 'Dì agli sposi una cosa che ammiri di loro come coppia', photo: false },
-  { t: 'Dai agli sposi un consiglio per i prossimi 50 anni insieme', photo: false },
-  { t: 'Chiedi allo sposo qual è la sua cosa preferita della sposa', photo: false },
-  { t: 'Chiedi alla sposa qual è la sua cosa preferita dello sposo', photo: false },
-  { t: 'Augura agli sposi qualcosa che non sia il classico “tanti auguri”', photo: false },  
+// Questo elenco e' solo il punto di partenza (e il ripiego se Firestore non
+// risponde): l'elenco vivo, modificabile dal pannello sposi, vive in
+// state.missionsList (vedi boot()/saveMissionsList()). Ogni missione ha un
+// id stabile, cosi' aggiungere/disattivare/modificare il testo di una non
+// scombina quelle gia' assegnate a qualcuno (che restano legate al loro id,
+// non a una posizione nell'elenco).
+const DEFAULT_MISSIONS = [
+  { id: 'm1', t: 'Fai un selfie con lo sposo' },
+  { id: 'm2', t: 'Fai un selfie con la sposa' },
+  { id: 'm3', t: 'Fai un selfie con le testimoni' },
+  { id: 'm4', t: 'Fai un selfie con un genitore degli sposi' },
+  { id: 'm5', t: 'Fai un selfie di gruppo' },
+  { id: 'm6', t: 'Fai un selfie con la persona a cui vuoi più bene' },
+  { id: 'm7', t: 'Fai un selfie con tutto il tuo tavolo' },
+  { id: 'm8', t: 'Fai un selfie con qualcuno vestito del tuo stesso colore' },
+  { id: 'm9', t: 'Dai un abbraccio allo sposo', photo: false },
+  { id: 'm10', t: 'Dai un abbraccio alla sposa', photo: false },
+  { id: 'm11', t: 'Fai un brindisi con qualcuno che hai appena conosciuto', photo: false },
+  { id: 'm12', t: 'Grida "Viva gli sposi!"', photo: false },
+  { id: 'm13', t: 'Presentati a una persona che non conosci', photo: false },
+  { id: 'm14', t: 'Scopri come conoscono gli sposi due persone che non avevi mai visto insieme', photo: false },
+  { id: 'm15', t: 'Chiedi a qualcuno di raccontarti un aneddoto sugli sposi', photo: false },
+  { id: 'm16', t: 'Scopri qual è il ricordo più vecchio che qualcuno ha con gli sposi', photo: false },
+  { id: 'm17', t: 'Trova chi ha viaggiato da più lontano per essere qui', photo: false },
+  { id: 'm18', t: 'Trova qualcuno con cui condividi un hobby', photo: false },
+  { id: 'm19', t: 'Fai un brindisi dedicato agli sposi', photo: false },
+  { id: 'm20', t: 'Proponi un brindisi al tuo tavolo', photo: false },
+  { id: 'm21', t: 'Convince qualcuno che non sta ballando a venire in pista con te', photo: false },
+  { id: 'm22', t: "Fai ballare qualcuno di un'altra generazione", photo: false },
+  { id: 'm23', t: 'Insegna a qualcuno un passo di danza', photo: false },
+  { id: 'm24', t: 'Improvvisa un trenino con almeno 5 persone', photo: false },
+  { id: 'm25', t: 'Canta una canzone a squarciagola insieme a tutto il tuo tavolo', photo: false },
+  { id: 'm26', t: 'Racconta agli sposi un ricordo che hai di loro', photo: false },
+  { id: 'm27', t: 'Dì agli sposi una cosa che ammiri di loro come coppia', photo: false },
+  { id: 'm28', t: 'Dai agli sposi un consiglio per i prossimi 50 anni insieme', photo: false },
+  { id: 'm29', t: 'Chiedi allo sposo qual è la sua cosa preferita della sposa', photo: false },
+  { id: 'm30', t: 'Chiedi alla sposa qual è la sua cosa preferita dello sposo', photo: false },
+  { id: 'm31', t: 'Augura agli sposi qualcosa che non sia il classico “tanti auguri”', photo: false },
 ];
 
 /* ============ Utilità ============ */
-// testo di una missione dato il suo indice, con un fallback per indici non
-// (piu') validi (es. una vecchia foto rimasta in missionPhotos dopo una
-// modifica manuale di MISSIONS).
-const missionText = i => (MISSIONS[i] && MISSIONS[i].t) || 'missione';
+// missione data il suo id, cercata nell'elenco vivo (state.missionsList):
+// contiene sia quelle attive sia quelle disattivate dal pannello sposi, cosi'
+// chi ha gia' una missione disattivata in corso la vede comunque per intero.
+const missionById = id => state.missionsList.find(m => m.id === id);
+// testo di una missione dato il suo id, con un fallback per id non (piu')
+// validi (es. una foto rimasta in missionPhotos dopo che l'admin ha tolto
+// quella missione dall'elenco).
+const missionText = id => (missionById(id) && missionById(id).t) || 'missione';
 const initialsOf = n => (n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('') || 'T').toUpperCase();
 // emoji al posto di una foto profilo vera: niente caricamenti, si sceglie da
 // una rosa fissa. Chi non ne sceglie una resta con le iniziali, come prima.
@@ -161,9 +171,12 @@ const state = {
   mode: 'local',
   guestId: null,
   heroPhoto: '',
-  missions: [], // [{ index, done }] — una per ogni missione presa (anche più di una)
-  missionPhotos: {}, // { [missionIndex]: dataURL } — solo le proprie, per mostrarle
+  missions: [], // [{ id, done }] — una per ogni missione presa (anche più di una)
+  missionPhotos: {}, // { [missionId]: {kind,src} } — solo le proprie, per mostrarle
   allMissionPhotos: [], // tutte le missioni di tutti, solo per il pannello sposi
+  missionsList: DEFAULT_MISSIONS, // elenco vivo delle missioni assegnabili: di
+  // base quello qui sopra, sovrascritto da Firestore (online) o localStorage
+  // (locale) se l'admin l'ha modificato — vedi boot()/saveMissionsList()
   adminUids: [], // uid di chi, oltre a chi conosce l'indirizzo #sposi, vede anche
                  // un tasto scorciatoia nel proprio profilo per il pannello sposi
   transferCode: '', // codice breve per ritrovare lo stesso profilo su un altro telefono
@@ -825,16 +838,17 @@ function renderMissione(){
 
   let body;
   if (inProgress){
-    // photo:false su MISSIONS = non necessariamente fotografica (es. un
+    // photo:false sulla missione = non necessariamente fotografica (es. un
     // brindisi, un abbraccio): solo per quelle compare anche "L'ho fatta,
     // senza foto", oltre a Scatta/Galleria che restano comunque disponibili
     // se la foto la si vuole fare lo stesso.
-    const optionalPhoto = MISSIONS[cur.index] && MISSIONS[cur.index].photo === false;
+    const curMission = missionById(cur.id);
+    const optionalPhoto = curMission && curMission.photo === false;
     body = `
     <div style="margin-top:auto;margin-bottom:auto;">
     <div class="card is-centered">
         <div class="kicker">La tua missione</div>
-      <h2 class="mission-text pretty">${esc(missionText(cur.index))}</h2>
+      <h2 class="mission-text pretty">${esc(missionText(cur.id))}</h2>
       <input id="mission-file-camera" type="file" accept="image/*" capture="environment" hidden>
       <input id="mission-file-gallery" type="file" accept="image/*" hidden>
       <div class="result-cta">
@@ -868,15 +882,15 @@ function renderMissione(){
 
   const missionGallery = [];
   const historyRows = done.slice().reverse().map(m => {
-    const entry = state.missionPhotos[m.index];
+    const entry = state.missionPhotos[m.id];
     let mediaHtml = '', rowAttr = '';
     if (entry && entry.src){
-      missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: missionText(m.index) });
+      missionGallery.push({ kind: entry.kind, src: entry.src, name: state.name, mission: missionText(m.id) });
       const idx = missionGallery.length - 1;
       mediaHtml = renderMissionMedia(entry, 'mission-history-thumb');
       rowAttr = ` data-action="open-lightbox" data-index="${idx}"`;
     }
-    return `<div class="mission-history-row"${rowAttr}>${mediaHtml}<span>${esc(missionText(m.index))}</span></div>`;
+    return `<div class="mission-history-row"${rowAttr}>${mediaHtml}<span>${esc(missionText(m.id))}</span></div>`;
   }).join('');
   state.lightboxGallery = missionGallery;
   const history = done.length ? `
@@ -1430,7 +1444,7 @@ function ensureAdminMissionsLoaded(){
   refreshAdminMissionsOnce();
 }
 
-const ADMIN_MODAL_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande' };
+const ADMIN_MODAL_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande', 'elenco-missioni': 'Elenco missioni' };
 
 // salva l'html completo di una lista per la modale a schermo intero (vedi
 // renderAdminModal()), aperta toccando il box con l'icona corrispondente
@@ -1496,7 +1510,7 @@ function renderAdmin(){
     .map(m => {
       let mediaHtml = '', rowAttr = '';
       if (m.src){
-        adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: missionText(m.missionIndex) });
+        adminMissionGallery.push({ kind: m.kind, src: m.src, name: m.name, mission: missionText(m.missionId) });
         const idx = adminMissionGallery.length - 1;
         mediaHtml = renderMissionMedia({ kind: m.kind, src: m.src }, 'mission-admin-thumb');
         rowAttr = ` data-action="open-lightbox" data-index="${idx}"`;
@@ -1505,14 +1519,42 @@ function renderAdmin(){
       ${mediaHtml}
       <div>
         <div class="tt">${esc(m.name || 'Senza nome')}</div>
-        <div class="kk">${esc(missionText(m.missionIndex))}</div>
+        <div class="kk">${esc(missionText(m.missionId))}</div>
       </div>
     </div>`;
     });
   state.lightboxGallery = adminMissionGallery;
+  const activeMissionsCount = state.missionsList.filter(m => m.active !== false).length;
+  const missionManageRows = state.missionsList.map(m => {
+    const isActive = m.active !== false;
+    return `<div class="admin-card-row${isActive ? '' : ' is-inactive'}">
+      <div class="admin-card-content">
+        <input class="mission-edit-input" data-id="${esc(m.id)}" type="text" value="${esc(m.t)}" maxlength="140">
+      </div>
+      ${m.photo === false ? '<div class="kk">Non richiede una foto</div>' : ''}
+      <div class="admin-card-row-actions">
+        <button class="reset-btn" data-action="save-mission-text" data-id="${esc(m.id)}">Salva testo</button>
+        <button class="reset-btn" data-action="toggle-mission-active" data-id="${esc(m.id)}">${isActive ? 'Disattiva' : 'Riattiva'}</button>
+      </div>
+    </div>`;
+  });
+  const missionAddRow = `<div class="admin-card-row">
+    <div class="admin-card-content">
+      <input id="new-mission-text" class="mission-edit-input" type="text" placeholder="Nuova missione…" maxlength="140">
+    </div>
+    <label class="mission-nophoto-label"><input id="new-mission-nophoto" type="checkbox"> Non richiede una foto</label>
+    <div class="admin-card-row-actions">
+      <button class="reset-btn" data-action="add-mission">Aggiungi</button>
+    </div>
+  </div>`;
   storeAdminList('invitati', playerRows, 'Nessuno ha ancora giocato.');
   storeAdminList('missioni', missionRows, 'Nessuna missione completata ancora.');
   storeAdminList('domande', questionRows, 'Nessuna domanda.');
+  storeAdminList('elenco-missioni', [
+    `<p class="fine-print">Le missioni disattivate non vengono più proposte a chi non le ha ancora avute, ma restano visibili a chi le ha già in corso.</p>`,
+    missionAddRow,
+    ...missionManageRows,
+  ], 'Nessuna missione.');
   return `<div class="screen screen-admin">
   <div class="topbar">  
   ${avatarButton()}
@@ -1563,6 +1605,11 @@ function renderAdmin(){
         <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M7.92 7.54c-.8-.34-1.14-1.33-.66-2.05C8.23 4.05 9.85 3 11.99 3c2.35 0 3.96 1.07 4.78 2.41c.7 1.15 1.11 3.3.03 4.9c-1.2 1.77-2.35 2.31-2.97 3.45c-.15.27-.24.49-.3.94c-.09.73-.69 1.3-1.43 1.3c-.87 0-1.58-.75-1.48-1.62c.06-.51.18-1.04.46-1.54c.77-1.39 2.25-2.21 3.11-3.44c.91-1.29.4-3.7-2.18-3.7c-1.17 0-1.93.61-2.4 1.34c-.35.57-1.08.75-1.69.5M14 20c0 1.1-.9 2-2 2s-2-.9-2-2s.9-2 2-2s2 .9 2 2"></path></svg></span>
         <span class="admin-link-count tabular">${totalCards}</span>
         <span class="admin-link-label">Domande</span>
+      </button>
+      <button class="admin-link-box" data-action="open-admin-modal" data-target="elenco-missioni">
+        <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68"></path></svg></span>
+        <span class="admin-link-count tabular">${activeMissionsCount}</span>
+        <span class="admin-link-label">Elenco missioni</span>
       </button>
     </div>
   </div>`;
@@ -1716,6 +1763,21 @@ root.addEventListener('click', e => {
     }
     case 'add-admin': addAdmin(el.dataset.id); break;
     case 'remove-admin': removeAdmin(el.dataset.id); break;
+    case 'add-mission': {
+      const input = document.getElementById('new-mission-text');
+      const text = (input && input.value.trim()) || '';
+      if (!text){ input?.focus(); break; }
+      const noPhoto = document.getElementById('new-mission-nophoto')?.checked;
+      addMission(text, noPhoto);
+      break;
+    }
+    case 'save-mission-text': {
+      const input = document.querySelector(`.mission-edit-input[data-id="${CSS.escape(el.dataset.id)}"]`);
+      const text = (input && input.value.trim()) || '';
+      if (text) editMissionText(el.dataset.id, text);
+      break;
+    }
+    case 'toggle-mission-active': toggleMissionActive(el.dataset.id); break;
     case 'delete-player': {
       openConfirm('Eliminare questo invitato? Sparisce dalla classifica e dal gioco, non si può annullare.', () => deletePlayer(el.dataset.id));
       break;
@@ -1836,20 +1898,20 @@ async function removeHeroPhoto(){
 // altro (via state.players) o già fatte/in corso per se stessi. In locale
 // (senza Firebase) non c'e' nessun altro con cui confrontarsi, quindi conta
 // solo la propria lista.
-function takenMissionIndexes(){
+function takenMissionIds(){
   const taken = new Set();
   for (const p of state.players){
     if (p.id === state.guestId) continue;
-    (p.missions || []).forEach(m => taken.add(m.index));
+    (p.missions || []).forEach(m => taken.add(m.id));
   }
-  state.missions.forEach(m => taken.add(m.index));
+  state.missions.forEach(m => taken.add(m.id));
   return taken;
 }
 
 // prende una nuova missione (la prima, o un'altra dopo aver completato/
-// saltato quella precedente). excludeIndex serve solo per lo "skip": evita
+// saltato quella precedente). excludeId serve solo per lo "skip": evita
 // di riproporre subito la stessa appena rifiutata.
-async function assignMission(excludeIndex){
+async function assignMission(excludeId){
   const cur = state.missions[state.missions.length - 1];
   if (cur && !cur.done) return; // ce n'e' gia' una in corso
   // prima del reveal state.players non e' tenuto aggiornato in tempo reale
@@ -1860,15 +1922,20 @@ async function assignMission(excludeIndex){
   // un eventuale doppione occasionale (già tollerato più sotto) è meglio di
   // un tasto che sembra non fare niente.
   await refreshPlayersOnce();
-  const taken = takenMissionIndexes();
-  if (excludeIndex != null) taken.add(excludeIndex);
-  const free = MISSIONS.map((_, i) => i).filter(i => !taken.has(i));
+  const taken = takenMissionIds();
+  if (excludeId != null) taken.add(excludeId);
+  // solo le missioni attive (vedi toggleMissionActive()): se l'admin le ha
+  // disattivate tutte, si riparte da qualunque missione dell'elenco pur di
+  // non restare senza nulla da assegnare.
+  const active = state.missionsList.filter(m => m.active !== false);
+  const source = active.length ? active : state.missionsList;
+  const free = source.map(m => m.id).filter(id => !taken.has(id));
   // se sono finite quelle libere (piu' invitati/missioni fatte che voci in
   // lista), si riparte da qualunque missione: da qui in poi qualche
   // doppione e' inevitabile.
-  const pool = free.length ? free : MISSIONS.map((_, i) => i);
-  const index = pool[Math.floor(Math.random() * pool.length)];
-  state.missions = [...state.missions, { index, done: false }];
+  const pool = free.length ? free : source.map(m => m.id);
+  const id = pool[Math.floor(Math.random() * pool.length)];
+  state.missions = [...state.missions, { id, done: false }];
   // mostra subito la missione (persistProgress() ormai non lancia mai, ma
   // può comunque metterci qualche secondo con una rete lenta): stesso
   // schema già usato in completeMission(), non si aspetta il salvataggio
@@ -1881,7 +1948,7 @@ async function skipMission(){
   const cur = state.missions[state.missions.length - 1];
   if (!cur || cur.done) return;
   state.missions = state.missions.slice(0, -1);
-  await assignMission(cur.index);
+  await assignMission(cur.id);
 }
 
 // file e' facoltativo: una missione si puo' segnare fatta anche senza foto
@@ -1905,15 +1972,15 @@ async function completeMission(file){
     kind = 'photo'; src = dataUrl;
   }
   cur.done = true;
-  state.missionPhotos = { ...state.missionPhotos, [cur.index]: { kind, src } };
+  state.missionPhotos = { ...state.missionPhotos, [cur.id]: { kind, src } };
   render();
   if (state.mode === 'online' && fb){
     await fb.setDoc(fb.doc(fb.db, 'players', state.guestId), { missions: state.missions }, { merge: true });
     // foto in una collezione separata (non nel documento players): con più
     // missioni completate si supererebbe presto il limite di 1MB per
     // documento di Firestore se stessero tutte insieme a punteggio/risposte.
-    await fb.setDoc(fb.doc(fb.db, 'missionPhotos', state.guestId + '_' + cur.index), {
-      guestId: state.guestId, name: state.name, missionIndex: cur.index,
+    await fb.setDoc(fb.doc(fb.db, 'missionPhotos', state.guestId + '_' + cur.id), {
+      guestId: state.guestId, name: state.name, missionId: cur.id,
       kind, src, createdAt: fb.serverTimestamp(),
     });
   } else {
@@ -1978,7 +2045,7 @@ async function downloadAllMissionPhotos(){
     const usedNames = new Set();
     photos.forEach(m => {
       const guest = (m.name || 'Senza nome').replace(/[\\/:*?"<>|]/g, '').trim() || 'Senza nome';
-      const mission = missionText(m.missionIndex).slice(0, 50).replace(/[\\/:*?"<>|]/g, '').trim();
+      const mission = missionText(m.missionId).slice(0, 50).replace(/[\\/:*?"<>|]/g, '').trim();
       const base = `${guest} - ${mission}`.trim();
       let filename = `${base}.jpg`, n = 2;
       while (usedNames.has(filename)){ filename = `${base} (${n}).jpg`; n++; }
@@ -2020,6 +2087,40 @@ async function removeAdmin(uid){
     localStorage.setItem('msquiz_admins', JSON.stringify(state.adminUids));
   }
   render();
+}
+
+/* ============ Gestione missioni (pannello sposi) ============ */
+// salva l'intero elenco (stesso schema di addAdmin/removeAdmin sopra): mai
+// una cancellazione vera, solo disattivazioni (vedi toggleMissionActive()),
+// cosi' chi ha gia' una missione in corso la ritrova sempre per intero anche
+// se nel frattempo e' stata tolta dall'elenco di quelle assegnabili.
+async function saveMissionsList(list){
+  state.missionsList = list;
+  try {
+    if (state.mode === 'online' && fb){
+      await fb.setDoc(fb.doc(fb.db, 'meta', 'state'), { missions: list }, { merge: true });
+    } else {
+      localStorage.setItem('msquiz_missions_list', JSON.stringify(list));
+    }
+  } catch (err) {
+    console.error('Non sono riuscito a salvare le missioni.', err);
+  }
+  render();
+}
+function toggleMissionActive(id){
+  saveMissionsList(state.missionsList.map(m => m.id === id ? { ...m, active: m.active === false ? true : false } : m));
+}
+function addMission(text, noPhoto){
+  const t = (text || '').trim();
+  if (!t) return;
+  const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const entry = noPhoto ? { id, t, photo: false } : { id, t };
+  saveMissionsList([...state.missionsList, entry]);
+}
+function editMissionText(id, text){
+  const t = (text || '').trim();
+  if (!t) return;
+  saveMissionsList(state.missionsList.map(m => m.id === id ? { ...m, t } : m));
 }
 
 /* ============ Avvio ============ */
@@ -2064,7 +2165,7 @@ async function boot(){
             // un inutile spreco di dati sul telefono di ciascuno.
             fb.onSnapshot(fb.query(fb.collection(fb.db, 'missionPhotos'), fb.where('guestId', '==', state.guestId)), qs => {
               const map = {};
-              qs.docs.forEach(doc => { const d = doc.data(); map[d.missionIndex] = normalizeMissionMedia(d); });
+              qs.docs.forEach(doc => { const d = doc.data(); map[d.missionId] = normalizeMissionMedia(d); });
               state.missionPhotos = map;
               render();
             });
@@ -2073,6 +2174,10 @@ async function boot(){
               state.revealed = !!d.revealed;
               state.heroPhoto = d.heroPhoto || '';
               state.adminUids = d.admins || [];
+              // l'elenco missioni lo modifica solo il pannello sposi (vedi
+              // saveMissionsList()): finche' nessuno l'ha mai toccato il
+              // documento non ha questo campo, si resta sul punto di partenza.
+              state.missionsList = (Array.isArray(d.missions) && d.missions.length) ? d.missions : DEFAULT_MISSIONS;
               // da qui in poi tutti vedono la classifica: un'istantanea basta,
               // il punteggio di nessuno cambiera' piu' (ensurePlayersLoaded()
               // parte una volta sola, richiamate successive non fanno nulla).
@@ -2121,6 +2226,10 @@ async function boot(){
       if (typeof state.missionPhotos[k] === 'string') state.missionPhotos[k] = { kind: 'photo', src: state.missionPhotos[k] };
     });
     try { state.adminUids = JSON.parse(localStorage.getItem('msquiz_admins') || '[]'); } catch { state.adminUids = []; }
+    try {
+      const savedMissions = JSON.parse(localStorage.getItem('msquiz_missions_list') || 'null');
+      if (Array.isArray(savedMissions) && savedMissions.length) state.missionsList = savedMissions;
+    } catch {}
     if (ensureOrder() && state.name) saveLocalProfile();
   }
   if (location.hash === '#sposi') state.screen = 'admin';
