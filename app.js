@@ -185,8 +185,11 @@ const state = {
   medalCat: null, // indice in CATS della medaglia appena vinta, per renderMedal()
   lightbox: null, // posizione aperta dentro lightboxGallery, o null se chiusa
   lightboxGallery: [], // [{ kind, src, name, mission }] della lista mostrata sullo schermo corrente
-  adminModal: null, // 'invitati' | 'missioni' | 'domande' | null: quale lista e' aperta a tutto schermo nel pannello sposi
-  adminModalContent: {}, // { invitati, missioni, domande }: html completo di ogni lista, ricalcolato a ogni renderAdmin()
+  adminPage: null, // 'invitati' | 'missioni' | 'domande' | 'elenco-missioni' | null:
+  // quale pagina del pannello sposi e' aperta (vedi renderAdminPage()); una
+  // vera schermata con la sua voce di history, non un overlay — si apre/
+  // chiude con la stessa navigazione a frecce usata ovunque nell'app.
+  adminPageContent: {}, // { invitati, missioni, domande, 'elenco-missioni' }: html di ogni lista, ricalcolato a ogni renderAdmin()
   medalModal: null, // indice in CATS, o null: quale medaglia e' aperta a tutto schermo nel profilo (vedi renderMedalModal())
   dialog: null, // { kind: 'alert'|'confirm', message, onConfirm? } al posto di alert()/confirm() nativi, vedi openAlert()/openConfirm()
   copiedFlash: null, // 'album' | 'transfer' | null: quale bottone "Copia" mostra "Copiato!" al momento, vedi flashCopied()
@@ -464,10 +467,10 @@ function pick(idx){
 // #sposi userebbe history.back() per uscire dall'app invece che dal pannello).
 let hasAppHistory = false;
 function pushScreen(screen){
-  try { history.pushState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); hasAppHistory = true; } catch {}
+  try { history.pushState({ screen, adminPage: state.adminPage }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); hasAppHistory = true; } catch {}
 }
 function replaceScreen(screen){
-  try { history.replaceState({ screen }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
+  try { history.replaceState({ screen, adminPage: state.adminPage }, '', '#' + (screen === 'admin' ? 'sposi' : screen)); } catch {}
 }
 function go(screen){
   state.screen = screen;
@@ -663,7 +666,7 @@ function render(){
     console.error('Errore nel render, torno all\'hub.', err);
     try {
       state.screen = state.name ? 'hub' : 'join';
-      state.dialog = null; state.lightbox = null; state.adminModal = null;
+      state.dialog = null; state.lightbox = null; state.adminPage = null;
       state.medalModal = null; state.profileEditOpen = false;
       renderScreen();
     } catch (err2) {
@@ -692,11 +695,12 @@ function renderScreen(){
     case 'profile': html = renderProfile(); break;
     case 'finale': html = renderFinale(); break;
     case 'admin': html = renderAdmin(); break;
+    case 'admin-page': html = renderAdminPage(); break;
     default: html = renderHub();
   }
   const screenChanged = state.screen !== lastScreen;
   lastScreen = state.screen;
-  root.innerHTML = html + (state.adminModal ? renderAdminModal() : '') + (state.medalModal != null ? renderMedalModal() : '') + (state.profileEditOpen ? renderProfileEditModal() : '') + (state.lightbox != null ? renderLightbox() : '') + (state.dialog ? renderDialog() : '');
+  root.innerHTML = html + (state.medalModal != null ? renderMedalModal() : '') + (state.profileEditOpen ? renderProfileEditModal() : '') + (state.lightbox != null ? renderLightbox() : '') + (state.dialog ? renderDialog() : '');
   if (screenChanged) resetScroll();
 }
 
@@ -1445,13 +1449,13 @@ function ensureAdminMissionsLoaded(){
   refreshAdminMissionsOnce();
 }
 
-const ADMIN_MODAL_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande', 'elenco-missioni': 'Elenco missioni' };
+const ADMIN_PAGE_TITLES = { invitati: 'Tutti gli invitati', missioni: 'Tutte le missioni completate', domande: 'Tutte le domande', 'elenco-missioni': 'Elenco missioni' };
 
-// salva l'html completo di una lista per la modale a schermo intero (vedi
-// renderAdminModal()), aperta toccando il box con l'icona corrispondente
+// salva l'html completo di una lista per la sua pagina a schermo intero
+// (vedi renderAdminPage()), aperta toccando il box con l'icona corrispondente
 // invece di allungare la pagina con l'anteprima delle righe.
 function storeAdminList(key, rowsArr, emptyLabel){
-  state.adminModalContent[key] = rowsArr.join('') || `<p class="fine-print">${emptyLabel}</p>`;
+  state.adminPageContent[key] = rowsArr.join('') || `<p class="fine-print">${emptyLabel}</p>`;
 }
 
 function renderAdmin(){
@@ -1590,17 +1594,17 @@ function renderAdmin(){
       <button class="reset-btn" data-action="admin-hero-pick">Carica</button>
     </div>`}
     <div class="admin-link-grid">
-      ${state.mode === 'online' ? `<button class="admin-link-box" data-action="open-admin-modal" data-target="invitati">
+      ${state.mode === 'online' ? `<button class="admin-link-box" data-action="go-admin-page" data-target="invitati">
         <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M234.38 210a123.36 123.36 0 0 0-60.78-53.23a76 76 0 1 0-91.2 0A123.36 123.36 0 0 0 21.62 210a12 12 0 1 0 20.77 12c18.12-31.32 50.12-50 85.61-50s67.49 18.69 85.61 50a12 12 0 0 0 20.77-12M76 96a52 52 0 1 1 52 52a52.06 52.06 0 0 1-52-52"></path></svg></span>
         <span class="admin-link-count tabular">${totalPlayers}</span>
         <span class="admin-link-label">Invitati</span>
       </button>` : ''}
-      ${state.mode === 'online' ? `<button class="admin-link-box" data-action="open-admin-modal" data-target="missioni">
+      ${state.mode === 'online' ? `<button class="admin-link-box" data-action="go-admin-page" data-target="missioni">
         <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ph" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 256"><path fill="currentColor" d="M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68"></path></svg></span>
         <span class="admin-link-count tabular">${missionRows.length}</span>
         <span class="admin-link-label">Missioni</span>
       </button>` : ''}
-      <button class="admin-link-box" data-action="open-admin-modal" data-target="domande">
+      <button class="admin-link-box" data-action="go-admin-page" data-target="domande">
         <span class="admin-link-icon"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M7.92 7.54c-.8-.34-1.14-1.33-.66-2.05C8.23 4.05 9.85 3 11.99 3c2.35 0 3.96 1.07 4.78 2.41c.7 1.15 1.11 3.3.03 4.9c-1.2 1.77-2.35 2.31-2.97 3.45c-.15.27-.24.49-.3.94c-.09.73-.69 1.3-1.43 1.3c-.87 0-1.58-.75-1.48-1.62c.06-.51.18-1.04.46-1.54c.77-1.39 2.25-2.21 3.11-3.44c.91-1.29.4-3.7-2.18-3.7c-1.17 0-1.93.61-2.4 1.34c-.35.57-1.08.75-1.69.5M14 20c0 1.1-.9 2-2 2s-2-.9-2-2s.9-2 2-2s2 .9 2 2"></path></svg></span>
         <span class="admin-link-count tabular">${totalCards}</span>
         <span class="admin-link-label">Domande</span>
@@ -1609,25 +1613,27 @@ function renderAdmin(){
   </div>`;
 }
 
-// lista completa (invitati/missioni/domande) a schermo intero: si apre dal
-// bottone "Mostra tutti" di renderAdmin(), che ha gia' salvato l'html di ogni
-// riga in state.adminModalContent cosi' anteprima e modale restano identiche.
-function renderAdminModal(){
-  const key = state.adminModal;
-  if (!key) return '';
+// lista completa (invitati/missioni/domande/elenco missioni), ciascuna la
+// sua pagina vera (freccia indietro in alto a sinistra, stessa navigazione a
+// cronologia di tutte le altre schermate): si apre dal box con l'icona
+// corrispondente in renderAdmin(), che ha gia' salvato l'html di ogni riga
+// in state.adminPageContent cosi' anteprima e pagina restano identiche.
+function renderAdminPage(){
+  const key = state.adminPage;
+  if (!key) return renderAdmin();
   const missionPhotoCount = state.allMissionPhotos.filter(m => m.src).length;
-  return `<div class="admin-modal" data-action="close-admin-modal">
-    <div class="admin-modal-sheet" data-action="lightbox-noop">
-      <div class="admin-modal-head">
-        <div class="section-title">${esc(ADMIN_MODAL_TITLES[key] || '')}</div>
-        <button class="admin-modal-close" data-action="close-admin-modal">✕</button>
-      </div>
-      ${key === 'missioni' ? `<div class="button-alone"><button class="btn-text" data-action="switch-admin-modal" data-target="elenco-missioni">Modifica missioni</button></div>` : ''}
-      ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
-      ` : ''}
-      <div class="admin-modal-body">${state.adminModalContent[key] || ''}</div>
-      ${key === 'missioni' ? `<div class="button-alone margin-top-medium"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>` : ''}
+  return `<div class="screen screen-admin">
+    <div class="topbar">
+      <button class="back-fab" data-action="nav-back"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--ic" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20z"></path></svg></button>
+      ${avatarButton()}
     </div>
+    <div class="kicker">Pannello sposi</div>
+    <h2 class="admin-title">${esc(ADMIN_PAGE_TITLES[key] || '')}</h2>
+    ${key === 'missioni' ? `<div class="button-alone"><button class="btn-text" data-action="go-admin-page" data-target="elenco-missioni">Modifica missioni</button></div>` : ''}
+    ${key === 'missioni' && missionPhotoCount ? `<div class="button-alone"><button class="btn-text" data-action="download-mission-photos" ${state.downloadingPhotos ? 'disabled' : ''}>${state.downloadingPhotos ? 'Preparazione dello zip…' : `Scarica tutte le foto (${missionPhotoCount})`}</button></div>
+    ` : ''}
+    <div class="admin-page-body">${state.adminPageContent[key] || ''}</div>
+    ${key === 'missioni' ? `<div class="button-alone margin-top-medium"><button class="btn-text" data-action="reset-all-missions">Svuota tutte le missioni</button></div>` : ''}
   </div>`;
 }
 
@@ -1748,12 +1754,10 @@ root.addEventListener('click', e => {
     case 'close-board': closeReveal(); break;
     case 'peek-categories': state.peekCategories = !state.peekCategories; render(); break;
     case 'board-tab': state.boardTab = el.dataset.tab; render(); break;
-    case 'open-admin-modal': saveScroll(); pushOverlayHistory(); state.adminModal = el.dataset.target; render(); resetScroll(); break;
-    // cambia solo il contenuto di una modale già aperta (es. da "Missioni" a
-    // "Modifica missioni"): niente nuova voce di history, altrimenti un solo
-    // "indietro" non basterebbe più a chiudere davvero la modale.
-    case 'switch-admin-modal': state.adminModal = el.dataset.target; render(); resetScroll(); break;
-    case 'close-admin-modal': state.adminModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
+    // pagina vera (non più un overlay): ogni apertura, anche da dentro
+    // un'altra pagina admin (es. "Missioni" -> "Modifica missioni"), è una
+    // normale voce di history — la freccia indietro la richiude da sola.
+    case 'go-admin-page': state.adminPage = el.dataset.target; go('admin-page'); resetScroll(); break;
     case 'open-medal-modal': saveScroll(); pushOverlayHistory(); state.medalModal = +el.dataset.cat; render(); resetScroll(); break;
     case 'close-medal-modal': state.medalModal = null; render(); restoreScroll(); closeOverlayHistory(); break;
     case 'reset-player-answers': {
@@ -2256,10 +2260,10 @@ window.addEventListener('popstate', e => {
   if (suppressNextPopstate){ suppressNextPopstate = false; return; }
   if (state.dialog){ state.dialog = null; overlayHistoryDepth--; render(); return; }
   if (state.lightbox != null){ state.lightbox = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
-  if (state.adminModal){ state.adminModal = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
   if (state.medalModal != null){ state.medalModal = null; overlayHistoryDepth--; restoreScroll(); render(); return; }
   if (state.profileEditOpen){ state.profileEditOpen = false; overlayHistoryDepth--; restoreScroll(); render(); return; }
   state.screen = (e.state && e.state.screen) || (state.name ? 'hub' : 'join');
+  state.adminPage = (e.state && e.state.adminPage) || null;
   render();
 });
 
