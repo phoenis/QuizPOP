@@ -46,6 +46,22 @@ function catState(res, c){
   return { done, right, n, earned: done === n };
 }
 const TEAMS = ['Calanchi','Etna','Étretat','Le Mont-Saint-Michel','Machu Picchu','Palcoyo','Parco della Majella','Tirino','Tuckett','XII Apostoli'];
+
+// risposte date quando il quiz aveva ancora 25 domande (prima categoria da
+// 10 invece di 5): quella riduzione ha spostato la posizione di tutte le
+// domande dalla seconda categoria in poi, quindi le risposte salvate con il
+// vecchio indice (la chiave di res) ora risultano agganciate alla domanda
+// sbagliata se lasciate ferme. Questa mappa dice, per ogni vecchio indice,
+// a quale nuovo indice spostare quella stessa risposta — null se la domanda
+// non esiste più (vedi fixLegacyQuizAnswers()). Chi ha giocato solo con le
+// 20 domande attuali non viene mai toccato: si riconosce chi ha ancora
+// risposte vecchie dal fatto che res contiene un indice 20 o più, impossibile
+// da qui in poi visto che le domande sono 20 (indici 0-19).
+const LEGACY_QUIZ_INDEX_MAP = {
+  0: null, 1: null, 2: 0, 3: 2, 4: null, 5: null, 6: null, 7: 3, 8: null, 9: null,
+  10: 5, 11: 6, 12: 7, 13: 8, 14: 9, 15: 10, 16: 11, 17: 12, 18: 13, 19: 14,
+  20: 15, 21: 16, 22: 17, 23: 18, 24: 19,
+};
 const RIVALS_DEMO = [
   {id:'demo-1', name:'Zia Franca', score:1042, res:demoRes(15,3.1), team:1, avatarEmoji:'🌻'},
   {id:'demo-2', name:'Testimone Andrea', score:918, res:demoRes(14,4.4), team:2, avatarEmoji:'🦄'},
@@ -1567,6 +1583,7 @@ function renderAdmin(){
       <div class="stat-cell"><div class="v serif tabular">${pct}%</div><div class="c">Completate</div></div>
     </div>
     ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="refresh-admin-data">Aggiorna i dati</button></div>` : ''}
+    ${state.mode === 'online' ? `<div class="button-alone"><button class="btn-text" data-action="fix-legacy-answers">Sistema risposte vecchio quiz (25 domande)</button></div>` : ''}
     <div class="envelope-box">
       <div class="row">
         <div><div class="micro">Il quiz</div><div class="big serif">${state.revealed ? 'Chiuso' : 'Aperto'}</div></div>
@@ -1811,6 +1828,10 @@ root.addEventListener('click', e => {
     }
     case 'download-mission-photos': downloadAllMissionPhotos(); break;
     case 'refresh-admin-data': refreshPlayersOnce(); refreshAdminMissionsOnce(); break;
+    case 'fix-legacy-answers': {
+      openConfirm('Sistemare le risposte di chi ha ancora giocato con le 25 domande? Sposta ogni risposta sulla domanda giusta, toglie quelle per domande non più in elenco.', fixLegacyQuizAnswers);
+      break;
+    }
     case 'reset-all-missions': {
       openConfirm('Svuotare tutte le missioni fatte? Cancella le foto caricate da ogni invitato e li fa ripartire da capo con una nuova missione. Non si può annullare.', () => resetAllMissions());
       break;
@@ -2029,6 +2050,30 @@ async function deletePlayer(playerId){
   // stesso motivo di resetPlayerAnswers(): senza questo l'invitato eliminato
   // resterebbe visibile nel pannello finche' non si tocca "Aggiorna" a mano.
   await refreshPlayersOnce();
+}
+
+// ===== correzione una tantum per chi ha giocato col vecchio quiz da 25
+// domande (vedi LEGACY_QUIZ_INDEX_MAP più sopra) — pensata per un solo
+// invitato (Massimo), da togliere di nuovo dal pannello appena confermato
+// che ha funzionato: individua da solo chi ha ancora risposte vecchie (un
+// indice 20 o più in res, impossibile ora che le domande sono 20) e sposta
+// ciascuna risposta sulla nuova posizione della stessa domanda, scartando
+// quelle per domande non più in elenco.
+async function fixLegacyQuizAnswers(){
+  if (state.mode !== 'online' || !fb) return;
+  const affected = state.players.filter(p => Object.keys(p.res || {}).some(k => +k >= 20));
+  if (!affected.length){ openAlert('Nessun invitato ha ancora risposte della vecchia versione del quiz.'); return; }
+  for (const p of affected){
+    const newRes = {};
+    for (const [oldIdx, entry] of Object.entries(p.res || {})){
+      const newIdx = LEGACY_QUIZ_INDEX_MAP[oldIdx];
+      if (newIdx != null) newRes[newIdx] = entry;
+    }
+    const newScore = Object.values(newRes).reduce((s, r) => s + (r.pts || 0), 0);
+    await fb.setDoc(fb.doc(fb.db, 'players', p.id), { res: newRes, score: newScore }, { merge: true });
+  }
+  await refreshPlayersOnce();
+  openAlert(`Risposte sistemate per: ${affected.map(p => p.name || 'Senza nome').join(', ')}.`);
 }
 
 // impacchetta in uno zip tutte le foto missione di tutti gli invitati e lo
